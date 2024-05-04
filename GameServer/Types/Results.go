@@ -7,3 +7,6 @@ type Results struct {
 	LoserScore  int
 	Draw        bool
 }
+
+type ResultLogic interface {
+}

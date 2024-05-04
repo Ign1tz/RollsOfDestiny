@@ -1,7 +1,6 @@
-package Components
+package Types
 
 import (
-	"RollsOfDestiny/Components/Types"
 	"fmt"
 	"strconv"
 )
@@ -26,8 +25,8 @@ func (p *Playfield) Clear() {
 	p.GuestGrid.Clear()
 }
 
-func (p Playfield) Results() Types.Results {
-	results := Types.Results{}
+func (p Playfield) Results() Results {
+	results := Results{}
 	if p.HostGrid.Value() > p.GuestGrid.Value() {
 		results.Winner = p.Host
 		results.Loser = p.Guest
@@ -43,7 +42,7 @@ func (p Playfield) Results() Types.Results {
 	results.LoserScore = min(p.HostGrid.Value(), p.GuestGrid.Value())
 	return results
 }
-func (p *Playfield) PrettyPrint() {
+func (p Playfield) PrettyPrint() {
 	fmt.Println(p.Guest)
 	fmt.Println("+-+-+-+")
 	fmt.Println("|" + strconv.Itoa(p.GuestGrid.Left.Third) + "|" + strconv.Itoa(p.GuestGrid.Middle.Third) + "|" + strconv.Itoa(p.GuestGrid.Right.Third) + "|")

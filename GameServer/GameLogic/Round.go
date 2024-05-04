@@ -1,7 +1,7 @@
 package GameLogic
 
 import (
-	"RollsOfDestiny/Components"
+	Types2 "RollsOfDestiny/GameServer/Types"
 	"bufio"
 	"fmt"
 	"os"
@@ -11,10 +11,10 @@ import (
 
 func GameLoop() {
 	reader := bufio.NewReader(os.Stdin)
-	playfield := Components.Playfield{Host: "Moritz", Guest: "Tester", HostGrid: Components.Grid{},
-		GuestGrid: Components.Grid{}, GameID: "12345", ActivePlayer: "Moritz"}
+	playfield := Types2.Playfield{Host: "Moritz", Guest: "Tester", HostGrid: Types2.Grid{},
+		GuestGrid: Types2.Grid{}, GameID: "12345", ActivePlayer: "Moritz"}
 	for !playfield.HostGrid.IsFull() && !playfield.GuestGrid.IsFull() {
-		die := Die{[]int{1, 2, 3, 4, 5, 6}}
+		die := Types2.Die{[]int{1, 2, 3, 4, 5, 6}}
 		roll := die.Throw()
 		fmt.Println(playfield.ActivePlayer + " rolled a " + strconv.Itoa(roll))
 		fmt.Println("Pick a column")
@@ -38,7 +38,7 @@ func GameLoop() {
 	fmt.Println("With " + strconv.Itoa(result.WinnerScore) + " against " + strconv.Itoa(result.LoserScore))
 }
 
-func pickColumn(col string, grid *Components.Grid, enemyGrid *Components.Grid, roll int) {
+func pickColumn(col string, grid *Types2.Grid, enemyGrid *Types2.Grid, roll int) {
 	if col == "1" {
 		grid.Left.Add(roll)
 		enemyGrid.Left.Remove(roll)

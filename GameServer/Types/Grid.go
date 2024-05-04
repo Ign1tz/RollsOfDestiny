@@ -1,4 +1,4 @@
-package Components
+package Types
 
 type Grid struct {
 	Left   Column
@@ -21,6 +21,7 @@ func (g *Grid) Clear() {
 func (g Grid) Value() int {
 	return g.Left.Value() + g.Middle.Value() + g.Right.Value()
 }
+
 func (g Grid) IsFull() bool {
 	return g.Left.IsFull && g.Middle.IsFull && g.Right.IsFull
 }
