@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func GameLoop() {
@@ -18,16 +17,13 @@ func GameLoop() {
 		roll := die.Throw()
 		fmt.Println(playfield.ActivePlayer + " rolled a " + strconv.Itoa(roll))
 		fmt.Println("Pick a column")
+		playfield.PrettyPrint()
+		col, _ := reader.ReadString('\n')
+		col = string(col[0])
 		if playfield.ActivePlayer == playfield.Host {
-			playfield.PrettyPrint()
-			col, _ := reader.ReadString('\n')
-			col = strings.Replace(col, "\r\n", "", -1)
 			pickColumn(col, &playfield.HostGrid, &playfield.GuestGrid, roll)
 			playfield.ActivePlayer = playfield.Guest
 		} else {
-			playfield.PrettyPrint()
-			col, _ := reader.ReadString('\n')
-			col = strings.Replace(col, "\r\n", "", -1)
 			pickColumn(col, &playfield.GuestGrid, &playfield.HostGrid, roll)
 			playfield.ActivePlayer = playfield.Host
 		}

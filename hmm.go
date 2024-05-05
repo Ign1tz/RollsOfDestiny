@@ -1,8 +1,7 @@
 package main
 
-import "RollsOfDestiny/GameServer/GameLogic"
-
 func main() {
-	GameLogic.GameLoop()
+	//GameLogic.GameLoop()
 	//Database.Database()
+	a()
 }
