@@ -1,23 +1,21 @@
 import React from 'react';
 import './App.css';
+import Home from "./pages/Home";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
+import Profile from "./pages/Profile";
+import {profile} from "./types/profileTypes";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    let p: profile = {username: "Bernd", biography: "H", picture:" H", rating:839}
+    return (
+    <>
+        <BrowserRouter>
+            <Routes>
+                <Route index element={<Home/>}/>
+                <Route path="/profile" element={<Profile user={p}/>}/>
+            </Routes>
+        </BrowserRouter>
+    </>
   );
 }
 
