@@ -15,7 +15,6 @@ type Player struct {
 type PlayerLogic interface {
 	AddMana()
 	RemoveMana()
-	ChangeRating()
 }
 
 func (p *Player) AddMana(additionalMana int) {
@@ -30,7 +29,3 @@ func (p *Player) RemoveMana(spent int) error {
 	}
 	return nil
 }
-
-/*func (p *Player) ChangeRating(ratingChange int) {
-	p.Rating = max((p.Rating + ratingChange), 0)
-}*/

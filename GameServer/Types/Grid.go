@@ -4,6 +4,7 @@ type Grid struct {
 	Left   Column
 	Middle Column
 	Right  Column
+	GridId string
 }
 
 type GridLogic interface {

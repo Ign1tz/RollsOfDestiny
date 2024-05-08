@@ -10,6 +10,7 @@ type Column struct {
 	Second int
 	Third  int
 	IsFull bool
+	GridId string
 }
 
 type ColumnLogic interface {

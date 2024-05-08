@@ -6,6 +6,7 @@ import (
 )
 
 type Deck struct {
+	DeckID string
 	Name   string
 	UserID string
 	Cards  []Card
