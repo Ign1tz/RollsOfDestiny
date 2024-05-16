@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "rollsofDestinyApp"
-include(":app")
+include(":myapplication")
