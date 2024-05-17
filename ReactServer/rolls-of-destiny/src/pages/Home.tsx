@@ -1,28 +1,36 @@
 import "../css/Home.css"
 import {useEffect, useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
-import homeScreenButtonGroup from "../bars/buttonGroup";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
-import {ButtonGroup} from "@mui/material";
+import BottomAppBar from "../bars/BottomAppBar";
+import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 
-export default function Home() {
-    const [loggedIn, setLoggedIn] = useState<boolean> (false)
+export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
     const [playOpened, setPlayOpened] = useState<boolean> (false)
 
-    useEffect(() => {
-        console.log(loggedIn)
-    }, [])
-
-    console.log("hello")
     const relocate = () => {
         window.location.href = "/profile";
-        // setLoggedIn(!loggedIn)
+        setLoggedIn(!loggedIn)
     };
+
+    function visibleButtons() {
+        if (playOpened) {
+            return (
+                <>
+                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened} playOpened={playOpened}/>
+                </>
+            )
+        } else {
+            return (
+                <Button variant="contained" color = "secondary"  onClick = {() => setPlayOpened(!playOpened)}> Play </Button>
+            )
+        }
+    }
     return (
         <>
             <header>
-                <TopAppBar/>
+                <TopAppBar loggedIn={loggedIn}/>
             </header>
             <div className="homepage">
                 <div className="homeText">
@@ -33,11 +41,12 @@ export default function Home() {
                     <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
                 </div>
                 <div className="homeButtons">
-                    <Button variant="contained" onClick={() => window.location.href = "/game"}> Play </Button>
+                    {visibleButtons()}
                 </div>
-                <footer>
-                </footer>
             </div>
+            <footer style={{textAlign: "center", fontSize: "x-small"}}>
+                Copyright
+            </footer>
         </>
     )
 }

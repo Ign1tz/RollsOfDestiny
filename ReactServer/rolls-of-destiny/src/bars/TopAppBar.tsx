@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 const pages = ['Friends', 'Leaderboard'];
 const settings = ['Profile','Settings', 'Logout'];
 
-export default function TopAppBar() {
+export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -36,7 +36,7 @@ export default function TopAppBar() {
     };
 
     const relocate = () => {
-        window.location.href = "/profile"
+        window.location.href = loggedIn ? "/profile": "/login"
     }
 
     return (

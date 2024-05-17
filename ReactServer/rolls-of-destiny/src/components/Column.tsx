@@ -1,17 +1,24 @@
-import Box from '@mui/material/Box';
+// Column.jsx
+import React from "react";
+import SimpleBox from "./SimpleBox";
 
-export default function Column() {
+export default function Column({ onClick, columnKey }: { onClick: Function, columnKey: number}) {
+    const handleClick = () => {
+        console.log(`Column ${columnKey} clicked`);
+        if (onClick) {
+            onClick(columnKey);
+        }
+    };
+
+    const oneColumn = [
+        <SimpleBox key={0} />,
+        <SimpleBox key={1} />,
+        <SimpleBox key={2} />
+    ];
+
     return (
-        <Box
-            height={200}
-            width={200}
-            my={4}
-            display="flex"
-            alignItems="center"
-            gap={4}
-            p={2}
-            sx={{ border: '2px solid grey' }}
-        >
-        </Box>
-    )
+        <div onClick={handleClick} style={{ cursor: "pointer" }}>
+            {oneColumn}
+        </div>
+    );
 }
