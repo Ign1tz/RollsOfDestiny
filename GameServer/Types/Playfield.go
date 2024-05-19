@@ -5,6 +5,15 @@ import (
 	"strconv"
 )
 
+type Game struct {
+	Host         string
+	Guest        string
+	HostGrid     string
+	GuestGrid    string
+	GameID       string
+	ActivePlayer string
+}
+
 type Playfield struct {
 	Host         Player
 	Guest        Player
