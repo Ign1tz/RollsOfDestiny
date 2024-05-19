@@ -6,7 +6,7 @@ import (
 )
 
 type Game struct {
-	Host         string
+	HostId       string
 	Guest        string
 	HostGrid     string
 	GuestGrid    string

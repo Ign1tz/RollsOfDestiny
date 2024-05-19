@@ -6,11 +6,12 @@ import (
 )
 
 type Column struct {
-	First  int
-	Second int
-	Third  int
-	IsFull bool
-	GridId string
+	First     int
+	Second    int
+	Third     int
+	IsFull    bool
+	GridId    string
+	Placement string
 }
 
 type ColumnLogic interface {

@@ -50,8 +50,8 @@ func InsertCard(card Types.Card) error {
 }
 
 func InsertColumn(column Types.Column) error {
-	_, err := Database.Exec("INSERT INTO columns VALUES ($1, $2, $3, $4)",
-		column.GridId, column.First, column.Second, column.Third)
+	_, err := Database.Exec("INSERT INTO columns VALUES ($1, $2, $3, $4, $5)",
+		column.GridId, column.First, column.Second, column.Third, column.Placement)
 	return err
 }
 
@@ -63,7 +63,7 @@ func InsertGrid(grid Types.Grid) error {
 
 func InsertGame(game Types.Game) error {
 	_, err := Database.Exec("INSERT INTO games VALUES ($1, $2, $3, $4, $5, $6)",
-		game.GameID, game.Host, game.Guest, game.ActivePlayer,
+		game.GameID, game.HostId, game.Guest, game.ActivePlayer,
 		game.HostGrid, game.GuestGrid)
 	return err
 }
@@ -86,7 +86,7 @@ func Update(query string) error {
 	return , err
 }*/
 
-func GetPlayer(playerId string) (Types.Player, error) {
+func GetDBPlayer(playerId string) (Types.Player, error) {
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
 	var player Types.Player
 	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana); err != nil {
@@ -96,9 +96,9 @@ func GetPlayer(playerId string) (Types.Player, error) {
 }
 
 func GetGame(gameId string) (Types.Game, error) {
-	dbGame := Database.QueryRow("Select * from games where userid = $1", gameId)
+	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.Host, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
 		return Types.Game{}, err
 	}
 	return game, nil
@@ -129,6 +129,99 @@ func GetGrid(gridId string) (Types.Grid, error) {
 		}
 	}
 	return grid, nil
+}
+
+func GetDeckByDeckId(deckId string) (Types.Deck, error) {
+	dbDeck := Database.QueryRow("Select * from decks where deckid = $1", deckId)
+	var deck Types.Deck
+	if err := dbDeck.Scan(&deck.DeckID, &deck.UserID); err != nil {
+		return Types.Deck{}, err
+	}
+	dbCards, err := Database.Query("select * from cards where deckid = $1", deck.DeckID)
+	if err != nil {
+		return deck, err
+	}
+
+	for dbCards.Next() {
+		var card Types.Card
+
+		if err := dbCards.Scan(&card.Name, &card.Cost, &card.Effect, &card.Picture, card.CardID, card.DeckID, card.Played, card.InHand); err != nil {
+			return deck, err
+		}
+		deck.Cards = append(deck.Cards, card)
+	}
+	deck.Size = len(deck.Cards)
+	return deck, nil
+}
+
+func GetDeckByPlayerId(playerId string) (Types.Deck, error) {
+	dbDeck := Database.QueryRow("Select * from decks where playerid = $1", playerId)
+	var deck Types.Deck
+	if err := dbDeck.Scan(&deck.DeckID, &deck.UserID); err != nil {
+		return Types.Deck{}, err
+	}
+	dbCards, err := Database.Query("select * from cards where deckid = $1", deck.DeckID)
+	if err != nil {
+		return deck, err
+	}
+
+	for dbCards.Next() {
+		var card Types.Card
+
+		if err := dbCards.Scan(&card.Name, &card.Cost, &card.Effect, &card.Picture, &card.CardID, &card.DeckID, &card.Played, &card.InHand); err != nil {
+			return deck, err
+		}
+		deck.Cards = append(deck.Cards, card)
+	}
+	deck.Size = len(deck.Cards)
+	return deck, nil
+}
+
+func GetPlayer(playerId string) (Types.Player, error) {
+	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
+	var player Types.Player
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana); err != nil {
+		return Types.Player{}, err
+	}
+	deck, err := GetDeckByPlayerId(player.UserID)
+	if err != nil {
+		return player, err
+	}
+	player.Deck = deck
+
+	return player, nil
+}
+
+func GetPlayfield(gameId string) (Types.Playfield, error) {
+	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
+	var game Types.Game
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
+		return Types.Playfield{}, err
+	}
+	var playfield Types.Playfield
+	playfield.GameID = game.GameID
+	playfield.ActivePlayer = game.ActivePlayer
+	hostPlayer, err := GetPlayer(game.HostId)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Host = hostPlayer
+	guestPlayer, err := GetPlayer(game.Guest)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Guest = guestPlayer
+	hostGrid, err := GetGrid(game.HostGrid)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.HostGrid = hostGrid
+	guestGrid, err := GetGrid(game.GuestGrid)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.GuestGrid = guestGrid
+	return playfield, nil
 }
 
 func DatabaseTest() {
