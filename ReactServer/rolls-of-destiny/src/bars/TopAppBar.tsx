@@ -36,6 +36,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
     };
 
     const relocate = () => {
+        console.log(loggedIn)
         window.location.href = loggedIn ? "/profile": "/login"
     }
 

@@ -1,4 +1,4 @@
-import "../css/BasicCSS.css"
+import "../css/Home.css"
 import {useEffect, useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";

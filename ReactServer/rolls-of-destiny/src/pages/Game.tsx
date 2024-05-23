@@ -2,8 +2,8 @@ import { Button } from "@mui/material";
 import Grid from "../components/Grid";
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
-import { profile } from "../types/profileTypes"; // Assuming profile type is defined in types.ts
-import "../css/BasicCSS.css";
+import { profile } from "../types/profileTypes";
+import "../css/Game.css";
 
 export default function Game() {
     const player1: profile = {

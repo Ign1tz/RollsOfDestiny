@@ -1,4 +1,4 @@
-import "../css/BasicCSS.css"
+import "../css/Home.css"
 import Button from "@mui/material/Button";
 
 export default function LoginAndSignUpScreen({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
