@@ -19,10 +19,10 @@ export default function Grid() {
             flexDirection="row"
             justifyContent="center"
             alignItems="center"
-            height="100vh"
+            minHeight="40vh"
         >
             {columns.map((column, index) => (
-                <Box key={index}>
+                <Box key={index} flexGrow={1}> {}
                     {column}
                 </Box>
             ))}
