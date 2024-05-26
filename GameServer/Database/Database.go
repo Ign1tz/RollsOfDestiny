@@ -30,14 +30,6 @@ func InitDatabase() *sql.DB {
 	return db
 }
 
-/*func getGameState(gameId string) (Types.Playfield, error) {
-	gameSQL, err := Database.Query("select * from games where gameid = $GameId", gameId)
-	gameSQL.Scan(Types.Playfield{})
-	hostSQL, err := Database.Query("select * from players where userid = $UserId", gameSQL)
-
-	return , err
-}*/
-
 func DatabaseTest() {
 	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
