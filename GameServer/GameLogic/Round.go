@@ -15,7 +15,6 @@ func RollDie(gameId string) int {
 	}
 
 	currentRoll := gamefield.ActivePlayer.Die.Throw()
-	//todo: add database update to save roll
 	err = Database.UpdateLastRollGames(gamefield)
 	if err != nil {
 		panic(err)
@@ -65,10 +64,15 @@ func PickColumn(gameId string, columnNumber int) error {
 		columnErr = errors.New("wrong column number")
 	}
 
-	//todo: update database
 	if columnErr == nil {
-		Database.UpdateColumn(playerColumn)
-		Database.UpdateColumn(enemyColumn)
+		err = Database.UpdateColumn(playerColumn)
+		if err != nil {
+			return err
+		}
+		err = Database.UpdateColumn(enemyColumn)
+		if err != nil {
+			return err
+		}
 	}
 	return columnErr
 }
