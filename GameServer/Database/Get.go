@@ -14,7 +14,7 @@ func GetDBPlayer(playerId string) (Types.Player, error) {
 func GetGame(gameId string) (Types.Game, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
 		return Types.Game{}, err
 	}
 	return game, nil
@@ -118,7 +118,7 @@ func GetPlayer(playerId string) (Types.Player, error) {
 func GetPlayfield(gameId string) (Types.Playfield, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
 		return Types.Playfield{}, err
 	}
 	var playfield Types.Playfield
@@ -134,7 +134,7 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 		return playfield, err
 	}
 	playfield.Host = hostPlayer
-	guestPlayer, err := GetPlayer(game.Guest)
+	guestPlayer, err := GetPlayer(game.GuestId)
 	if err != nil {
 		return playfield, err
 	}

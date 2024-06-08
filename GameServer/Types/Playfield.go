@@ -7,7 +7,7 @@ import (
 
 type Game struct {
 	HostId       string
-	Guest        string
+	GuestId      string
 	HostGrid     string
 	GuestGrid    string
 	GameID       string
