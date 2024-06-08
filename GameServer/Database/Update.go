@@ -17,7 +17,12 @@ func UpdateCard(card Types.Card) error {
 	return err
 }
 
-func UpdateGames(playfiled Types.Playfield) error {
-	_, err := Database.Exec("Update games set activeplayer = $1 where gameid = $2", playfiled.ActivePlayer, playfiled.GameID)
+func UpdateActivePlayerGames(playfiled Types.Playfield) error {
+	_, err := Database.Exec("Update games set activeplayer = $1 where gameid = $2", playfiled.ActivePlayer.UserID, playfiled.GameID)
+	return err
+}
+
+func UpdateLastRollGames(playfiled Types.Playfield) error {
+	_, err := Database.Exec("Update games set lastRoll = $1 where gameid = $2", playfiled.LastRoll, playfiled.GameID)
 	return err
 }
