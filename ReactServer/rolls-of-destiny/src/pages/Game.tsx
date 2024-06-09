@@ -4,17 +4,22 @@ import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
 import {profile} from "../types/profileTypes";
 import "../css/Game.css";
+import {useEffect, useState} from "react";
 
 
 export const ws = new WebSocket('http://localhost:8080/ws');
 
 ws.onopen = () => {
     console.log('WebSocket connected')
+    ws.send(JSON.stringify({purpose:"login", UserId:"testuser1", Username:"testuser1"}))
 };
 ws.onclose = () => console.log('WebSocket disconnected');
 
 
 export default function Game() {
+
+    const [connected, setConnected] = useState(false)
+
     const player1: profile = {
         username: "Lukas",
         rating: 3450913,
@@ -29,6 +34,18 @@ export default function Game() {
         biography: "Player 2's bio"
     };
 
+    useEffect(() =>{
+        if (connected) {
+            ws.send("test")
+        }
+    }, [connected])
+
+    ws.onmessage = (e) => {
+        if (e.data == "connected") {
+            setConnected(true)
+        }
+        console.log(e.data)
+    }
     return (
         <div className="gameDivision">
             <div className="header">
