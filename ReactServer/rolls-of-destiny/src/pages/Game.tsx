@@ -1,9 +1,18 @@
-import { Button } from "@mui/material";
+import {Button} from "@mui/material";
 import Grid from "../components/Grid";
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
-import { profile } from "../types/profileTypes";
+import {profile} from "../types/profileTypes";
 import "../css/Game.css";
+
+
+export const ws = new WebSocket('http://localhost:8080/ws');
+
+ws.onopen = () => {
+    console.log('WebSocket connected')
+};
+ws.onclose = () => console.log('WebSocket disconnected');
+
 
 export default function Game() {
     const player1: profile = {
@@ -24,7 +33,7 @@ export default function Game() {
         <div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
-                <Button variant="contained" onClick={() => window.location.href="/"}>
+                <Button variant="contained" onClick={() => window.location.href = "/"}>
                     Back
                 </Button>
             </div>
