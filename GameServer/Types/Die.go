@@ -1,11 +1,11 @@
-package GameLogic
+package Types
 
 import (
 	"math/rand"
 )
 
 type Die struct {
-	possibleThrows []int
+	PossibleThrows []int
 }
 
 type DieLogic interface {
@@ -13,6 +13,6 @@ type DieLogic interface {
 }
 
 func (d Die) Throw() int {
-	res := rand.Intn(len(d.possibleThrows))
-	return d.possibleThrows[res]
+	res := rand.Intn(len(d.PossibleThrows))
+	return d.PossibleThrows[res]
 }

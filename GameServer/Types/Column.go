@@ -1,4 +1,4 @@
-package Components
+package Types
 
 import (
 	"errors"
@@ -6,10 +6,12 @@ import (
 )
 
 type Column struct {
-	First  int
-	Second int
-	Third  int
-	IsFull bool
+	First     int
+	Second    int
+	Third     int
+	IsFull    bool
+	GridId    string
+	Placement string
 }
 
 type ColumnLogic interface {
