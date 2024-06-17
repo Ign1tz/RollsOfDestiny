@@ -10,15 +10,11 @@ export default function Column({ onClick, columnKey }: { onClick: Function, colu
         }
     };
 
-    const oneColumn = [
-        <SimpleBox key={0} />,
-        <SimpleBox key={1} />,
-        <SimpleBox key={2} />
-    ];
-
     return (
         <div onClick={handleClick} style={{ cursor: "pointer" }}>
-            {oneColumn}
+            <SimpleBox key={0} />
+            <SimpleBox key={1} />
+            <SimpleBox key={2} />
         </div>
     );
 }

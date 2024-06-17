@@ -66,7 +66,7 @@ export default function Game() {
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">
@@ -80,7 +80,7 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">
