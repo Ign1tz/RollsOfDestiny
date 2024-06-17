@@ -34,7 +34,7 @@ export default function Game() {
         biography: "Player 2's bio"
     };
 
-    useEffect(() =>{
+    useEffect(() => {
         if (connected) {
             ws.send("test")
         }
