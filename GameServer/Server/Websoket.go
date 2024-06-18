@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 )
@@ -10,18 +11,28 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func reader(conn *websocket.Conn) {
+func reader(conn *websocket.Conn, c2 chan string) {
+	conn.WriteMessage(1, []byte("connected"))
+	//fmt.Printf("test")
 	for {
-		messageType, p, err := conn.ReadMessage()
+		//fmt.Printf(conn.RemoteAddr())
+		//
+		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
+		fmt.Printf("test3")
+		c2 <- string(conn.RemoteAddr().String())
+
 		log.Println(string(p))
 
-		if err := conn.WriteMessage(messageType, p); err != nil {
+		//conn.WriteMessage(messageType, []byte("testasdfas"))
+
+		/*if err := conn.WriteMessage(messageType, p); err != nil {
 			log.Println(err)
 			return
-		}
+		}*/
+		//fmt.Printf("test2")
 	}
 }

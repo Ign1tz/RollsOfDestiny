@@ -1,0 +1,71 @@
+.gameDivision {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.diceWrapper {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.playerSection {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    width: 50%;
+}
+
+
+.playerInfo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.playerInfo img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.playerInfo p {
+    margin: 0;
+}
+
+.playerActions {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.playerCards {
+    display: flex;
+    margin-left:30px;
+}
+
+.playerCards .simpleBox {
+    margin-right: 10px;
+}
+
+.grid {
+    width: 80%;
+    margin-bottom: 10px;
+}
