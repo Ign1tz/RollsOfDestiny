@@ -22,7 +22,7 @@ func RollDie(gameId string) int {
 	return currentRoll
 }
 
-func PickColumn(gameId string, columnNumber int) error {
+func PickColumn(gameId string, columnNumber string) error {
 	gamefield, err := Database.GetPlayfield(gameId)
 
 	if err != nil {
@@ -39,26 +39,26 @@ func PickColumn(gameId string, columnNumber int) error {
 	var playerColumn Types.Column
 	var enemyColumn Types.Column
 
-	if columnNumber == 0 {
+	if columnNumber == "0" {
 		columnErr = gamefield.ActivePlayer.Grid.Left.Add(rolls)
 		if columnErr == nil {
 			enemy.Grid.Left.Remove(rolls)
 			playerColumn = gamefield.ActivePlayer.Grid.Left
-			enemyColumn = gamefield.EnemyPlayer().Grid.Left
+			enemyColumn = enemy.Grid.Left
 		}
-	} else if columnNumber == 1 {
+	} else if columnNumber == "1" {
 		columnErr = gamefield.ActivePlayer.Grid.Middle.Add(rolls)
 		if columnErr == nil {
 			enemy.Grid.Middle.Remove(rolls)
 			playerColumn = gamefield.ActivePlayer.Grid.Middle
-			enemyColumn = gamefield.EnemyPlayer().Grid.Middle
+			enemyColumn = enemy.Grid.Middle
 		}
-	} else if columnNumber == 2 {
+	} else if columnNumber == "2" {
 		columnErr = gamefield.ActivePlayer.Grid.Right.Add(rolls)
 		if columnErr == nil {
 			enemy.Grid.Right.Remove(rolls)
 			playerColumn = gamefield.ActivePlayer.Grid.Right
-			enemyColumn = gamefield.EnemyPlayer().Grid.Right
+			enemyColumn = enemy.Grid.Right
 		}
 	} else {
 		columnErr = errors.New("wrong column number")
