@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { Button } from "@mui/material";
+import {useState} from "react";
+import {Button} from "@mui/material";
 import Grid from "../components/Grid";
+import OpponentGrid from "../components/OpponentGrid"
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
-import { profile } from "../types/profileTypes";
+import {profile} from "../types/profileTypes";
 import "../css/Game.css";
+import background from "../images/game.jpg"
+
 
 export default function Game() {
     const player1: profile = {
@@ -24,9 +27,12 @@ export default function Game() {
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
     const [diceRoll, setDiceRoll] = useState<number | null>(null);
+    const [disableRoll, setDisableRoll] = useState(false) // TODO: change to true
+    const [canPlace, setCanPlace] = useState(true) // TODO: change to false
 
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
+        setDisableRoll(true);
         if (player === 'player1') {
             setPlayer1Score(player1Score + value);
         } else {
@@ -34,16 +40,18 @@ export default function Game() {
         }
     };
 
-    const handleColumnClick = (columnKey: number) => {
-        console.log(`Game received click from column ${columnKey}`);
-        // Add logic to place dice image in the column here
-    };
-
     return (
-        <div className="gameDivision">
+        <div className="gameDivision"
+             style={{
+                 backgroundImage: `url(${background})`,
+                 backgroundSize: 'cover',
+                 backgroundPosition: 'center',
+                 height: '100vh',
+                 width: '100%'
+             }}>
             <div className="header">
                 <h1>Welcome to the Game!</h1>
-                <Button variant="contained" onClick={() => window.location.href="/"}>
+                <Button variant="contained" onClick={() => window.location.href = "/"}>
                     Back
                 </Button>
             </div>
@@ -59,9 +67,9 @@ export default function Game() {
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => handleRoll('player1', value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice defaultValue={6} size={100} cheatValue={undefined} disabled={true}/>
                         </div>
-                        <Grid onColumnClick={handleColumnClick} diceRoll={diceRoll}/>
+                        <OpponentGrid diceRoll={diceRoll}/>
                         <div className="playerCards">
                             <SimpleBox diceValue={null}/>
                             <SimpleBox diceValue={null}/>
@@ -72,9 +80,10 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
+                                  cheatValue={undefined} disabled={disableRoll}/>
                         </div>
-                        <Grid onColumnClick={handleColumnClick} diceRoll={diceRoll}/>
+                        <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
                         <div className="playerCards">
                             <SimpleBox diceValue={null}/>
                             <SimpleBox diceValue={null}/>

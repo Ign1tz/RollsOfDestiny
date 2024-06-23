@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
 import BottomAppBar from "../bars/BottomAppBar";
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
+import background from "../images/game.jpg";
 
 export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
     const [playOpened, setPlayOpened] = useState<boolean> (false)
@@ -30,9 +31,18 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
     return (
         <>
             <header>
-                <TopAppBar loggedIn={loggedIn}/>
+                <TopAppBar loggedIn={loggedIn} />
             </header>
-            <div className="homepage">
+            <div
+                className="homepage"
+                style={{
+                    backgroundColor: "black",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    height: '100vh',
+                    width: '100%'
+                }}
+            >
                 <div className="homeText">
                     <h1>Rolls of Destiny</h1>
                     <h3>A game made by</h3>
@@ -44,9 +54,6 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
                     {visibleButtons()}
                 </div>
             </div>
-            <footer style={{textAlign: "center", fontSize: "x-small"}}>
-                Copyright
-            </footer>
         </>
     )
 }
