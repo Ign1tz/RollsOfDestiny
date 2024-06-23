@@ -18,17 +18,20 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	for {
 		//fmt.Printf(conn.RemoteAddr())
 		//
+		fmt.Println("test3")
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
 
+		fmt.Println("test3")
 		if string(p) == "id" {
+			log.Println(string(p))
 			conn.WriteMessage(1, []byte("id:"+conn.RemoteAddr().String()))
 		}
 
-		fmt.Printf("test3")
+		fmt.Println("test3")
 
 		var msg = make(map[string]string)
 		msg["id"] = strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]

@@ -5,9 +5,8 @@ import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 
-export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLoggedIn: Function }) {
+export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, setWebsocket}: { loggedIn: boolean, setLoggedIn: Function, setGameInfo: Function, websocket: WebSocket|undefined, setWebsocket: Function }) {
     const [playOpened, setPlayOpened] = useState<boolean>(false)
-    const [websocket, setWebsocket] = useState<WebSocket>()
     const [connected, setConnected] = useState(false)
     const [websoketId, setWebsoketId] = useState("")
 
@@ -22,12 +21,13 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
                 <>
                     <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
                                            playOpened={playOpened}
+                                           connected={connected}
                                            websocket={websocket}
                                            setWebsocket={setWebsocket}
-                                           connected={connected}
                                            setConnected={setConnected}
                                            websocketId={websoketId}
-                                           setWebsocketId={setWebsoketId}/>
+                                           setWebsocketId={setWebsoketId}
+                    setGameInfo={setGameInfo}/>
                 </>
             )
         } else {

@@ -4,6 +4,7 @@ import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
 	"fmt"
+	"github.com/google/uuid"
 )
 
 func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
@@ -18,14 +19,14 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 		}
 	} else {
 		fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
-
+		gridId1 := uuid.New().String()
 		hostGrid := Types.Grid{
 			Left: Types.Column{
 				First:     0,
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid1",
+				GridId:    gridId1,
 				Placement: 0,
 			},
 			Middle: Types.Column{
@@ -33,7 +34,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid1",
+				GridId:    gridId1,
 				Placement: 1,
 			},
 			Right: Types.Column{
@@ -41,11 +42,12 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid1",
+				GridId:    gridId1,
 				Placement: 2,
 			},
-			GridId: "Grid1",
+			GridId: gridId1,
 		}
+		gridId2 := uuid.New().String()
 
 		guestGrid := Types.Grid{
 			Left: Types.Column{
@@ -53,7 +55,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid2",
+				GridId:    gridId2,
 				Placement: 0,
 			},
 			Middle: Types.Column{
@@ -61,7 +63,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid2",
+				GridId:    gridId2,
 				Placement: 1,
 			},
 			Right: Types.Column{
@@ -69,10 +71,10 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Second:    0,
 				Third:     0,
 				IsFull:    false,
-				GridId:    "Grid2",
+				GridId:    gridId2,
 				Placement: 2,
 			},
-			GridId: "Grid2",
+			GridId: gridId2,
 		}
 		fmt.Println("After creating grid")
 
@@ -102,7 +104,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			Guest:        guest,
 			HostGrid:     hostGrid,
 			GuestGrid:    guestGrid,
-			GameID:       "12345",
+			GameID:       uuid.New().String(),
 			ActivePlayer: host,
 		}
 
@@ -116,7 +118,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 		var msg = make(map[string]string)
 
 		msg["id"] = host.WebsocketConnectionID
-		message := `{"gameid": ` + playfield.GameID + `, "YourInfo": { "WebsocketId": ` + playfield.Host.WebsocketConnectionID + `, "Username": ` + playfield.Host.Username + `}, "EnemyInfo": { "WebsocketId":` + playfield.Guest.WebsocketConnectionID + `, "Username": ` + playfield.Guest.Username + `}}`
+		message := `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}}`
 		msg["message"] = message
 
 		*c2 <- msg
@@ -125,7 +127,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 		fmt.Println("first", msg["id"])
 		fmt.Println("After first message")
 		msg2["id"] = guest.WebsocketConnectionID
-		message = `{"gameid": ` + playfield.GameID + `, "YourInfo": { "WebsocketId": ` + playfield.Guest.WebsocketConnectionID + `, "Username": ` + playfield.Guest.Username + `}, "EnemyInfo": { "WebsocketId":` + playfield.Host.WebsocketConnectionID + `, "Username": ` + playfield.Host.Username + `}}`
+		message = `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}}`
 		msg2["message"] = message
 
 		*c2 <- msg2

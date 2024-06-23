@@ -1,27 +1,40 @@
 import Button from "@mui/material/Button";
 import {useEffect} from "react";
-import Game from "../pages/Game";
 //import {ws} from "../pages/Game";
 
-type ButtonGroupPatameter ={
+type ButtonGroupPatameter = {
     setPlayOpened: Function,
     playOpened: boolean,
-    websocket: WebSocket|undefined,
+    websocket: WebSocket | undefined,
     setWebsocket: Function,
     connected: boolean,
     setConnected: Function,
     websocketId: string,
-    setWebsocketId: Function
+    setWebsocketId: Function,
+    setGameInfo: Function
 }
 
-export default function HomeScreenButtonGroup({setPlayOpened, playOpened, websocket, setWebsocket, connected, setConnected, websocketId, setWebsocketId}: ButtonGroupPatameter) {
 
-    async function startWebsocket() {
+
+export default function HomeScreenButtonGroup({
+                                                  setPlayOpened,
+                                                  playOpened,
+                                                  websocket,
+                                                  setWebsocket,
+                                                  connected,
+                                                  setConnected,
+                                                  websocketId,
+                                                  setWebsocketId,
+                                                  setGameInfo
+                                              }: ButtonGroupPatameter) {
+
+    /*async function startWebsocket() {
         console.log("Starting websocket")
         setWebsocket(new WebSocket('http://localhost:8080/ws'))
+        localStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         console.log("queuing websocket")
         if (websocketId !== "") {
             queueForGame()
@@ -36,10 +49,13 @@ export default function HomeScreenButtonGroup({setPlayOpened, playOpened, websoc
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({userid: "testasdasfasasdasd".split('').sort(function(){return 0.5-Math.random()}).join(''), websocketconnectionid: websocketId})
+            body: JSON.stringify({
+                userid: "testasdasfasasdasd".split('').sort(function () {
+                    return 0.5 - Math.random()
+                }).join(''), websocketconnectionid: websocketId
+            })
         });
-        //window.location.href = "/game"
-        <Game></Game>
+        window.location.href = "/game"
     }
 
     useEffect(() => {
@@ -49,32 +65,37 @@ export default function HomeScreenButtonGroup({setPlayOpened, playOpened, websoc
     }, [connected])
 
     if (websocket) {
+        console.log(websocket)
         websocket.onmessage = (e) => {
             console.log("go a message")
             console.log("message: " + e.data)
             if (e.data == "connected") {
                 setConnected(true)
                 websocket.send("id")
-            } else if(e.data.includes("id:[::1]:")) {
+            } else if (e.data.includes("id:[::1]:")) {
                 console.log(e.data.split(":")[e.data.split(":").length - 1])
                 setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
-            }else{
+            } else if (e.data.includes("{")) {
                 console.log(e.data)
+                localStorage.setItem("gameInfo", e.data)
             }
         }
-    }
+    }*/
 
     return (
         <>
-            <Button className="buttonInHomeScreenGroup"  color = "secondary" variant="contained" onClick = {() => startWebsocket()}>
+            <Button className="buttonInHomeScreenGroup" color="secondary" variant="contained"
+                    onClick={() => window.location.href = "/game"}>
                 Play Against Bot
             </Button>
             <br/>
-            <Button className="buttonInHomeScreenGroup" color = "secondary"  variant="contained" onClick = {() => window.location.href = "/game"}>
+            <Button className="buttonInHomeScreenGroup" color="secondary" variant="contained"
+                    onClick={() => window.location.href = "/game"}>
                 Play Against Real Enemy
             </Button>
             <br/>
-            <Button className="buttonInHomeScreenGroup"  color = "secondary" variant="contained" onClick = {() => setPlayOpened(!playOpened)}> Back </Button>
+            <Button className="buttonInHomeScreenGroup" color="secondary" variant="contained"
+                    onClick={() => setPlayOpened(!playOpened)}> Back </Button>
         </>
     )
 }

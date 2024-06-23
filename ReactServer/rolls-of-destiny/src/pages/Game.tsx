@@ -15,36 +15,89 @@ ws.onopen = () => {
 };
 ws.onclose = () => console.log('WebSocket disconnected');
 */
-
 export default function Game() {
+    console.log(localStorage.getItem("gameInfo"))
+    let gameInfo = localStorage.getItem("gameInfo")
+    if (!gameInfo) {
+        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    }
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('http://localhost:8080/ws'))
+    const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
-
+    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
+    const [gameId, setGameId] = useState("")
     const player1: profile = {
-        username: "Lukas",
+        username: gameInfoJson.EnemyInfo.Username,
         rating: 3450913,
         picture: "/path/to/player1.jpg",
         biography: "Player 1's bio"
     };
 
     const player2: profile = {
-        username: "Moritz",
+        username: gameInfoJson.YourInfo.Username,
         rating: 1,
         picture: "/path/to/player2.jpg",
         biography: "Player 2's bio"
     };
 
-    /*useEffect(() => {
-        if (connected) {
-            ws.send("test")
+
+
+
+    useEffect(() => {
+        console.log("Starting websocket")
+        //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
+        localStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
+    }, [])
+
+    useEffect(() => {
+        console.log(websocket)
+        if (connected && websocket) {
+            console.log("test")
+            websocket.send("test")
         }
     }, [connected])
 
-    ws.onmessage = (e) => {
-        if (e.data == "connected") {
-            setConnected(true)
+    useEffect(() => {
+        console.log("queuing websocket")
+        if (websocketId !== "") {
+            queueForGame()
         }
-        console.log(e.data)
-    }*/
+    }, [websocketId])
+
+    if (websocket) {
+        websocket.onmessage = (e) => {
+            console.log("go a message")
+            console.log("message: " + e.data)
+            if (e.data == "connected") {
+                setConnected(true)
+                websocket.send("id")
+            } else if (e.data.includes("id:[::1]:")) {
+                console.log(e.data.split(":")[e.data.split(":").length - 1])
+                setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
+            } else if (e.data.includes("{")) {
+                console.log(e.data)
+                localStorage.setItem("gameInfo", e.data)
+            }
+        }
+    }
+
+    async function queueForGame() {
+        console.log("test")
+        const response = await fetch("http://localhost:8080/queue", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                userid: "testasdasfasasdasd".split('').sort(function () {
+                    return 0.5 - Math.random()
+                }).join(''), websocketconnectionid: websocketId
+            })
+        });
+    }
+
+
     return (
         <div className="gameDivision">
             <div className="header">
@@ -65,9 +118,10 @@ export default function Game() {
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
-                        <Grid/>
+                        <Grid websocket={websocket}/>
                         <div className="playerCards">
                             {/* Placeholder for player's cards */}
                             <SimpleBox/>
@@ -79,9 +133,10 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
-                        <Grid/>
+                        <Grid websocket={websocket}/>
                         <div className="playerCards">
                             <SimpleBox/>
                             <SimpleBox/>
