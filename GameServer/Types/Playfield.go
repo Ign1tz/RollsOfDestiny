@@ -7,11 +7,12 @@ import (
 
 type Game struct {
 	HostId       string
-	Guest        string
+	GuestId      string
 	HostGrid     string
 	GuestGrid    string
 	GameID       string
 	ActivePlayer string
+	LastRoll     string
 }
 
 type Playfield struct {
@@ -20,7 +21,7 @@ type Playfield struct {
 	HostGrid     Grid
 	GuestGrid    Grid
 	GameID       string
-	ActivePlayer string
+	ActivePlayer Player
 }
 
 type PlayfieldLogic interface {

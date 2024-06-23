@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
+	"strings"
 )
 
 var upgrader = websocket.Upgrader{
@@ -11,7 +12,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func reader(conn *websocket.Conn, c2 chan string) {
+func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	conn.WriteMessage(1, []byte("connected"))
 	//fmt.Printf("test")
 	for {
@@ -22,8 +23,18 @@ func reader(conn *websocket.Conn, c2 chan string) {
 			log.Println(err)
 			return
 		}
+
+		if string(p) == "id" {
+			conn.WriteMessage(1, []byte("id:"+conn.RemoteAddr().String()))
+		}
+
 		fmt.Printf("test3")
-		c2 <- string(conn.RemoteAddr().String())
+
+		var msg = make(map[string]string)
+		msg["id"] = strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]
+		msg["message"] = string(conn.RemoteAddr().String())
+
+		*c2 <- msg
 
 		log.Println(string(p))
 

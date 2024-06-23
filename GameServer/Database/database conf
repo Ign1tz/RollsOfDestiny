@@ -52,4 +52,11 @@ CREATE TABLE IF NOT EXISTS Games
     LastRoll     text
 );
 
+create table if not exists queue
+(
+    UserID text NOT NULL primary key,
+    WebsocketConnectionID text NOT NULL unique,
+    placement serial
+)
+
 Alter Table Players add column WebsocketConnectionID   text not null unique

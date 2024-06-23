@@ -7,17 +7,16 @@ import "../css/Game.css";
 import {useEffect, useState} from "react";
 
 
-export const ws = new WebSocket('http://localhost:8080/ws');
+/*export const ws = new WebSocket('http://localhost:8080/ws');
 
 ws.onopen = () => {
     console.log('WebSocket connected')
     ws.send(JSON.stringify({purpose:"login", UserId:"testuser1", Username:"testuser1"}))
 };
 ws.onclose = () => console.log('WebSocket disconnected');
-
+*/
 
 export default function Game() {
-
     const [connected, setConnected] = useState(false)
 
     const player1: profile = {
@@ -34,7 +33,7 @@ export default function Game() {
         biography: "Player 2's bio"
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (connected) {
             ws.send("test")
         }
@@ -45,7 +44,7 @@ export default function Game() {
             setConnected(true)
         }
         console.log(e.data)
-    }
+    }*/
     return (
         <div className="gameDivision">
             <div className="header">

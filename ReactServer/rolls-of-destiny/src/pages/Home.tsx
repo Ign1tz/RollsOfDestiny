@@ -1,13 +1,15 @@
 import "../css/Home.css"
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
-import BottomAppBar from "../bars/BottomAppBar";
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 
-export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
-    const [playOpened, setPlayOpened] = useState<boolean> (false)
+export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLoggedIn: Function }) {
+    const [playOpened, setPlayOpened] = useState<boolean>(false)
+    const [websocket, setWebsocket] = useState<WebSocket>()
+    const [connected, setConnected] = useState(false)
+    const [websoketId, setWebsoketId] = useState("")
 
     const relocate = () => {
         window.location.href = "/profile";
@@ -18,15 +20,23 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
         if (playOpened) {
             return (
                 <>
-                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened} playOpened={playOpened}/>
+                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
+                                           playOpened={playOpened}
+                                           websocket={websocket}
+                                           setWebsocket={setWebsocket}
+                                           connected={connected}
+                                           setConnected={setConnected}
+                                           websocketId={websoketId}
+                                           setWebsocketId={setWebsoketId}/>
                 </>
             )
         } else {
             return (
-                <Button variant="contained" color = "secondary"  onClick = {() => setPlayOpened(!playOpened)}> Play </Button>
+                <Button variant="contained" color="secondary" onClick={() => setPlayOpened(!playOpened)}> Play </Button>
             )
         }
     }
+
     return (
         <>
             <header>
