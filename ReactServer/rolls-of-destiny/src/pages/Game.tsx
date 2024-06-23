@@ -26,14 +26,14 @@ export default function Game() {
     const [connected, setConnected] = useState(false)
     const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
     const [gameId, setGameId] = useState("")
-    const player1: profile = {
+    let player1: profile = {
         username: gameInfoJson.EnemyInfo.Username,
         rating: 3450913,
         picture: "/path/to/player1.jpg",
         biography: "Player 1's bio"
     };
 
-    const player2: profile = {
+    let player2: profile = {
         username: gameInfoJson.YourInfo.Username,
         rating: 1,
         picture: "/path/to/player2.jpg",
@@ -77,6 +77,7 @@ export default function Game() {
             } else if (e.data.includes("{")) {
                 console.log(e.data)
                 localStorage.setItem("gameInfo", e.data)
+                setGameInfoJson(JSON.parse(e.data))
             }
         }
     }
