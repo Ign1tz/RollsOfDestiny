@@ -18,7 +18,7 @@ function App() {
                 <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
                 <Route path={"/game" } element={<Game/>}/>
-                <Route path="/login" element={<Login loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
+                <Route path="/login" element={<Login/>}/>
                 <Route path="/signup" element={<SignUp/>}/>
             </Routes>
         </BrowserRouter>
