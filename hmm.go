@@ -1,9 +1,24 @@
 package main
 
-import "RollsOfDestiny/GameServer/Server"
+import (
+	"RollsOfDestiny/AccountServer/Database"
+	"RollsOfDestiny/AccountServer/SignUpLogic"
+	"fmt"
+)
 
 func main() {
-	Server.Server()
+	Database.InitDatabase()
+	account := SignUpLogic.SignUpInfo{
+		Username:        "test",
+		Email:           "test",
+		Password:        "testtest",
+		ConfirmPassword: "testtest",
+	}
+	fmt.Println(account.CheckUsername())
+	fmt.Println(account.CheckEmail())
+	fmt.Println(account.ComparePassword())
+	//go Server.Server()
+	//Server2.Server()
 	//GameLogic.GameLoop()
 	/*Database.InitDatabase()
 	//player := Types.Player{UserID: "5678", Username: "tester2", Mana: 10}

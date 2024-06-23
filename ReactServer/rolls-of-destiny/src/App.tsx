@@ -11,6 +11,7 @@ import SignUp from "./pages/SignUp";
 function App() {
     let p: profile = {username: "Bernd", biography: "H", picture:" H", rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    
     return (
     <>
         <BrowserRouter>

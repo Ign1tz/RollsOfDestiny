@@ -28,12 +28,11 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupRoutes() {
-	http.HandleFunc("/", homePage)
 	http.HandleFunc("/ws", wsEndpoint)
 }
 
 func Server() {
-	fmt.Printf("starting")
+	fmt.Println("starting")
 	setupRoutes()
 	go func() {
 		var somekindofstorrage = map[string]*websocket.Conn{}
