@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@mui/material";
 import Grid from "../components/Grid";
 import Dice from "react-dice-roll";
@@ -20,6 +21,24 @@ export default function Game() {
         biography: "Player 2's bio"
     };
 
+    const [player1Score, setPlayer1Score] = useState(0);
+    const [player2Score, setPlayer2Score] = useState(0);
+    const [diceRoll, setDiceRoll] = useState<number | null>(null);
+
+    const handleRoll = (player: 'player1' | 'player2', value: number) => {
+        setDiceRoll(value);
+        if (player === 'player1') {
+            setPlayer1Score(player1Score + value);
+        } else {
+            setPlayer2Score(player2Score + value);
+        }
+    };
+
+    const handleColumnClick = (columnKey: number) => {
+        console.log(`Game received click from column ${columnKey}`);
+        // Add logic to place dice image in the column here
+    };
+
     return (
         <div className="gameDivision">
             <div className="header">
@@ -35,32 +54,31 @@ export default function Game() {
                         <div>
                             <h2>{player1.username}</h2>
                             <p>Rating: {player1.rating}</p>
-                            <p>Score: <span id="player1Score">0</span></p>
+                            <p>Score: <span id="player1Score">{player1Score}</span></p>
                         </div>
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => handleRoll('player1', value)} defaultValue={6} size={100} cheatValue={undefined}/>
                         </div>
-                        <Grid/>
+                        <Grid onColumnClick={handleColumnClick} diceRoll={diceRoll}/>
                         <div className="playerCards">
-                            {/* Placeholder for player's cards */}
-                            <SimpleBox/>
-                            <SimpleBox/>
-                            <SimpleBox/>
+                            <SimpleBox diceValue={null}/>
+                            <SimpleBox diceValue={null}/>
+                            <SimpleBox diceValue={null}/>
                         </div>
                     </div>
                 </div>
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100} cheatValue={undefined}/>
                         </div>
-                        <Grid/>
+                        <Grid onColumnClick={handleColumnClick} diceRoll={diceRoll}/>
                         <div className="playerCards">
-                            <SimpleBox/>
-                            <SimpleBox/>
-                            <SimpleBox/>
+                            <SimpleBox diceValue={null}/>
+                            <SimpleBox diceValue={null}/>
+                            <SimpleBox diceValue={null}/>
                         </div>
                     </div>
                     <div className="playerInfo">
@@ -68,7 +86,7 @@ export default function Game() {
                         <div>
                             <h2>{player2.username}</h2>
                             <p>Rating: {player2.rating}</p>
-                            <p>Score: <span id="player2Score">0</span></p>
+                            <p>Score: <span id="player2Score">{player2Score}</span></p>
                         </div>
                     </div>
                 </div>

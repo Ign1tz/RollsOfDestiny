@@ -2,11 +2,7 @@ import React from "react";
 import Column from "./Column";
 import Box from "@mui/material/Box";
 
-export default function Grid() {
-    const handleColumnClick = (key: number) => {
-        console.log(`Grid received click from column ${key}`);
-    };
-
+export default function Grid({ onColumnClick, diceRoll }: { onColumnClick: Function, diceRoll: number | null }) {
     return (
         <Box
             display="flex"
@@ -14,9 +10,9 @@ export default function Grid() {
             justifyContent="center"
             alignItems="center"
         >
-            <Box><Column key={0} onClick={handleColumnClick} columnKey={0} /></Box>
-            <Box><Column key={1} onClick={handleColumnClick} columnKey={1} /></Box>
-            <Box><Column key={2} onClick={handleColumnClick} columnKey={2} /></Box>
+            <Box><Column key={0} onClick={onColumnClick} columnKey={0} diceRoll={diceRoll} /></Box>
+            <Box><Column key={1} onClick={onColumnClick} columnKey={1} diceRoll={diceRoll} /></Box>
+            <Box><Column key={2} onClick={onColumnClick} columnKey={2} diceRoll={diceRoll} /></Box>
         </Box>
     );
 }
