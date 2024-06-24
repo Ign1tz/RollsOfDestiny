@@ -9,7 +9,7 @@ export default function Login() {
 
     function submit() {
         if (username && password) {
-            fetch("http://localhost:9090/signup", {
+            fetch("http://localhost:9090/login", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
