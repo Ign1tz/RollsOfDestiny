@@ -21,7 +21,10 @@ export default function SimpleBox({diceValue}: { diceValue: number | null }) {
             alignItems="center"
             justifyContent="center"
             p={2}
-            sx={{border: "2px solid grey"}}
+            sx={{
+                border: "2px solid black",
+                backgroundColor: "darkgray",
+            }}
         >
             {diceValue !== null && (
                 <img src={diceImages[diceValue - 1]} alt={`Dice ${diceValue}`} height={80} width={80} style={{borderRadius: "10%" }}/>

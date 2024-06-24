@@ -33,25 +33,19 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
             <header>
                 <TopAppBar loggedIn={loggedIn} />
             </header>
-            <div
-                className="homepage"
-                style={{
-                    backgroundColor: "black",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    height: '100vh',
-                    width: '100%'
-                }}
-            >
-                <div className="homeText">
-                    <h1>Rolls of Destiny</h1>
-                    <h3>A game made by</h3>
-                    <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
-                </div>
-                <div className="homeButtons">
-                    {visibleButtons()}
+            <div className="homepage">
+                <div className="textAndButtons">
+                    <div className="homeText">
+                        <h1>Rolls of Destiny</h1>
+                        <h3>A game made by</h3>
+                        <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
+                        <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link>
+                        </p>
+                        <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
+                    </div>
+                    <div className="homeButtons">
+                        {visibleButtons()}
+                    </div>
                 </div>
             </div>
         </>

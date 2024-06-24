@@ -7,6 +7,7 @@ import {profile} from "./types/profileTypes";
 import Game from "./pages/Game";
 import Login from "./pages/Login";
 import Leaderboard from "./pages/Leaderboard";
+import Friendlist from "./pages/Friendlist";
 
 function App() {
     let p: profile = {username: "Bernd", biography: "H", picture:" H", rating:839}
@@ -20,6 +21,7 @@ function App() {
                 <Route path={"/game" } element={<Game/>}/>
                 <Route path="/login" element={<Login loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>
+                <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn}/>}/>
             </Routes>
         </BrowserRouter>
     </>
