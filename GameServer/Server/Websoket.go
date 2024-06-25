@@ -2,7 +2,6 @@ package Server
 
 import (
 	"RollsOfDestiny/GameServer/Database"
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
@@ -102,5 +101,4 @@ func handlePickedColumn(message websocketMessage) {
 	default:
 		return
 	}
-
 }

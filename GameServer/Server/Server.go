@@ -1,7 +1,6 @@
 package Server
 
 import (
-	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
 	"fmt"
@@ -80,7 +79,6 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 func setupRoutes() {
 	fmt.Println("handle something")
 	http.HandleFunc("/queue", queueForGame)
-	http.HandleFunc("/", homePage)
 	http.HandleFunc("/ws", wsEndpoint)
 }
 
