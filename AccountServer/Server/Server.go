@@ -133,10 +133,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Errorf("No username found")
 
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprint(w, tokenString)
 				return
 			}
+
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, tokenString)
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Invalid credentials")
