@@ -2,6 +2,8 @@ package SignUpLogic
 
 import (
 	"RollsOfDestiny/AccountServer/Database"
+	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -20,6 +22,7 @@ type SignUpInfoLogic interface {
 
 func (s *SignUpInfo) CheckUsername() bool {
 	for _, u := range s.Username {
+		fmt.Println(string(u))
 		if !strings.Contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", string(u)) {
 			return false
 		}
@@ -35,6 +38,10 @@ func (s *SignUpInfo) CheckUsername() bool {
 }
 
 func (s *SignUpInfo) CheckEmail() bool {
+	emailRegex, _ := regexp.Compile(`^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$`)
+	if !emailRegex.MatchString(s.Email) {
+		return false
+	}
 
 	_, err := Database.GetAccountByEmail(s.Email)
 

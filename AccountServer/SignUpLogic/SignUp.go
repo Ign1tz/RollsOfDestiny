@@ -4,6 +4,7 @@ import (
 	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/Encryption"
 	"RollsOfDestiny/AccountServer/Types"
+	"fmt"
 	"github.com/google/uuid"
 	"log"
 )
@@ -13,6 +14,7 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 	validUsername := newInfo.CheckUsername()
 	validEmail := newInfo.CheckEmail()
 
+	fmt.Println(validPassword, validUsername, validEmail)
 	if validPassword && validUsername && validEmail {
 		hashedPassword, _ := Encryption.HashPassword(newInfo.Password)
 		newAccount := Types.Account{
