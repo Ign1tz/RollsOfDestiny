@@ -2,6 +2,7 @@ package SignUpLogic
 
 import (
 	"RollsOfDestiny/AccountServer/Database"
+	"RollsOfDestiny/AccountServer/Encryption"
 	"RollsOfDestiny/AccountServer/Types"
 	"github.com/google/uuid"
 	"log"
@@ -13,10 +14,11 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 	validEmail := newInfo.CheckEmail()
 
 	if validPassword && validUsername && validEmail {
+		hashedPassword, _ := Encryption.HashPassword(newInfo.Password)
 		newAccount := Types.Account{
 			UserID:         uuid.New().String(),
 			Username:       newInfo.Username,
-			Password:       newInfo.Password,
+			Password:       hashedPassword,
 			Email:          newInfo.Email,
 			ProfilePicture: "default",
 			Rating:         1000,
