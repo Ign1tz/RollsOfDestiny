@@ -15,7 +15,7 @@ func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTIN
 func GetGame(gameId string) (Types.Game, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
 		return Types.Game{}, err
 	}
 	return game, nil
@@ -98,7 +98,7 @@ func GetPlayer(playerId string) (Types.Player, error) {
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
 	var player Types.Player
 	var gridid string
-	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, gridid, &player.WebsocketConnectionID); err != nil {
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridid, &player.WebsocketConnectionID); err != nil {
 		return Types.Player{}, err
 	}
 	deck, err := GetDeckByPlayerId(player.UserID)

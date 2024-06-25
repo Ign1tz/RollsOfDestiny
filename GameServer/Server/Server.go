@@ -85,8 +85,8 @@ func setupRoutes() {
 }
 
 func Server() {
+
 	fmt.Println("starting")
-	Database.InitDatabase()
 	setupRoutes()
 	go func() {
 		var somekindofstorrage = map[string]*websocket.Conn{}
