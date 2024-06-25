@@ -41,8 +41,6 @@ export default function Game() {
     };
 
 
-
-
     useEffect(() => {
         console.log("Starting websocket")
         //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
@@ -99,8 +97,7 @@ export default function Game() {
     }
 
 
-    return (
-        <div className="gameDivision">
+    return (<div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
                 <Button variant="contained" onClick={() => window.location.href = "/"}>
@@ -120,9 +117,9 @@ export default function Game() {
                     <div className="playerActions">
                         <div className="diceWrapper">
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
-                                  cheatValue={undefined}/>
+                                  cheatValue={undefined} disabled={true}/>
                         </div>
-                        <Grid websocket={websocket}/>
+                        <Grid/>
                         <div className="playerCards">
                             {/* Placeholder for player's cards */}
                             <SimpleBox/>
@@ -137,7 +134,7 @@ export default function Game() {
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
                                   cheatValue={undefined}/>
                         </div>
-                        <Grid websocket={websocket}/>
+                        <Grid websocket={websocket} connected={connected}/>
                         <div className="playerCards">
                             <SimpleBox/>
                             <SimpleBox/>

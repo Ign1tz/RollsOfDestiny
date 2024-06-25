@@ -2,10 +2,10 @@ import React from "react";
 import Column from "./Column";
 import Box from "@mui/material/Box";
 
-export default function Grid({websocket}: {websocket: WebSocket|undefined}) {
+export default function Grid({websocket, connected}: {websocket?: WebSocket, connected?: boolean}) {
     const handleColumnClick = (key: number) => {
-        console.log(`Grid received click from column ${key}`);
-        if (websocket){
+        console.log(connected)
+        if (websocket && connected){
             websocket.send("test " + key)
         }
     };
@@ -17,9 +17,9 @@ export default function Grid({websocket}: {websocket: WebSocket|undefined}) {
             justifyContent="center"
             alignItems="center"
         >
-            <Box><Column key={0} onClick={handleColumnClick} columnKey={0} /></Box>
-            <Box><Column key={1} onClick={handleColumnClick} columnKey={1} /></Box>
-            <Box><Column key={2} onClick={handleColumnClick} columnKey={2} /></Box>
+            <Box><Column key={0} handleClick={handleColumnClick} columnKey={0} /></Box>
+            <Box><Column key={1} handleClick={handleColumnClick} columnKey={1} /></Box>
+            <Box><Column key={2} handleClick={handleColumnClick} columnKey={2} /></Box>
         </Box>
     );
 }
