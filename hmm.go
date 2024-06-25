@@ -2,24 +2,21 @@ package main
 
 import (
 	"RollsOfDestiny/AccountServer/Database"
-	"RollsOfDestiny/AccountServer/Encryption"
 	Server2 "RollsOfDestiny/AccountServer/Server"
 	Database2 "RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Server"
-	"fmt"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	password := "secret"
-	hash, _ := Encryption.HashPassword(password) // ignore error for the sake of simplicity
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Println("Password:", password)
-	fmt.Println("Hash:    ", hash)
-
-	match := Encryption.CheckPasswordHash("secret", hash)
-	fmt.Println("Match:   ", match)
 	Database.InitDatabase()
 	Database2.InitDatabase()
+	//Database2.DatabaseTest()
 	/*account := SignUpLogic.SignUpInfo{
 		Username:        "test",
 		Email:           "test",
