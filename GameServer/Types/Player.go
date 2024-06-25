@@ -10,7 +10,7 @@ type Player struct {
 	Mana                  int
 	Deck                  Deck
 	Die                   Die
-	Gridid                string
+	Grid                  Grid
 	WebsocketConnectionID string
 }
 

@@ -22,12 +22,22 @@ type Playfield struct {
 	GuestGrid    Grid
 	GameID       string
 	ActivePlayer Player
+	LastRoll     string
 }
 
 type PlayfieldLogic interface {
 	Clear()
 	Results()
 	PrettyPrint()
+	EnemyPlayer()
+}
+
+func (p *Playfield) EnemyPlayer() Player {
+	if p.ActivePlayer.UserID != p.Host.UserID {
+		return p.Host
+	} else {
+		return p.Guest
+	}
 }
 
 func (p *Playfield) Clear() {

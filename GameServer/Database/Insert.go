@@ -7,7 +7,7 @@ import (
 
 func InsertPlayer(player Types.Player) error {
 	_, err := Database.Exec("INSERT INTO players (userid, username, mana, gridid, websocketconnectionid) VALUES ($1, $2, $3, $4, $5)",
-		player.UserID, player.Username, player.Mana, player.Gridid, player.WebsocketConnectionID)
+		player.UserID, player.Username, player.Mana, player.Grid.GridId, player.WebsocketConnectionID)
 	return err
 }
 
