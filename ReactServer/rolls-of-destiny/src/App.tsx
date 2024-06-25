@@ -6,10 +6,12 @@ import Profile from "./pages/Profile";
 import {profile} from "./types/profileTypes";
 import Game from "./pages/Game";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 function App() {
     let p: profile = {username: "Bernd", biography: "H", picture:" H", rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    
     return (
     <>
         <BrowserRouter>
@@ -17,7 +19,8 @@ function App() {
                 <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
                 <Route path={"/game" } element={<Game/>}/>
-                <Route path="/login" element={<Login loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/signup" element={<SignUp/>}/>
             </Routes>
         </BrowserRouter>
     </>

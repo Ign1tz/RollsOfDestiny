@@ -10,6 +10,7 @@ type Player struct {
 	Mana     int
 	Deck     Deck
 	Die      Die
+	Grid     Grid
 }
 
 type PlayerLogic interface {

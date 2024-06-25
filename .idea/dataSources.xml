@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="postgres@localhost" uuid="4d84ddec-9826-4293-bcd7-7580895bac71">
+    <data-source source="LOCAL" name="postgres@localhost" uuid="1bd8b101-f224-4be3-8880-83e2ed6b382f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="defaultdb@rollsofdestiny-ignitz-0884.i.aivencloud.com" uuid="04418b24-0e6a-4ef8-b542-b507778e26ee">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://rollsofdestiny-ignitz-0884.i.aivencloud.com:28882/defaultdb?ssl=require&amp;user=avnadmin&amp;password=AVNS_4-EmYo7yBjENNxweTJn</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -14,7 +14,7 @@ func GetDBPlayer(playerId string) (Types.Player, error) {
 func GetGame(gameId string) (Types.Game, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
 		return Types.Game{}, err
 	}
 	return game, nil
@@ -95,8 +95,9 @@ func GetDeckByPlayerId(playerId string) (Types.Deck, error) {
 
 func GetPlayer(playerId string) (Types.Player, error) {
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
+	var gridId string
 	var player Types.Player
-	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana); err != nil {
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridId); err != nil {
 		return Types.Player{}, err
 	}
 	deck, err := GetDeckByPlayerId(player.UserID)
@@ -105,24 +106,35 @@ func GetPlayer(playerId string) (Types.Player, error) {
 	}
 	player.Deck = deck
 
+	grid, err := GetGrid(gridId)
+	if err != nil {
+		return player, err
+	}
+	player.Grid = grid
+
 	return player, nil
 }
 
 func GetPlayfield(gameId string) (Types.Playfield, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.Guest, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid); err != nil {
+	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
 		return Types.Playfield{}, err
 	}
 	var playfield Types.Playfield
 	playfield.GameID = game.GameID
-	playfield.ActivePlayer = game.ActivePlayer
+
+	activePlayer, err := GetPlayer(game.ActivePlayer)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.ActivePlayer = activePlayer
 	hostPlayer, err := GetPlayer(game.HostId)
 	if err != nil {
 		return playfield, err
 	}
 	playfield.Host = hostPlayer
-	guestPlayer, err := GetPlayer(game.Guest)
+	guestPlayer, err := GetPlayer(game.GuestId)
 	if err != nil {
 		return playfield, err
 	}
