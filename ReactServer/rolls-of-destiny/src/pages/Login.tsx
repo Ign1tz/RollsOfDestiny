@@ -1,22 +1,51 @@
-import "../css/Home.css"
+import React, {useState} from "react";
+import {TextField} from "@mui/material";
 import Button from "@mui/material/Button";
-import SignUp from "./SignUp"
 
-export default function LoginAndSignUpScreen({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
+export default function Login() {
 
-    const doWork = () => {
-        setLoggedIn(!loggedIn)
-        console.log(loggedIn)
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    function submit() {
+        if (username && password) {
+            fetch("http://localhost:9090/login", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({username: username, password: password})
+            })
+                .then(res => {
+                    if (res.status === 200) {
+                        window.location.href = "/home";
+                    }
+                })
+        } else {
+
+        }
     }
 
+
     return (
-        <div className = "loginSignUpDivision">
-            <h2>Login / SignUp</h2>
-            <h4> To be implemented ... </h4>
-            <SignUp/>
-            <Button variant ="contained" onClick={() => window.location.href = "/"}> Login </Button>
-            <Button variant ="contained" onClick={() => window.location.href = "/"}> SignUp </Button>
-            <Button onClick={doWork}>TestButton to set LoggedIn</Button>
+        <div className={"loginSignUpDivision"}>
+            <h1>Login</h1>
+            <h3>Username</h3>
+            <TextField required id="filled-basic" label="Username" variant="filled"
+                       value={username}
+                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                           setUsername(event.target.value);
+                       }}/>
+            <h3>Password</h3>
+            <TextField required id="filled-basic" label="Password" type="password" variant="filled"
+                       value={password}
+                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                           setPassword(event.target.value);
+                       }}/>
+            <br/>
+            <br/>
+            <Button variant="contained" onClick={submit}>Login</Button>
         </div>
     )
 }

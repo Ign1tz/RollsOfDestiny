@@ -63,7 +63,7 @@ export default function SignUp() {
 
 
     return (
-        <div className={"signUpDivision"}>
+        <div className={"loginSignUpDivision"}>
             <h1>SignUp</h1>
             <h3>Username</h3>
             <TextField required id="filled-basic" label="Username" variant="filled"
