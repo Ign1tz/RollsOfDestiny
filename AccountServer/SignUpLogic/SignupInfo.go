@@ -21,6 +21,9 @@ type SignUpInfoLogic interface {
 }
 
 func (s *SignUpInfo) CheckUsername() bool {
+	if len(s.Username) < 3 || len(s.Username) > 20 {
+		return false
+	}
 	for _, u := range s.Username {
 		fmt.Println(string(u))
 		if !strings.Contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", string(u)) {
