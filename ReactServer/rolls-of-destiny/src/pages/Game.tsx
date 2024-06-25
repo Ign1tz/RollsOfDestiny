@@ -7,13 +7,7 @@ import "../css/Game.css";
 import {useEffect, useState} from "react";
 
 
-export const ws = new WebSocket('http://localhost:8080/ws');
 
-ws.onopen = () => {
-    console.log('WebSocket connected')
-    ws.send(JSON.stringify({purpose:"login", UserId:"testuser1", Username:"testuser1"}))
-};
-ws.onclose = () => console.log('WebSocket disconnected');
 
 
 export default function Game() {
@@ -35,24 +29,12 @@ export default function Game() {
         biography: "Player 2's bio"
     };
 
-    useEffect(() => {
-        if (connected) {
-            ws.send("test")
-        }
-    }, [connected])
 
-    ws.onmessage = (e) => {
-        if (e.data == "connected") {
-            setConnected(true)
-        }
-        console.log(e.data)
-        setSession(e.data)
-    }
     return (
         <div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
-                <Button variant="contained" onClick={() => ws.send(JSON.stringify({session: session}))/*window.location.href = "/"*/}>
+                <Button variant="contained" onClick={() => window.location.href = "/"}>
                     Back
                 </Button>
             </div>

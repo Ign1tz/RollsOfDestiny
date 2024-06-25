@@ -132,22 +132,57 @@ func login(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Errorf("No username found")
-
 				return
 			}
-
+			fmt.Println("token", tokenString)
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, tokenString)
+			test := `{"token": "` + tokenString + `"}`
+			fmt.Fprint(w, test)
+			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Invalid credentials")
 	}
 }
 
+func isLoggedIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		fmt.Println("OPTIONS request")
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		fmt.Println(w.Header())
+		return
+	}
+	fmt.Println(r.Method)
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprint(w, "Missing authorization header")
+		return
+	}
+	tokenString = tokenString[len("Bearer "):]
+
+	err := verifyToken(tokenString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprint(w, "Invalid token")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func refresh(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("refresh")
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
 	http.HandleFunc("/login", login)
+	http.HandleFunc("/isLoggedIn", isLoggedIn)
+	http.HandleFunc("/refresh", refresh)
 }
 
 func Server() {

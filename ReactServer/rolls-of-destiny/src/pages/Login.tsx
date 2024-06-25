@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {TextField} from "@mui/material";
 import Button from "@mui/material/Button";
+import {login, authFetch, useAuth} from "../auth"
 
 export default function Login() {
 
@@ -16,11 +17,24 @@ export default function Login() {
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({username: username, password: password})
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        window.location.href = "/home";
-                    }
+            }).then(r => {
+
+                return r.json()
+            }).then(token => {
+                console.log(token)
+                    if (token.token) {
+                        login(token.token)
+                        authFetch("http://localhost:9090/isLoggedIn").then(response => {
+                            if (response.status === 200) {
+                                window.location.href = "/"
+                            }
+                        })
+
+                    } /*else {
+                        window.alert(token.errors + "\nPlease try again!")
+                        setPassword("")
+                        setUsername("")
+                    }*/
                 })
         } else {
 

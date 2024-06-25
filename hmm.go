@@ -1,7 +1,11 @@
 package main
 
 import (
+	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/Encryption"
+	Server2 "RollsOfDestiny/AccountServer/Server"
+	Database2 "RollsOfDestiny/GameServer/Database"
+	"RollsOfDestiny/GameServer/Server"
 	"fmt"
 )
 
@@ -14,7 +18,8 @@ func main() {
 
 	match := Encryption.CheckPasswordHash("secret", hash)
 	fmt.Println("Match:   ", match)
-	//Database.InitDatabase()
+	Database.InitDatabase()
+	Database2.InitDatabase()
 	/*account := SignUpLogic.SignUpInfo{
 		Username:        "test",
 		Email:           "test",
@@ -25,6 +30,6 @@ func main() {
 	fmt.Println(account.CheckEmail())
 	fmt.Println(account.ComparePassword())*/
 
-	//go Server.Server()
-	//Server2.Server()
+	go Server.Server()
+	Server2.Server()
 }
