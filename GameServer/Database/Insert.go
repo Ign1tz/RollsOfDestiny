@@ -22,7 +22,7 @@ func InsertCard(card Types.Card) error {
 
 func InsertColumn(column Types.Column) error {
 	_, err := Database.Exec("INSERT INTO columns VALUES ($1, $2, $3, $4, $5)",
-		column.GridId, column.First, column.Second, column.Third, column.Placement)
+		column.GridId, column.Placement, column.First, column.Second, column.Third)
 	return err
 }
 
@@ -33,9 +33,9 @@ func InsertGrid(grid Types.Grid) error {
 }
 
 func InsertGame(game Types.Game) error {
-	_, err := Database.Exec("INSERT INTO games VALUES ($1, $2, $3, $4, $5, $6)",
-		game.GameID, game.HostId, game.Guest, game.ActivePlayer,
-		game.HostGrid, game.GuestGrid)
+	_, err := Database.Exec("INSERT INTO games VALUES ($1, $2, $3, $4, $5, $6, $7)",
+		game.GameID, game.HostId, game.GuestId, game.ActivePlayer,
+		game.HostGrid, game.GuestGrid, game.LastRoll)
 	return err
 }
 

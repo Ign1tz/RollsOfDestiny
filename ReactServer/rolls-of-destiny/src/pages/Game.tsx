@@ -19,6 +19,7 @@ ws.onclose = () => console.log('WebSocket disconnected');
 export default function Game() {
 
     const [connected, setConnected] = useState(false)
+    const [session, setSession] = useState("")
 
     const player1: profile = {
         username: "Lukas",
@@ -45,12 +46,13 @@ export default function Game() {
             setConnected(true)
         }
         console.log(e.data)
+        setSession(e.data)
     }
     return (
         <div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
-                <Button variant="contained" onClick={() => window.location.href = "/"}>
+                <Button variant="contained" onClick={() => ws.send(JSON.stringify({session: session}))/*window.location.href = "/"*/}>
                     Back
                 </Button>
             </div>
