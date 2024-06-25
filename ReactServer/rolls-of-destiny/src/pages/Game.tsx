@@ -30,7 +30,8 @@ export default function Game() {
     const [diceRoll, setDiceRoll] = useState<number | null>(null);
     const [disableRoll, setDisableRoll] = useState(false);
     const [canPlace, setCanPlace] = useState(true);
-    const [isPaused, setIsPaused] = useState(false); // State for Pause Menu
+    const [isPaused, setIsPaused] = useState(false);
+    const [confirmSurrender, setConfirmSurrender] = useState(false);
 
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
@@ -42,7 +43,11 @@ export default function Game() {
     };
 
     const handleQuit = () => {
-        window.location.href = "/"; // Navigate back to homepage
+        window.location.href = "/";
+    };
+
+    const toggleSurrender = () => {
+        setConfirmSurrender(!confirmSurrender)
     };
 
     return (
@@ -55,12 +60,21 @@ export default function Game() {
                  width: '100%'
              }}>
             <div className="header">
-                <h1>Welcome to the Game!</h1>
                 <Button variant="contained" onClick={togglePause}>
                     Pause
                 </Button>
             </div>
             <div className="content">
+                <Modal open={confirmSurrender} onClose={toggleSurrender}>
+                    <div className="confirmSurrenderMenu">
+                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" onClick={handleQuit}>
+                            Confirm Surrender
+                        </Button>
+                    </div>
+                </Modal>
                 <Modal open={isPaused} onClose={togglePause}>
                     <div className="pauseMenu">
                         <h2>Pause Menu</h2>
@@ -70,8 +84,8 @@ export default function Game() {
                         <Button variant="contained" onClick={() => console.log("Go to Settings")}>
                             Settings
                         </Button>
-                        <Button variant="contained" onClick={handleQuit}>
-                            Quit
+                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
+                        Surrender
                         </Button>
                     </div>
                 </Modal>

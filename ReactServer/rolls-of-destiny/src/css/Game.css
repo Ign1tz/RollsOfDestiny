@@ -130,7 +130,7 @@
     margin-bottom: 20px;
 }
 
-.pauseMenu button {
+.pauseMenu button, .confirmSurrenderMenu button {
     display: block;
     width: 100%;
     margin-bottom: 10px;
@@ -144,14 +144,27 @@
     transition: background-color 0.3s;
 }
 
-.pauseMenu button:hover {
+.pauseMenu button:hover, .confirmSurrenderMenu button:hover {
     background-color: #45a049;
 }
 
-.pauseMenu button:last-child {
+.pauseMenu button:last-child, .confirmSurrenderMenu button:last-child {
     background-color: #f44336;
 }
 
-.pauseMenu button:last-child:hover {
+.pauseMenu button:last-child:hover, .confirmSurrenderMenu button:last-child:hover {
     background-color: #d32f2f;
+}
+
+.confirmSurrenderMenu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 20%;
+    text-align: center;
 }
