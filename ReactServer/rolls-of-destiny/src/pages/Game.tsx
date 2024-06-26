@@ -16,12 +16,13 @@ ws.onopen = () => {
 ws.onclose = () => console.log('WebSocket disconnected');
 */
 export default function Game() {
+    localStorage.setItem("gameInfo", "")
     console.log(localStorage.getItem("gameInfo"))
     let gameInfo = localStorage.getItem("gameInfo")
     if (!gameInfo) {
         gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
-    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('http://localhost:8080/ws'))
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
