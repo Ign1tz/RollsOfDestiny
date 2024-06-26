@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {login, authFetch, useAuth} from "../auth"
+import {Link} from "react-router-dom";
 
 export default function Login() {
 
@@ -60,6 +61,10 @@ export default function Login() {
             <br/>
             <br/>
             <Button variant="contained" onClick={submit}>Login</Button>
+            <p className={"link"}> Don't have an account yet?
+                <br/>
+                <Link to="http://localhost:3000/signup">Sign Up Here</Link>
+            </p>
         </div>
     )
 }

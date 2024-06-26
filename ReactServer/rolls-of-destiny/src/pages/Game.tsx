@@ -4,10 +4,7 @@ import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
 import {profile} from "../types/profileTypes";
 import "../css/Game.css";
-import {useEffect, useState} from "react";
-
-
-
+import {useState} from "react";
 
 
 export default function Game() {
@@ -50,7 +47,8 @@ export default function Game() {
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">
@@ -64,7 +62,8 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">

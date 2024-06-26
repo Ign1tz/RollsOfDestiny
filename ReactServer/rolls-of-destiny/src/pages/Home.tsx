@@ -1,13 +1,12 @@
 import "../css/Home.css"
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
-import BottomAppBar from "../bars/BottomAppBar";
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 
-export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
-    const [playOpened, setPlayOpened] = useState<boolean> (false)
+export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLoggedIn: Function }) {
+    const [playOpened, setPlayOpened] = useState<boolean>(false)
 
     const relocate = () => {
         window.location.href = "/profile";
@@ -23,10 +22,11 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
             )
         } else {
             return (
-                <Button variant="contained" color = "secondary"  onClick = {() => setPlayOpened(!playOpened)}> Play </Button>
+                <Button variant="contained" color="secondary" onClick={() => setPlayOpened(!playOpened)}> Play </Button>
             )
         }
     }
+
     return (
         <>
             <header>

@@ -7,16 +7,17 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import ProfileButton from "../components/ProfileButton";
+import LoginSignUpButton from "../components/LoginSignUpButton";
 
-const pages = ['Friends', 'Leaderboard'];
-const settings = ['Profile','Settings', 'Logout'];
 
-export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
+const pages = ["Home", 'Friends', 'Leaderboard', 'Rules'];
+const settings = ['Profile', 'Settings', 'Logout'];
+
+export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -35,24 +36,42 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
         setAnchorElUser(null);
     };
 
-    const relocate = () => {
-        console.log(loggedIn)
-        window.location.href = loggedIn ? "/profile": "/signup"
+    const relocate = (page: string) => {
+        console.log(loggedIn);
+        switch (page) {
+            case "Profile":
+                window.location.href = loggedIn ? "/profile" : "/login";
+                break;
+            case "Settings":
+                window.location.href = "/settings";
+                break;
+            case "Leaderboard":
+                window.location.href = "/leaderboard";
+                break;
+            case "Friends":
+                window.location.href = "/friendlist";
+                break;
+            case "Home":
+                window.location.href = "/";
+                break;
+            case "Rules":
+                window.location.href = "/rules";
+                break;
+        }
     }
 
     return (
         <AppBar position="static" color={"secondary"}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <AdbIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
                     <Typography
                         variant="h6"
                         noWrap
                         component="a"
-                        // href="#app-bar-with-responsive-menu"
                         sx={{
                             mr: 2,
-                            display: { xs: 'none', md: 'flex' },
+                            display: {xs: 'none', md: 'flex'},
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.3rem',
@@ -63,7 +82,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                         Rolls of Destiny
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
                             size="large"
                             aria-label="account of current user"
@@ -72,7 +91,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                             onClick={handleOpenNavMenu}
                             color="inherit"
                         >
-                            <MenuIcon />
+                            <MenuIcon/>
                         </IconButton>
                         <Menu
                             id="menu-appbar"
@@ -89,17 +108,17 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                             open={Boolean(anchorElNav)}
                             onClose={handleCloseNavMenu}
                             sx={{
-                                display: { xs: 'block', md: 'none' },
+                                display: {xs: 'block', md: 'none'},
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                                <MenuItem key={page} onClick={() => relocate(page)}>
                                     <Typography textAlign="center">{page}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
                     </Box>
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+                    <AdbIcon sx={{display: {xs: 'flex', md: 'none'}, mr: 1}}/>
                     <Typography
                         variant="h5"
                         noWrap
@@ -107,7 +126,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                         href="#app-bar-with-responsive-menu"
                         sx={{
                             mr: 2,
-                            display: { xs: 'flex', md: 'none' },
+                            display: {xs: 'flex', md: 'none'},
                             flexGrow: 1,
                             fontFamily: 'monospace',
                             fontWeight: 700,
@@ -118,47 +137,20 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                     >
                         Rolls of Destiny
                     </Typography>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                         {pages.map((page) => (
                             <Button
                                 key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
+                                onClick={() => relocate(page)}
+                                sx={{my: 2, color: 'white', display: 'block'}}
                             >
                                 {page}
                             </Button>
                         ))}
                     </Box>
-
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={setting==="Profile" ? relocate:handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
+                    {loggedIn ? <ProfileButton anchorElUser={anchorElUser} handleOpenUserMenu={handleOpenUserMenu}
+                                               handleCloseUserMenu={handleCloseUserMenu} settings={settings}
+                                               relocate={relocate}/> : <LoginSignUpButton></LoginSignUpButton>}
                 </Toolbar>
             </Container>
         </AppBar>
