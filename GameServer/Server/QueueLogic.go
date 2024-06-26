@@ -8,16 +8,19 @@ import (
 )
 
 func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
-
+	fmt.Println("Adding to queue")
 	if alreadyInGame(queueEntry.UserId) {
+		fmt.Println("Already in game")
 		err := Database.UpdatePlayerWebsocketID(queueEntry.UserId, queueEntry.WebsocketConnectionId)
 		if err != nil {
 			panic(err)
 			return
 		}
 	} else {
+		fmt.Println("Not in game")
 		player, _ := Database.GetOldestEntry()
-		fmt.Println(player.UserId)
+
+		fmt.Println("userid:", player.UserId)
 
 		if player.UserId == "" {
 			fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")

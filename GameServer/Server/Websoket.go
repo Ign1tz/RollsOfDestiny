@@ -33,7 +33,7 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 
 		if string(p) == "id" {
 			log.Println(string(p))
-			conn.WriteMessage(1, []byte("id:"+conn.RemoteAddr().String()))
+			conn.WriteMessage(1, []byte("id:"+strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]))
 		}
 
 		var msg = make(map[string]string)

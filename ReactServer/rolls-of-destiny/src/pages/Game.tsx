@@ -69,7 +69,7 @@ export default function Game() {
             if (e.data == "connected") {
                 setConnected(true)
                 websocket.send("id")
-            } else if (e.data.includes("id:[::1]:")) {
+            } else if (e.data.includes("id:")) {
                 console.log(e.data.split(":")[e.data.split(":").length - 1])
                 setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
             } else if (e.data.includes("{")) {
