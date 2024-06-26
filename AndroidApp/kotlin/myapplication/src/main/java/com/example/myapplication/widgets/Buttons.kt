@@ -32,10 +32,10 @@ fun LoginButton () {
     }
 }
 @Composable
-fun RegisterButton (navController: NavController) {
+fun RegisterButton () {
     Button(
         modifier = Modifier.size(130.dp,50.dp),
-        onClick = {navController.navigate(route = "home")},
+        onClick = {},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -56,7 +56,7 @@ fun TopButton (navController: NavController, icon: String) {
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black),
         shape = RoundedCornerShape(10.dp),
-        onClick = {}
+        onClick = { }
     ) {
         Text(icon,
             color = Color.White,

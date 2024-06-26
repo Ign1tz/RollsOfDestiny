@@ -26,23 +26,31 @@ fun LoginBox (navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        StartScreenTextFields(initialText = "username")
-        StartScreenTextFields(initialText = "password")
+        var nameState by remember { mutableStateOf(TextFieldValue()) }
+        var pwState by remember { mutableStateOf(TextFieldValue()) }
+
+        TextField(value = nameState,
+            onValueChange = { nameState = it},
+            label = {Text("username")},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp))
+
+        TextField(value = pwState,
+            onValueChange = { pwState = it},
+            label = {Text("password")},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp))
+
         Spacer(modifier = Modifier.padding(padding))
-        RegisterButton(navController)
+        RegisterButton()
         Spacer(Modifier.padding(padding))
         LoginButton()
     }
 }
 
 @Composable
-fun StartScreenTextFields (initialText: String) {
-    var textState by remember { mutableStateOf(TextFieldValue()) }
+fun StartScreenTextFields () {
 
-    TextField(value = textState,
-        onValueChange = { textState = it},
-        label = {Text(initialText)},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp))
 }

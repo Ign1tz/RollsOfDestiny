@@ -6,13 +6,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.LoginBox
 
 
 @Composable
-fun LoginScreen (navController: NavController) {
+fun LoginScreen (navController: NavController, loginViewModel: LoginViewModel) {
     Scaffold (
         topBar = {
             HeaderTopBar(navController, "X")

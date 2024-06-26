@@ -9,7 +9,7 @@ import com.example.myapplication.widgets.PlayField
 @Composable
 fun GameScreen (navController: NavController) {
     Column {
-        PlayField(3)
+        PlayField(6)
 
     }
 }

@@ -10,11 +10,12 @@ import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
+import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.widgets.UpButton
 
 
 @Composable
-fun HomeScreen (navController: NavController) {
+fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
     Scaffold (
         topBar = {
             HeaderTopBar(navController, "<")
