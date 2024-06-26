@@ -1,16 +1,18 @@
 package Server
 
 import (
+	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var c = make(chan *websocket.Conn, 5) //5 is an arbitrary buffer size
-var c2 = make(chan string, 5)
+var c2 = make(chan map[string]string, 5)
 
 type BotResp struct {
 	Userid string `json:"Userid"`
@@ -88,28 +90,17 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Homag Page")
-}
 
-type resp struct {
-	Gameid    string `json:"gameid"`
-	ColumnKey string `json:"columnKey"`
-}
-
-func pickColumn(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
+func queueForGame(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Println(r.Method)
 	if r.Method == "OPTIONS" {
 		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-
 	if r.Method == "POST" {
-		fmt.Println("POST request")
-
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -120,7 +111,7 @@ func pickColumn(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Raw body: %s\n", body)
 
-		var t resp
+		var t Types.QueueInfo
 
 		fmt.Println(string(body))
 
@@ -136,10 +127,17 @@ func pickColumn(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		*/
-		log.Printf("Received gameid: %s\n", t.Gameid)
-		log.Printf("Received column key: %s\n", t.ColumnKey)
+		log.Printf("Received gameid: %s\n", t.UserId)
+		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
+
+		AddToQueue(t, &c2)
+
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Homag Page")
 }
 
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -152,29 +150,33 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Client Successfully Connected")
 
-	reader(ws, c2)
+	reader(ws, &c2)
 }
 
 func setupRoutes() {
+	fmt.Println("handle something")
+	http.HandleFunc("/queue", queueForGame)
 	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/picKColumn", pickColumn)
 }
 
 func Server() {
 
-	fmt.Printf("starting")
 	fmt.Println("starting")
 	setupRoutes()
 	go func() {
-		fmt.Println("this thing")
 		var somekindofstorrage = map[string]*websocket.Conn{}
 		for {
 			select {
 			case newC := <-c:
-				somekindofstorrage[newC.RemoteAddr().String()] = newC
+				somekindofstorrage[strings.Split(newC.RemoteAddr().String(), ":")[len(strings.Split(newC.RemoteAddr().String(), ":"))-1]] = newC
 			case msg := <-c2:
-				somekindofstorrage[msg].WriteMessage(1, []byte(msg))
+				fmt.Println("s", msg["id"])
+				fmt.Println("s", msg["message"])
+				err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
+				fmt.Println(err)
 			}
 		}
 	}()
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -1,10 +1,13 @@
 package Database
 
-import "RollsOfDestiny/GameServer/Types"
+import (
+	"RollsOfDestiny/GameServer/Types"
+	"fmt"
+)
 
 func InsertPlayer(player Types.Player) error {
-	_, err := Database.Exec("INSERT INTO players (userid, username, mana) VALUES ($1, $2, $3)",
-		player.UserID, player.Username, player.Mana)
+	_, err := Database.Exec("INSERT INTO players (userid, username, mana, gridid, websocketconnectionid) VALUES ($1, $2, $3, $4, $5)",
+		player.UserID, player.Username, player.Mana, player.Grid.GridId, player.WebsocketConnectionID)
 	return err
 }
 
@@ -21,8 +24,8 @@ func InsertCard(card Types.Card) error {
 }
 
 func InsertColumn(column Types.Column) error {
-	_, err := Database.Exec("INSERT INTO columns VALUES ($1, $2, $3, $4, $5)",
-		column.GridId, column.Placement, column.First, column.Second, column.Third)
+	_, err := Database.Exec("INSERT INTO columns (gridid, first, second, third, placement) VALUES ($1, $2, $3, $4, $5)",
+		column.GridId, column.First, column.Second, column.Third, column.Placement)
 	return err
 }
 
@@ -33,13 +36,72 @@ func InsertGrid(grid Types.Grid) error {
 }
 
 func InsertGame(game Types.Game) error {
-	_, err := Database.Exec("INSERT INTO games VALUES ($1, $2, $3, $4, $5, $6, $7)",
+	_, err := Database.Exec("INSERT INTO games (gameid, host, guest, activeplayer, hostgrid, guestgrid, lastroll) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		game.GameID, game.HostId, game.GuestId, game.ActivePlayer,
 		game.HostGrid, game.GuestGrid, game.LastRoll)
+	fmt.Println(err)
 	return err
 }
 
 func UndefinedDelete(table string, key string, value string) error {
 	_, err := Database.Exec("Delete From $1 Where $2 = $3", table, key, value)
+	return err
+}
+
+func InsertWholeGame(playfield Types.Playfield) error {
+	err := InsertGrid(playfield.HostGrid)
+	if err != nil {
+		return err
+	}
+	err = InsertGrid(playfield.GuestGrid)
+	if err != nil {
+		return err
+	}
+
+	err = InsertColumn(playfield.HostGrid.Left)
+	if err != nil {
+		return err
+	}
+	err = InsertColumn(playfield.HostGrid.Middle)
+	if err != nil {
+		return err
+	}
+	err = InsertColumn(playfield.HostGrid.Right)
+	if err != nil {
+		return err
+	}
+	err = InsertColumn(playfield.GuestGrid.Left)
+	if err != nil {
+		return err
+	}
+	err = InsertColumn(playfield.GuestGrid.Middle)
+	if err != nil {
+		return err
+	}
+	err = InsertColumn(playfield.GuestGrid.Right)
+	if err != nil {
+		return err
+	}
+
+	err = InsertPlayer(playfield.Host)
+	if err != nil {
+		return err
+	}
+	err = InsertPlayer(playfield.Guest)
+	if err != nil {
+		return err
+	}
+
+	game := Types.Game{
+		HostId:       playfield.Host.UserID,
+		GuestId:      playfield.Guest.UserID,
+		HostGrid:     playfield.HostGrid.GridId,
+		GuestGrid:    playfield.GuestGrid.GridId,
+		GameID:       playfield.GameID,
+		ActivePlayer: playfield.ActivePlayer.UserID,
+		LastRoll:     "",
+	}
+
+	err = InsertGame(game)
 	return err
 }

@@ -5,12 +5,13 @@ import (
 )
 
 type Player struct {
-	Username string
-	UserID   string
-	Mana     int
-	Deck     Deck
-	Die      Die
-	Grid     Grid
+	Username              string
+	UserID                string
+	Mana                  int
+	Deck                  Deck
+	Die                   Die
+	Grid                  Grid
+	WebsocketConnectionID string
 }
 
 type PlayerLogic interface {
