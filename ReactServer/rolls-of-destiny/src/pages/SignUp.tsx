@@ -1,8 +1,7 @@
 import {Modal, TextField} from "@mui/material";
-import "../css/Login.css"
 import Button from "@mui/material/Button";
 import React, {useState} from "react";
-import "../css/SignUp.css"
+import "../css/LoginSignup.css"
 
 export default function SignUp() {
 

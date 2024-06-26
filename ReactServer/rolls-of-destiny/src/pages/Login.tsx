@@ -1,12 +1,18 @@
 import React, {useState} from "react";
-import {TextField} from "@mui/material";
+import {Modal, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {login, authFetch, useAuth} from "../auth"
+import "../css/LoginSignup.css"
 
 export default function Login() {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [isError, setIsError] = useState(false)
+
+    function handleError() {
+        setIsError(!isError)
+    }
 
     function submit() {
         if (username && password) {
@@ -37,13 +43,24 @@ export default function Login() {
                     }*/
                 })
         } else {
-
+            setIsError(true)
         }
     }
 
 
     return (
         <div className={"loginSignUpDivision"}>
+            <Modal open={isError} onClose={handleError}>
+                <div className="errorMenu">
+                    <h2>Oops...something went wrong.</h2>
+                    <div className="errorText">
+                        {"Username or Password wrong. Please try again or reset your password."}
+                    </div>
+                    <Button variant="contained" color={"secondary"} onClick={handleError}>
+                        I understand.
+                    </Button>
+                </div>
+            </Modal>
             <h1>Login</h1>
             <h3>Username</h3>
             <TextField required id="filled-basic" label="Username" variant="filled"
