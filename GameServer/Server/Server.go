@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"RollsOfDestiny/GameServer/GameLogic"
 	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
 	"fmt"
@@ -50,8 +51,13 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
+		GameLogic.BotStartGame(t)
 	}
+}
+
+type Resp struct {
+	Gameid    string `json:"gameid"`
+	ColumnKey string `json:"columnKey"`
 }
 
 func playBot(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +83,7 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Raw body: %s\n", body)
 
-		var t resp
+		var t Resp
 
 		fmt.Println(string(body))
 
@@ -86,10 +92,9 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
+		GameLogic.BotTurn(t)
 	}
 }
-
 
 func queueForGame(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -157,7 +162,9 @@ func setupRoutes() {
 	fmt.Println("handle something")
 	http.HandleFunc("/queue", queueForGame)
 	http.HandleFunc("/ws", wsEndpoint)
-	http.HandleFunc("/picKColumn", pickColumn)
+	http.HandleFunc("/startBot", startBot)
+	http.HandleFunc("/playBot", playBot)
+	//http.HandleFunc("/picKColumn", pickColumn)
 }
 
 func Server() {

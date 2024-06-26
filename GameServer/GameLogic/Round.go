@@ -63,7 +63,7 @@ func PickColumn(gameId string, columnNumber string) error {
 	} else {
 		columnErr = errors.New("wrong column number")
 	}
-
+	gamefield.ActivePlayer = gamefield.EnemyPlayer()
 	if columnErr == nil {
 		err = Database.UpdateColumn(playerColumn)
 		if err != nil {
@@ -73,6 +73,7 @@ func PickColumn(gameId string, columnNumber string) error {
 		if err != nil {
 			return err
 		}
+		err = Database.UpdateActivePlayerGames(gamefield)
 	}
 	return columnErr
 }
