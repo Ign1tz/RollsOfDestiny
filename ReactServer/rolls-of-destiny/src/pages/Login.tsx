@@ -14,8 +14,33 @@ export default function Login() {
         setIsError(!isError)
     }
 
+    function checkUsername() {
+        if (username.length < 3 || username.length > 20) {
+            return false
+        }
+
+        for (let character of username) {
+            if (!"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_".includes(character)) {
+                return false;
+            }
+        }
+        return true
+    }
+
+    function checkPassword() {
+        if (password.length < 6 || password.length > 50) {
+            return false;
+        }
+        for (let character of password) {
+            if (!"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_!$@&#+*-€".includes(character)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function submit() {
-        if (username && password) {
+        if (checkUsername() && checkPassword()) {
             fetch("http://localhost:9090/login", {
                 method: "POST",
                 headers: {
