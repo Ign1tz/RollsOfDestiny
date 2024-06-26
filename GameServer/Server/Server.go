@@ -12,8 +12,80 @@ import (
 var c = make(chan *websocket.Conn, 5) //5 is an arbitrary buffer size
 var c2 = make(chan string, 5)
 
-func cueForGame(w http.ResponseWriter, r *http.Request) {
+type BotResp struct {
+	Userid string `json:"Userid"`
+}
 
+func startBot(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Method)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		fmt.Println("OPTIONS request")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		fmt.Println("POST request")
+
+		// Read the raw body
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		fmt.Printf("Raw body: %s\n", body)
+
+		var t BotResp
+
+		fmt.Println(string(body))
+
+		err = json.Unmarshal(body, &t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+	}
+}
+
+func playBot(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Method)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		fmt.Println("OPTIONS request")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		fmt.Println("POST request")
+
+		// Read the raw body
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		fmt.Printf("Raw body: %s\n", body)
+
+		var t resp
+
+		fmt.Println(string(body))
+
+		err = json.Unmarshal(body, &t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+	}
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -85,6 +157,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func setupRoutes() {
 	http.HandleFunc("/ws", wsEndpoint)
+	http.HandleFunc("/picKColumn", pickColumn)
 }
 
 func Server() {
