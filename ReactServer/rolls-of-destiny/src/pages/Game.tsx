@@ -33,6 +33,8 @@ export default function Game() {
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
 
+    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined >(undefined);
+
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
         setDisableRoll(true);
@@ -118,7 +120,7 @@ export default function Game() {
                     <div className="playerActions">
                         <div className="diceWrapper">
                             <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
-                                  cheatValue={undefined} disabled={disableRoll}/>
+                                  cheatValue={rollValue} disabled={disableRoll}/>
                         </div>
                         <div className="grid">
                             <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
