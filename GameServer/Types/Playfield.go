@@ -7,11 +7,12 @@ import (
 
 type Game struct {
 	HostId       string
-	Guest        string
+	GuestId      string
 	HostGrid     string
 	GuestGrid    string
 	GameID       string
 	ActivePlayer string
+	LastRoll     string
 }
 
 type Playfield struct {
@@ -20,13 +21,15 @@ type Playfield struct {
 	HostGrid     Grid
 	GuestGrid    Grid
 	GameID       string
-	ActivePlayer string
+	ActivePlayer Player
+	LastRoll     string
 }
 
 type PlayfieldLogic interface {
 	Clear()
 	Results()
 	PrettyPrint()
+	EnemyPlayer()
 }
 
 func (p *Playfield) Clear() {
@@ -69,4 +72,16 @@ func (p Playfield) PrettyPrint() {
 	fmt.Println("+-+-+-+")
 	fmt.Println("|" + strconv.Itoa(p.HostGrid.Left.Third) + "|" + strconv.Itoa(p.HostGrid.Middle.Third) + "|" + strconv.Itoa(p.HostGrid.Right.Third) + "|")
 	fmt.Println("+-+-+-+")
+}
+
+func (p *Playfield) EnemyPlayer() Player {
+	activePlayer := p.ActivePlayer
+
+	var enemy Player
+	if activePlayer.UserID == p.Host.UserID {
+		enemy = p.Guest
+	} else if activePlayer.UserID == p.Guest.UserID {
+		enemy = p.Host
+	}
+	return enemy
 }

@@ -37,15 +37,27 @@ func InitDatabase() *sql.DB {
 }
 
 func DatabaseTest() {
+	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	db.Exec("Insert into players Values ('testID', 'testName', 5)")
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Established a successful connection!")
+}
+func Test2() {
 	serviceURI := os.Getenv("DATABASE_URL")
-
 	conn, _ := url.Parse(serviceURI)
 	conn.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
-	var psqlInfo = fmt.Sprintf("user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		"avnadmin", "AVNS_LLYDbJlnEIHL8CxAH1z", "defaultdb")
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", conn.String())
 
 	if err != nil {
 		log.Fatal(err)
