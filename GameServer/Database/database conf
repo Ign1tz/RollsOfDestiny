@@ -3,7 +3,8 @@ Create table IF NOT EXISTS Players
     UserID   text primary key,
     Username text not null,
     Mana     int  not null,
-    GridId   text references Grids (GridID) on delete cascade   not null
+    GridId   text references Grids (GridID) on delete cascade   not null,
+    WebsocketConnectionID text not null unique
 );
 
 CREATE table if not exists Decks
@@ -50,6 +51,15 @@ CREATE TABLE IF NOT EXISTS Games
     GuestGrid    text references Grids (GridID) on delete cascade   not null,
     LastRoll     text
 );
+
+create table if not exists queue
+(
+    UserID text NOT NULL primary key,
+    WebsocketConnectionID text NOT NULL unique,
+    placement serial
+)
+
+Alter Table Players add column WebsocketConnectionID   text not null unique
 
 
 CREATE TABLE IF NOT EXISTS accounts

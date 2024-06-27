@@ -2,10 +2,11 @@ package Database
 
 import "RollsOfDestiny/GameServer/Types"
 
-func GetDBPlayer(playerId string) (Types.Player, error) {
+func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTING IF ALREADY IN GAME
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
 	var player Types.Player
-	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana); err != nil {
+	var gridId string
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, gridId, &player.WebsocketConnectionID); err != nil {
 		return Types.Player{}, err
 	}
 	return player, nil
@@ -95,9 +96,9 @@ func GetDeckByPlayerId(playerId string) (Types.Deck, error) {
 
 func GetPlayer(playerId string) (Types.Player, error) {
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
-	var gridId string
 	var player Types.Player
-	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridId); err != nil {
+	var gridid string
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridid, &player.WebsocketConnectionID); err != nil {
 		return Types.Player{}, err
 	}
 	deck, err := GetDeckByPlayerId(player.UserID)
@@ -106,7 +107,7 @@ func GetPlayer(playerId string) (Types.Player, error) {
 	}
 	player.Deck = deck
 
-	grid, err := GetGrid(gridId)
+	grid, err := GetGrid(gridid)
 	if err != nil {
 		return player, err
 	}
@@ -123,7 +124,7 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 	}
 	var playfield Types.Playfield
 	playfield.GameID = game.GameID
-
+	playfield.LastRoll = game.LastRoll
 	activePlayer, err := GetPlayer(game.ActivePlayer)
 	if err != nil {
 		return playfield, err
