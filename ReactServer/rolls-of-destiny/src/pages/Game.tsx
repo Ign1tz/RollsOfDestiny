@@ -16,12 +16,13 @@ ws.onopen = () => {
 ws.onclose = () => console.log('WebSocket disconnected');
 */
 export default function Game() {
+    localStorage.setItem("gameInfo", "")
     console.log(localStorage.getItem("gameInfo"))
     let gameInfo = localStorage.getItem("gameInfo")
     if (!gameInfo) {
         gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
-    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('http://localhost:8080/ws'))
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
@@ -69,7 +70,7 @@ export default function Game() {
             if (e.data == "connected") {
                 setConnected(true)
                 websocket.send("id")
-            } else if (e.data.includes("id:[::1]:")) {
+            } else if (e.data.includes("id:")) {
                 console.log(e.data.split(":")[e.data.split(":").length - 1])
                 setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
             } else if (e.data.includes("{")) {
