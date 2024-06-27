@@ -73,6 +73,7 @@ export default function Login() {
             })
         } else {
             setIsError(true)
+            setPassword("")
         }
     }
 

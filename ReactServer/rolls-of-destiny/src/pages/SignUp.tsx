@@ -48,6 +48,8 @@ export default function SignUp() {
 
             setErrorMessage(message.join("\n"));
             setIsError(true)
+            setPassword("")
+            setConfirmPassword("")
 
         }
     }
