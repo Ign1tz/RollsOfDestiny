@@ -7,31 +7,30 @@ import "../css/Game.css";
 import {useEffect, useState} from "react";
 
 
-
-
-
 export default function Game() {
 
     const [connected, setConnected] = useState(false)
     const [session, setSession] = useState("")
-
-    const player1: profile = {
+    const [userInfo, setUserInfo] = useState("")
+    const [player1, setPlayer1] = useState({
         username: "Lukas",
         rating: 3450913,
-        profilePicture: "/path/to/player1.jpg",
-        biography: "Player 1's bio"
-    };
+        profilePicture: "/path/to/player1.jpg"
+    })
+    const [player2, setPlayer2] = useState<profile>({
+        username: "default",
+        rating: 0,
+        profilePicture: "/path/to/player1.jpg"
+    })
 
-    const player2: profile = {
-        username: "Moritz",
-        rating: 1,
-        profilePicture: "/path/to/player2.jpg",
-        biography: "Player 2's bio"
-    };
+    useEffect(() => {
+        let user = sessionStorage.getItem("userInfo")
+        if (user) {
+            setPlayer2(JSON.parse(user))
+        }
+    }, []);
 
-
-    return (
-        <div className="gameDivision">
+    return (<div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
                 <Button variant="contained" onClick={() => window.location.href = "/"}>
@@ -50,7 +49,8 @@ export default function Game() {
                     </div>
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">
@@ -64,7 +64,8 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100} cheatValue={undefined}/>
+                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                  cheatValue={undefined}/>
                         </div>
                         <Grid/>
                         <div className="playerCards">

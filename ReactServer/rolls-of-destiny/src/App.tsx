@@ -10,7 +10,7 @@ import SignUp from "./pages/SignUp";
 import {authFetch} from "./auth";
 
 function App() {
-    let p: profile = {username: "Bernd", biography: "H", profilePicture:" H", rating:839}
+    let p: profile = {username: "Bernd", profilePicture:" H", rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (false)
 
 
