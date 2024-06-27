@@ -5,6 +5,8 @@ import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
 import BottomAppBar from "../bars/BottomAppBar";
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
+import {authFetch} from "../auth";
+import {profile} from "../types/profileTypes";
 
 export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
     const [playOpened, setPlayOpened] = useState<boolean> (false)
@@ -13,6 +15,19 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
         window.location.href = "/profile";
         setLoggedIn(!loggedIn)
     };
+
+    useEffect(() => {
+        if (localStorage.getItem("access_token")) {
+            console.log("Access token", localStorage.getItem("access_token"));
+            authFetch("http://localhost:9090/userInfo?username=" + sessionStorage.getItem("username")).then(r => {
+
+                return r.json()
+            }).then(response => {
+                let profile: profile = response
+                sessionStorage.setItem("userInfo", JSON.stringify(profile))
+            })
+        }
+    }, []);
 
     function visibleButtons() {
         if (playOpened) {

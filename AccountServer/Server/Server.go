@@ -1,18 +1,17 @@
 package Server
 
 import (
+	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/SignUpLogic"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 )
-
-var c = make(chan *websocket.Conn, 5) //5 is an arbitrary buffer size
-var c2 = make(chan string, 5)
 
 var secretKey = []byte(os.Getenv("SECRET_KEY"))
 
@@ -115,18 +114,40 @@ func login(w http.ResponseWriter, r *http.Request) {
 func isLoggedIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
-		fmt.Println(w.Header())
 		return
 	}
-	fmt.Println(r.Method)
+	fmt.Println("isloggedin", r.Method)
 
 	if checkToken(w, r) {
+		fmt.Println("worked")
 		w.WriteHeader(http.StatusOK)
 	}
+}
 
+func accountInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	fmt.Println("aaaaaaaa", w.Header().Get("Authorization"))
+	if checkToken(w, r) {
+		myUrl, _ := url.Parse(r.URL.String())
+		params, _ := url.ParseQuery(myUrl.RawQuery)
+		fmt.Println(r.URL.String())
+		account, err := Database.GetAccountByUsername(params.Get("username"))
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		accInfo := fmt.Sprintf("{\"username\": \"%s\", \"email\": \"%s\", \"profilePicture\": \"%s\", \"rating\": \"%s\"}", account.Username, account.Email, account.ProfilePicture, strconv.Itoa(account.Rating))
+		fmt.Fprint(w, accInfo)
+	}
 }
 
 func refresh(w http.ResponseWriter, r *http.Request) {
@@ -139,6 +160,8 @@ func setupRoutes() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/isLoggedIn", isLoggedIn)
 	http.HandleFunc("/refresh", refresh)
+	http.HandleFunc("/userInfo", accountInfo)
+
 }
 
 func Server() {

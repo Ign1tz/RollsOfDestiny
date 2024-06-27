@@ -1,7 +1,7 @@
 type profile = {
     username: string,
     rating: number,
-    picture: string,
+    profilePicture: string,
     biography: string
 }
 

@@ -18,14 +18,14 @@ export default function Game() {
     const player1: profile = {
         username: "Lukas",
         rating: 3450913,
-        picture: "/path/to/player1.jpg",
+        profilePicture: "/path/to/player1.jpg",
         biography: "Player 1's bio"
     };
 
     const player2: profile = {
         username: "Moritz",
         rating: 1,
-        picture: "/path/to/player2.jpg",
+        profilePicture: "/path/to/player2.jpg",
         biography: "Player 2's bio"
     };
 
@@ -41,7 +41,7 @@ export default function Game() {
             <div className="content">
                 <div className="playerSection">
                     <div className="playerInfo">
-                        <img src={player1.picture} alt={player1.username}/>
+                        <img src={player1.profilePicture} alt={player1.username}/>
                         <div>
                             <h2>{player1.username}</h2>
                             <p>Rating: {player1.rating}</p>
@@ -74,7 +74,7 @@ export default function Game() {
                         </div>
                     </div>
                     <div className="playerInfo">
-                        <img src={player2.picture} alt={player2.username}/>
+                        <img src={player2.profilePicture} alt={player2.username}/>
                         <div>
                             <h2>{player2.username}</h2>
                             <p>Rating: {player2.rating}</p>
