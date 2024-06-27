@@ -2,8 +2,13 @@ package Database
 
 import "RollsOfDestiny/GameServer/Types"
 
-func UpdatePlayer(player Types.Player) error {
+func UpdatePlayerMana(player Types.Player) error {
 	_, err := Database.Exec("Update players set mana = $1 where userid = $2", player.Mana, player.UserID)
+	return err
+}
+
+func UpdatePlayerWebsocketID(userid string, websocketid string) error {
+	_, err := Database.Exec("Update players set websocketconnectionid = $1 where userid = $2", websocketid, userid)
 	return err
 }
 
