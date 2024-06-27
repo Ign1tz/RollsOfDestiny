@@ -52,6 +52,7 @@ export default function Login() {
                 if (r.status === 200) {
                     return r.json()
                 }else {
+                    setPassword("")
                     setIsError(true)
                     return
                 }
