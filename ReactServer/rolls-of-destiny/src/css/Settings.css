@@ -1,0 +1,91 @@
+/* Settings.css */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.settings {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+h2, h3 {
+    color: #ffffff;
+}
+
+.errorMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f8bbd0;
+    padding: 20px;
+    border: 2px solid #8e24aa;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.errorText {
+    color: #b71c1c;
+    margin: 10px 0;
+}
+
+.MuiButton-contained {
+    background-color: #8e24aa;
+    color: white;
+}
+
+.MuiButton-contained:hover {
+    background-color: #6a1b9a;
+}
+
+.MuiTextField-root {
+    margin: 10px 0;
+}
+
+.MuiInputBase-root {
+    background-color: white;
+    border-radius: 5px;
+}
+
+.MuiInputBase-input {
+    color: #6a1b9a;
+}
+
+.MuiFormLabel-root {
+    color: #6a1b9a;
+}
+
+.MuiFilledInput-underline:before {
+    border-bottom: 2px solid #8e24aa;
+}
+
+.MuiFilledInput-underline:hover:not(.Mui-disabled):before {
+    border-bottom: 2px solid #6a1b9a;
+}
+
+.MuiFilledInput-underline:after {
+    border-bottom: 2px solid #6a1b9a;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.volume, .username, .password {
+    background: rgba(85, 70, 93, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+}

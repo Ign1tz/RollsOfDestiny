@@ -5,6 +5,7 @@ export default function Rules() {
         <>
             <>
                 <TopAppBar loggedIn={true}></TopAppBar>
+                <h4>To be added...</h4>
             </>
         </>
     )
