@@ -32,6 +32,14 @@ type PlayfieldLogic interface {
 	EnemyPlayer()
 }
 
+func (p *Playfield) EnemyPlayer() Player {
+	if p.ActivePlayer.UserID != p.Host.UserID {
+		return p.Host
+	} else {
+		return p.Guest
+	}
+}
+
 func (p *Playfield) Clear() {
 	p.HostGrid.Clear()
 	p.GuestGrid.Clear()
@@ -72,16 +80,4 @@ func (p Playfield) PrettyPrint() {
 	fmt.Println("+-+-+-+")
 	fmt.Println("|" + strconv.Itoa(p.HostGrid.Left.Third) + "|" + strconv.Itoa(p.HostGrid.Middle.Third) + "|" + strconv.Itoa(p.HostGrid.Right.Third) + "|")
 	fmt.Println("+-+-+-+")
-}
-
-func (p *Playfield) EnemyPlayer() Player {
-	activePlayer := p.ActivePlayer
-
-	var enemy Player
-	if activePlayer.UserID == p.Host.UserID {
-		enemy = p.Guest
-	} else if activePlayer.UserID == p.Guest.UserID {
-		enemy = p.Host
-	}
-	return enemy
 }

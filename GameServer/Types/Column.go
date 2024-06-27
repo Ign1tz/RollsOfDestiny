@@ -11,7 +11,7 @@ type Column struct {
 	Third     int
 	IsFull    bool
 	GridId    string
-	Placement string
+	Placement int
 }
 
 type ColumnLogic interface {
