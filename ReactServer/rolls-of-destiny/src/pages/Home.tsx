@@ -1,5 +1,5 @@
 import "../css/Home.css"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
@@ -7,7 +7,7 @@ import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 import {authFetch} from "../auth";
 import {profile} from "../types/profileTypes";
 
-export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, setWebsocket}: { loggedIn: boolean, setLoggedIn: Function, setGameInfo: Function, websocket: WebSocket|undefined, setWebsocket: Function }) {
+export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLoggedIn: Function}) {
     const [playOpened, setPlayOpened] = useState<boolean>(false)
     const [connected, setConnected] = useState(false)
     const [websoketId, setWebsoketId] = useState("")
@@ -36,13 +36,7 @@ export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, set
                 <>
                     <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
                                            playOpened={playOpened}
-                                           connected={connected}
-                                           websocket={websocket}
-                                           setWebsocket={setWebsocket}
-                                           setConnected={setConnected}
-                                           websocketId={websoketId}
-                                           setWebsocketId={setWebsoketId}
-                    setGameInfo={setGameInfo}/>
+                                           />
                 </>
             )
         } else {

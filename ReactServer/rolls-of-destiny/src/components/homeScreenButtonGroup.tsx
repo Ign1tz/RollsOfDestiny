@@ -4,14 +4,7 @@ import {useEffect} from "react";
 
 type ButtonGroupPatameter = {
     setPlayOpened: Function,
-    playOpened: boolean,
-    websocket: WebSocket | undefined,
-    setWebsocket: Function,
-    connected: boolean,
-    setConnected: Function,
-    websocketId: string,
-    setWebsocketId: Function,
-    setGameInfo: Function
+    playOpened: boolean
 }
 
 
@@ -19,13 +12,6 @@ type ButtonGroupPatameter = {
 export default function HomeScreenButtonGroup({
                                                   setPlayOpened,
                                                   playOpened,
-                                                  websocket,
-                                                  setWebsocket,
-                                                  connected,
-                                                  setConnected,
-                                                  websocketId,
-                                                  setWebsocketId,
-                                                  setGameInfo
                                               }: ButtonGroupPatameter) {
 
     /*async function startWebsocket() {
