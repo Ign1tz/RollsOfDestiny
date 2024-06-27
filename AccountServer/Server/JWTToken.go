@@ -12,8 +12,6 @@ func verifyToken(tokenString string) error {
 		return secretKey, nil
 	})
 
-	fmt.Println("token raw", token)
-
 	if err != nil {
 		return err
 	}
@@ -42,13 +40,11 @@ func createToken(username string) (string, error) {
 
 func checkToken(w http.ResponseWriter, r *http.Request) bool {
 	tokenString := r.Header.Get("Authorization")
-	fmt.Println("token", tokenString)
 	if tokenString == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "Missing authorization header")
 		return false
 	}
-	fmt.Println("checking")
 	tokenString = tokenString[len("Bearer "):]
 
 	err := verifyToken(tokenString)

@@ -8,9 +8,9 @@ import {useEffect, useState} from "react";
 
 
 export default function Game() {
-    localStorage.setItem("gameInfo", "")
-    console.log(localStorage.getItem("gameInfo"))
-    let gameInfo = localStorage.getItem("gameInfo")
+    sessionStorage.setItem("gameInfo", "")
+    console.log(sessionStorage.getItem("gameInfo"))
+    let gameInfo = sessionStorage.getItem("gameInfo")
     if (!gameInfo) {
         gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
@@ -18,10 +18,10 @@ export default function Game() {
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [session, setSession] = useState("")
-    const [userInfo, setUserInfo] = useState("")
+    const [userID, setUserID] = useState("")
     const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
     const [gameId, setGameId] = useState("")
-    const [player1, setPlayer1] = useState({
+    const [player1, setPlayer1] = useState<profile>({
         username: "Lukas",
         rating: 3450913,
         profilePicture: "/path/to/player1.jpg"
@@ -33,18 +33,23 @@ export default function Game() {
     })
 
     useEffect(() => {
+        console.log("Starting websocket")
+        //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
+        sessionStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
         let user = sessionStorage.getItem("userInfo")
         if (user) {
             setPlayer2(JSON.parse(user))
+            setUserID(JSON.parse(user).userid)
         }
     }, []);
 
-
     useEffect(() => {
-        console.log("Starting websocket")
-        //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
-        localStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
-    }, [])
+        if (!gameInfoJson) {
+            console.log(gameInfoJson)
+            let tempPlayer: profile = JSON.parse(gameInfoJson)
+            setPlayer1(tempPlayer)
+        }
+    }, [gameInfoJson])
 
     useEffect(() => {
         console.log(websocket)
@@ -55,8 +60,9 @@ export default function Game() {
     }, [connected])
 
     useEffect(() => {
-        console.log("queuing websocket")
         if (websocketId !== "") {
+            console.log("queuing websocket")
+            console.log("websocketid", websocketId)
             queueForGame()
         }
     }, [websocketId])
@@ -73,14 +79,14 @@ export default function Game() {
                 setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
             } else if (e.data.includes("{")) {
                 console.log(e.data)
-                localStorage.setItem("gameInfo", e.data)
+                sessionStorage.setItem("gameInfo", e.data)
                 setGameInfoJson(JSON.parse(e.data))
             }
         }
     }
 
     async function queueForGame() {
-        console.log("test")
+        console.log("test queue")
         const response = await fetch("http://localhost:8080/queue", {
             method: "POST",
             headers: {
@@ -88,9 +94,7 @@ export default function Game() {
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({
-                userid: "testasdasfasasdasd".split('').sort(function () {
-                    return 0.5 - Math.random()
-                }).join(''), websocketconnectionid: websocketId
+                userid: userID, websocketconnectionid: websocketId
             })
         });
     }

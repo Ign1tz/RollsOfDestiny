@@ -24,8 +24,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
 
                 return r.json()
             }).then(response => {
-                let profile: profile = response
-                sessionStorage.setItem("userInfo", JSON.stringify(profile))
+                sessionStorage.setItem("userInfo", JSON.stringify(response))
             })
         }
     }, []);
