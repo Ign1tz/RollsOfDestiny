@@ -1,14 +1,15 @@
 import "../css/Home.css"
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
-import BottomAppBar from "../bars/BottomAppBar";
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 import background from "../images/game.jpg";
 
-export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLoggedIn: Function}) {
-    const [playOpened, setPlayOpened] = useState<boolean> (false)
+export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, setWebsocket}: { loggedIn: boolean, setLoggedIn: Function, setGameInfo: Function, websocket: WebSocket|undefined, setWebsocket: Function }) {
+    const [playOpened, setPlayOpened] = useState<boolean>(false)
+    const [connected, setConnected] = useState(false)
+    const [websoketId, setWebsoketId] = useState("")
 
     const relocate = () => {
         window.location.href = "/profile";
@@ -19,15 +20,24 @@ export default function Home({loggedIn, setLoggedIn}: {loggedIn: boolean, setLog
         if (playOpened) {
             return (
                 <>
-                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened} playOpened={playOpened}/>
+                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
+                                           playOpened={playOpened}
+                                           connected={connected}
+                                           websocket={websocket}
+                                           setWebsocket={setWebsocket}
+                                           setConnected={setConnected}
+                                           websocketId={websoketId}
+                                           setWebsocketId={setWebsoketId}
+                    setGameInfo={setGameInfo}/>
                 </>
             )
         } else {
             return (
-                <Button variant="contained" color = "secondary"  onClick = {() => setPlayOpened(!playOpened)}> Play </Button>
+                <Button variant="contained" color="secondary" onClick={() => setPlayOpened(!playOpened)}> Play </Button>
             )
         }
     }
+
     return (
         <>
             <header>

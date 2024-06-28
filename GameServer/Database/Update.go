@@ -2,8 +2,13 @@ package Database
 
 import "RollsOfDestiny/GameServer/Types"
 
-func UpdatePlayer(player Types.Player) error {
+func UpdatePlayerMana(player Types.Player) error {
 	_, err := Database.Exec("Update players set mana = $1 where userid = $2", player.Mana, player.UserID)
+	return err
+}
+
+func UpdatePlayerWebsocketID(userid string, websocketid string) error {
+	_, err := Database.Exec("Update players set websocketconnectionid = $1 where userid = $2", websocketid, userid)
 	return err
 }
 
@@ -17,7 +22,12 @@ func UpdateCard(card Types.Card) error {
 	return err
 }
 
-func UpdateGames(playfiled Types.Playfield) error {
-	_, err := Database.Exec("Update games set activeplayer = $1 where gameid = $2", playfiled.ActivePlayer, playfiled.GameID)
+func UpdateActivePlayerGames(playfield Types.Playfield) error {
+	_, err := Database.Exec("Update games set activeplayer = $1 where gameid = $2", playfield.ActivePlayer.UserID, playfield.GameID)
+	return err
+}
+
+func UpdateLastRollGames(playfield Types.Playfield) error {
+	_, err := Database.Exec("Update games set lastRoll = $1 where gameid = $2", playfield.LastRoll, playfield.GameID)
 	return err
 }

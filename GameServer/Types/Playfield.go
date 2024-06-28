@@ -7,11 +7,12 @@ import (
 
 type Game struct {
 	HostId       string
-	Guest        string
+	GuestId      string
 	HostGrid     string
 	GuestGrid    string
 	GameID       string
 	ActivePlayer string
+	LastRoll     string
 }
 
 type Playfield struct {
@@ -20,13 +21,23 @@ type Playfield struct {
 	HostGrid     Grid
 	GuestGrid    Grid
 	GameID       string
-	ActivePlayer string
+	ActivePlayer Player
+	LastRoll     string
 }
 
 type PlayfieldLogic interface {
 	Clear()
 	Results()
 	PrettyPrint()
+	EnemyPlayer()
+}
+
+func (p *Playfield) EnemyPlayer() Player {
+	if p.ActivePlayer.UserID != p.Host.UserID {
+		return p.Host
+	} else {
+		return p.Guest
+	}
 }
 
 func (p *Playfield) Clear() {

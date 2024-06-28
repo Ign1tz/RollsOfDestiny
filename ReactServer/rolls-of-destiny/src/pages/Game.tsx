@@ -1,30 +1,28 @@
-import { useState } from "react";
 import { Button, Modal } from "@mui/material"; // Assuming you're using Material-UI components
 
 import Grid from "../components/Grid";
 import OpponentGrid from "../components/OpponentGrid";
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
-import { profile } from "../types/profileTypes";
+import {profile} from "../types/profileTypes";
 import "../css/Game.css";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
+import {useEffect, useState} from "react";
+
 
 export default function Game() {
-    const player1: profile = {
-        username: "Lukas",
-        rating: 3450913,
-        picture: testImage,
-        biography: "Player 1's bio"
-    };
-
-    const player2: profile = {
-        username: "Moritz",
-        rating: 1,
-        picture: "/path/to/player2.jpg",
-        biography: "Player 2's bio"
-    };
-
+    localStorage.setItem("gameInfo", "")
+    console.log(localStorage.getItem("gameInfo"))
+    let gameInfo = localStorage.getItem("gameInfo")
+    if (!gameInfo) {
+        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    }
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
+    const [websocketId, setWebsocketId] = useState("")
+    const [connected, setConnected] = useState(false)
+    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
+    const [gameId, setGameId] = useState("")
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
     const [diceRoll, setDiceRoll] = useState<number | null>(null);
@@ -52,15 +50,79 @@ export default function Game() {
         setConfirmSurrender(!confirmSurrender)
     };
 
-    return (
-        <div className="gameDivision"
-             style={{
-                 backgroundImage: `url(${background})`,
-                 backgroundSize: 'cover',
-                 backgroundPosition: 'center',
-                 height: '100%',
-                 width: '100%'
-             }}>
+
+    let player1: profile = {
+        username: gameInfoJson.EnemyInfo.Username,
+        rating: 3450913,
+        picture: testImage,
+        biography: "Player 1's bio"
+    };
+
+    let player2: profile = {
+        username: gameInfoJson.YourInfo.Username,
+        rating: 1,
+        picture: "/path/to/player2.jpg",
+        biography: "Player 2's bio"
+    };
+
+
+    useEffect(() => {
+        console.log("Starting websocket")
+        //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
+        localStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
+    }, [])
+
+    useEffect(() => {
+        console.log(websocket)
+        if (connected && websocket) {
+            console.log("test")
+            websocket.send("test")
+        }
+    }, [connected])
+
+    useEffect(() => {
+        console.log("queuing websocket")
+        if (websocketId !== "") {
+            queueForGame()
+        }
+    }, [websocketId])
+
+    if (websocket) {
+        websocket.onmessage = (e) => {
+            console.log("go a message")
+            console.log("message: " + e.data)
+            if (e.data == "connected") {
+                setConnected(true)
+                websocket.send("id")
+            } else if (e.data.includes("id:")) {
+                console.log(e.data.split(":")[e.data.split(":").length - 1])
+                setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
+            } else if (e.data.includes("{")) {
+                console.log(e.data)
+                localStorage.setItem("gameInfo", e.data)
+                setGameInfoJson(JSON.parse(e.data))
+            }
+        }
+    }
+
+    async function queueForGame() {
+        console.log("test")
+        const response = await fetch("http://localhost:8080/queue", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                userid: "testasdasfasasdasd".split('').sort(function () {
+                    return 0.5 - Math.random()
+                }).join(''), websocketconnectionid: websocketId
+            })
+        });
+    }
+
+
+    return (<div className="gameDivision">
             <div className="header">
                 <Button variant="contained" onClick={togglePause}>
                     Pause

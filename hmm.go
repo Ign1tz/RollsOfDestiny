@@ -1,23 +1,37 @@
 package main
 
-import "RollsOfDestiny/GameServer/Server"
+import (
+	"RollsOfDestiny/AccountServer/Database"
+	Server2 "RollsOfDestiny/AccountServer/Server"
+	Database2 "RollsOfDestiny/GameServer/Database"
+	"RollsOfDestiny/GameServer/Server"
+	"fmt"
+	"github.com/joho/godotenv"
+	"regexp"
+)
 
 func main() {
-	Server.Server()
-	//GameLogic.GameLoop()
-	/*Database.InitDatabase()
-	//player := Types.Player{UserID: "5678", Username: "tester2", Mana: 10}
-	//err := Database.InsertPlayer(player)
-	err := Database.InsertGame(Types.Game{GameID: "game1234", HostId: "1234", Guest: "5678", ActivePlayer: "1234", HostGrid: "grid1234", GuestGrid: "grid1234"})
+	emailRegex, _ := regexp.Compile(`^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$`)
+	fmt.Println(emailRegex.MatchString("tester@test.tes"))
+
+	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
 
-	newPlayer, err := Database.GetPlayfield("game1234")
-	if err != nil {
-		panic(err)
+	Database.InitDatabase()
+	Database2.InitDatabase()
+	//Database2.DatabaseTest()
+	/*account := SignUpLogic.SignUpInfo{
+		Username:        "test",
+		Email:           "test",
+		Password:        "testtest",
+		ConfirmPassword: "testtest",
 	}
-	fmt.Println(newPlayer.Guest.Deck.Cards[0].Name)*/
-	//Database.Database()
-	//a()
+	fmt.Println(account.CheckUsername())
+	fmt.Println(account.CheckEmail())
+	fmt.Println(account.ComparePassword())*/
+
+	go Server.Server()
+	Server2.Server()
 }
