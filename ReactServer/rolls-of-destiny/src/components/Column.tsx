@@ -1,15 +1,21 @@
 import React, {useState} from "react";
 import SimpleBox from "./SimpleBox";
 
-export default function Column({canPlace, setCanPlace, columnKey, diceRoll}: {
+export default function Column({canPlace, setCanPlace, columnKey, diceRoll, websocket, connected}: {
     canPlace?: boolean,
     setCanPlace?: Function,
     columnKey: number,
-    diceRoll: number | null
+    diceRoll: number | null,
+    websocket?: WebSocket,
+    connected?: boolean
 }) {
     const [boxes, setBoxes] = useState<(number | null)[]>([null, null, null]);
 
     const handleClick = () => {
+        console.log(connected)
+        if (websocket && connected){
+            websocket.send("test " + columnKey)
+        }
         if (canPlace && diceRoll !== null && setCanPlace) {
             console.log("DiceRoll received and CanPlace True")
             const newBoxes = [...boxes];

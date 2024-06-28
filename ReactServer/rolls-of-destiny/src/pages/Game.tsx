@@ -122,7 +122,14 @@ export default function Game() {
     }
 
 
-    return (<div className="gameDivision">
+    return (
+        <div className="gameDivision" style={{
+            backgroundImage: `url(${background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100%',
+            width: '100%'
+        }} >
             <div className="header">
                 <Button variant="contained" onClick={togglePause}>
                     Pause
