@@ -14,14 +14,14 @@
 
 .textAndButtons {
     background-color: rgba(12, 3, 3, 0.56);
-    width:40%;
+    width:60%;
     height:70%;
     border-radius: 40px;
 }
 
 .homeText {
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Add a subtle shadow to text for contrast */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .homeText h1 {
