@@ -76,6 +76,14 @@ export default function Game() {
         }
     }
 
+    const handleColumnClick = (key: number) => {
+        console.log(connected)
+        if (websocket && connected){
+            console.log(websocket)
+            websocket.send("test " + key)
+        }
+    };
+
     async function queueForGame() {
         console.log("test")
         const response = await fetch("http://localhost:8080/queue", {
@@ -115,7 +123,7 @@ export default function Game() {
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
                                   cheatValue={undefined} disabled={true}/>
                         </div>
-                        <Grid/>
+                        <Grid handleColumnClick={handleColumnClick}/>
                         <div className="playerCards">
                             {/* Placeholder for player's cards */}
                             <SimpleBox/>
@@ -130,7 +138,7 @@ export default function Game() {
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
                                   cheatValue={undefined}/>
                         </div>
-                        <Grid websocket={websocket} connected={connected}/>
+                        <Grid websocket={websocket} connected={connected} handleColumnClick={handleColumnClick}/>
                         <div className="playerCards">
                             <SimpleBox/>
                             <SimpleBox/>
