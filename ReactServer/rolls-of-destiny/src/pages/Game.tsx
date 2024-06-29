@@ -104,7 +104,7 @@ export default function Game() {
     return (<div className="gameDivision">
             <div className="header">
                 <h1>Welcome to the Game!</h1>
-                <Button variant="contained" onClick={() => window.location.href = "/"}>
+                <Button variant="contained" onClick={() => {websocket.send("test");/*window.location.href = "/"*/}}>
                     Back
                 </Button>
             </div>

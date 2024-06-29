@@ -168,7 +168,7 @@ func Server() {
 				fmt.Println("s", msg["id"])
 				fmt.Println("s", msg["message"])
 				err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
-				fmt.Println(err)
+				fmt.Println("send message", err)
 			}
 		}
 	}()
