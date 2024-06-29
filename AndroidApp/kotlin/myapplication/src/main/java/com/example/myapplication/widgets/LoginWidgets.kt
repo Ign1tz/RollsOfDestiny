@@ -1,6 +1,7 @@
 package com.example.myapplication.widgets
 
 import android.content.Context
+import android.widget.TextView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,10 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.android.volley.Request
+import com.example.myapplication.connection.performHttpRequest
+import com.example.myapplication.viewmodels.LoginViewModel
+import org.json.JSONObject
 
 @Composable
-fun LoginBox (navController: NavController) {
+fun LoginBox (navController: NavController, viewModel: LoginViewModel) {
     val padding = 10.dp
     Column (
         modifier = Modifier,
@@ -46,11 +52,25 @@ fun LoginBox (navController: NavController) {
         Spacer(modifier = Modifier.padding(padding))
         RegisterButton()
         Spacer(Modifier.padding(padding))
-        LoginButton()
+        LoginButton(viewModel)
     }
 }
 
-@Composable
-fun StartScreenTextFields () {
+fun makeRequest(context: Context) {
+    val url = "https://www.google.com"
+    val requestBody = JSONObject()
 
+    performHttpRequest(
+        context,
+        url,
+        Request.Method.GET,
+        requestBody,
+        onSuccess = { response ->
+            println("Response: $response")
+        },
+        onError = { error ->
+            println("Error: $error")
+        }
+    )
 }
+

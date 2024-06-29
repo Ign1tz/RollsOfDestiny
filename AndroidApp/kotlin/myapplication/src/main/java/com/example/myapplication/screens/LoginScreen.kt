@@ -10,6 +10,7 @@ import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.LoginBox
+import kotlin.math.log
 
 
 @Composable
@@ -23,7 +24,7 @@ fun LoginScreen (navController: NavController, loginViewModel: LoginViewModel) {
         }
     ) { innerPadding ->
         Column (modifier = Modifier.padding(innerPadding)){
-            LoginBox(navController = navController)
+            LoginBox(navController = navController, loginViewModel)
         }
 
     }

@@ -1,5 +1,7 @@
 package com.example.myapplication.widgets
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -9,17 +11,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.connection.VolleySingleton
+import com.example.myapplication.viewmodels.LoginViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 
 @Composable
-fun LoginButton () {
+fun LoginButton (viewModel: LoginViewModel) {
     Button(
         modifier = Modifier.size(130.dp,50.dp),
-        onClick = {},
+        onClick = { viewModel.testenWirZusammen() },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -31,11 +43,13 @@ fun LoginButton () {
         )
     }
 }
+
+
 @Composable
 fun RegisterButton () {
     Button(
         modifier = Modifier.size(130.dp,50.dp),
-        onClick = {},
+        onClick = {  },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -48,6 +62,7 @@ fun RegisterButton () {
     }
 }
 
+
 @Composable
 fun TopButton (navController: NavController, icon: String) {
     Button(
@@ -56,7 +71,7 @@ fun TopButton (navController: NavController, icon: String) {
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black),
         shape = RoundedCornerShape(10.dp),
-        onClick = { }
+        onClick = { navController.popBackStack() }
     ) {
         Text(icon,
             color = Color.White,

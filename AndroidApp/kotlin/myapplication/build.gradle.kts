@@ -53,6 +53,7 @@ android {
 
 dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.privacysandbox.tools:tools-core:1.0.0-alpha09")
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
@@ -70,6 +71,9 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.6.0")
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
