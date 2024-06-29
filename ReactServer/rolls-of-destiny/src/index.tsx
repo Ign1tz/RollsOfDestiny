@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {AudioProvider} from "./components/AudioProvider";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-    <App />
+    <AudioProvider>
+        <App/>
+    </AudioProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
