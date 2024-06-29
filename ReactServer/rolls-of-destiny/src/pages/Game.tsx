@@ -7,14 +7,6 @@ import "../css/Game.css";
 import {useEffect, useState} from "react";
 
 
-/*export const ws = new WebSocket('http://localhost:8080/ws');
-
-ws.onopen = () => {
-    console.log('WebSocket connected')
-    ws.send(JSON.stringify({purpose:"login", UserId:"testuser1", Username:"testuser1"}))
-};
-ws.onclose = () => console.log('WebSocket disconnected');
-*/
 export default function Game() {
     localStorage.setItem("gameInfo", "")
     console.log(localStorage.getItem("gameInfo"))
@@ -57,26 +49,29 @@ export default function Game() {
     }, [connected])
 
     useEffect(() => {
-        console.log("queuing websocket")
         if (websocketId !== "") {
+            console.log("queuing websocket")
             queueForGame()
         }
     }, [websocketId])
 
     if (websocket) {
         websocket.onmessage = (e) => {
-            console.log("go a message")
-            console.log("message: " + e.data)
-            if (e.data == "connected") {
+            console.log(e.data)
+            let message = JSON.parse(e.data)
+            console.log("got a message")
+            console.log(message)
+            if (message.info == "connected") {
+                console.log("connected")
                 setConnected(true)
-                websocket.send("id")
-            } else if (e.data.includes("id:")) {
-                console.log(e.data.split(":")[e.data.split(":").length - 1])
-                setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
-            } else if (e.data.includes("{")) {
-                console.log(e.data)
-                localStorage.setItem("gameInfo", e.data)
-                setGameInfoJson(JSON.parse(e.data))
+                websocket.send(JSON.stringify({type: "id"}))
+            } else if (message.info == "id") {
+                console.log("id:", message.message.id)
+                setWebsocketId(message.message.id)
+            } else if (message.info == "gameInfo") {
+                console.log(message.message.gameInfo)
+                localStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameInfoJson(message.message.gameInfo)
             }
         }
     }

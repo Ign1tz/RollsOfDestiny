@@ -6,6 +6,7 @@ export default function Grid({websocket, connected}: {websocket?: WebSocket, con
     const handleColumnClick = (key: number) => {
         console.log(connected)
         if (websocket && connected){
+            console.log(websocket)
             websocket.send("test " + key)
         }
     };

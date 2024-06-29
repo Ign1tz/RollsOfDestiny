@@ -130,7 +130,8 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 
 			msg["id"] = host.WebsocketConnectionID
 			message := `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}}`
-			msg["message"] = message
+			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + message + `}}`
+			msg["message"] = infoMessage
 
 			*c2 <- msg
 
@@ -139,7 +140,8 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			fmt.Println("After first message")
 			msg2["id"] = guest.WebsocketConnectionID
 			message = `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}}`
-			msg2["message"] = message
+			infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + message + `}}`
+			msg2["message"] = infoMessage
 
 			*c2 <- msg2
 			fmt.Println("second", msg2["id"])

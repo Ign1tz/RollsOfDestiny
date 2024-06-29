@@ -2,6 +2,8 @@ package Server
 
 import (
 	"RollsOfDestiny/GameServer/Database"
+	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"strconv"
@@ -20,49 +22,54 @@ type websocketMessage struct {
 }
 
 func reader(conn *websocket.Conn, c2 *chan map[string]string) {
-	conn.WriteMessage(1, []byte("connected"))
+	conn.WriteMessage(1, []byte(`{"info": "connected", "message": {"connected": "true"}}`))
+	connectionID := strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]
 	//fmt.Printf("test")
 	for {
+		fmt.Println("reader start")
 		//fmt.Printf(conn.RemoteAddr())
 		//
 		_, p, err := conn.ReadMessage()
+		fmt.Println("message recived")
 		if err != nil {
 			log.Println(err)
 			return
 		}
+		/*
+			if string(p) == "id" {
+				log.Println(string(p))
+				conn.WriteMessage(1, []byte("id:"+strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]))
+			}
 
-		if string(p) == "id" {
-			log.Println(string(p))
-			conn.WriteMessage(1, []byte("id:"+strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]))
+			var msg = make(map[string]string)
+			msg["id"] = connectionID
+			msg["message"] = string(conn.RemoteAddr().String())*/
+
+		log.Println(string(p))
+
+		var message websocketMessage
+
+		err = json.Unmarshal(p, &message)
+		if err != nil {
+			return
 		}
-
-		var msg = make(map[string]string)
-		msg["id"] = strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]
-		msg["message"] = string(conn.RemoteAddr().String())
-
+		msg := categorizeMessage(message, connectionID)
 		*c2 <- msg
 
 		log.Println("reader end:", string(p))
-
-		//conn.WriteMessage(messageType, []byte("testasdfas"))
-
-		/*if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}*/
-		//fmt.Printf("test2")
 	}
 }
 
-func categorizeMessage(message websocketMessage, connectionId string) {
+func categorizeMessage(message websocketMessage, connectionId string) map[string]string {
 	var msg = make(map[string]string)
 	switch message.Type {
 	case "id":
 		msg["id"] = connectionId
-		msg["message"] = `{"id": "` + connectionId + `"}`
+		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
 	case "pickColumn":
 		handlePickedColumn(message)
 	}
+	return msg
 }
 
 func handlePickedColumn(message websocketMessage) {

@@ -132,10 +132,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Homag Page")
-}
-
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
@@ -144,9 +140,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println("Client Successfully Connected")
 
 	reader(ws, &c2)
+	log.Println("Client Successfully Connected")
 }
 
 func setupRoutes() {
