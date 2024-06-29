@@ -15,10 +15,6 @@ import (
 var c = make(chan *websocket.Conn, 5) //5 is an arbitrary buffer size
 var c2 = make(chan map[string]string, 5)
 
-type BotResp struct {
-	Userid string `json:"Userid"`
-}
-
 func startBot(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -42,7 +38,7 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Raw body: %s\n", body)
 
-		var t BotResp
+		var t Types.BotResp
 
 		fmt.Println(string(body))
 
@@ -53,11 +49,6 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 		}
 		GameLogic.BotStartGame(t)
 	}
-}
-
-type Resp struct {
-	Gameid    string `json:"gameid"`
-	ColumnKey string `json:"columnKey"`
 }
 
 func playBot(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +74,7 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Raw body: %s\n", body)
 
-		var t Resp
+		var t Types.Resp
 
 		fmt.Println(string(body))
 

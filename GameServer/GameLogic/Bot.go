@@ -2,14 +2,13 @@ package GameLogic
 
 import (
 	"RollsOfDestiny/GameServer/Database"
-	"RollsOfDestiny/GameServer/Server"
 	"RollsOfDestiny/GameServer/Types"
 	"fmt"
 	"github.com/google/uuid"
 	"math/rand"
 )
 
-func BotTurn(gameInfo Server.Resp) {
+func BotTurn(gameInfo Types.Resp) {
 
 	err := PickColumn(gameInfo.Gameid, gameInfo.ColumnKey)
 
@@ -55,7 +54,7 @@ func BotTurn(gameInfo Server.Resp) {
 	gamefield.ActivePlayer = enemy
 }
 
-func BotStartGame(queueEntry Server.BotResp) {
+func BotStartGame(queueEntry Types.BotResp) {
 	fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 	gridId1 := uuid.New().String()
 	hostGrid := Types.Grid{
