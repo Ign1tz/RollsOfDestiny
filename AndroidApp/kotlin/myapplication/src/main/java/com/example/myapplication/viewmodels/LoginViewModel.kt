@@ -2,39 +2,89 @@ package com.example.myapplication.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
+import com.example.myapplication.types.token
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.request.get
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import kotlinx.coroutines.launch
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.coroutines.runBlocking
 
-class LoginViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
-
-    private val ipAddress = "192.168.0.181"
-    suspend private fun testHttp (userName: String, password: String) {
-        val client = HttpClient(CIO)
+class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
-        //Log.d("HttpTest", System.getenv("LOCAL_IP"))
+    private val IPADDRESS = "10.0.0.2"
 
-        val response: HttpResponse = client.post("http://" + ipAddress + ":9090/login") {
-            setBody("{\"username\":\"" + userName +"\", \"password\":\"" + password+"\"}")
+
+    suspend private fun loginRequest(userName: String, password: String): Boolean {
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
         }
 
-        Log.d("HttpTest", response.status.toString())
+        try {
+            val responseText: HttpResponse = client.post("http://$IPADDRESS:9090/login") {
+                contentType(ContentType.Application.Json)
+                setBody("{\"username\":\"$userName\", \"password\":\"$password\"}")
+            }
 
-        client.close()
+            if (responseText.status.value != 200) {
+                return false
+            }
 
+            val token: token = Json.decodeFromString(responseText.body())
+            repository.returnDelete(
+                User(
+                    userName = userName,
+                    password = password,
+                    jwtToken = token.token
+                )
+            )
+            repository.returnInsert(
+                User(
+                    userName = userName,
+                    password = password,
+                    jwtToken = token.token
+                )
+            )
+            client.close()
+            return true
+        } catch (e: Exception) {
+            Log.d("HttpTest", "Received error: ${e.message}")
+        }
+        return false
     }
 
-    fun login (userName: String, password: String) {
-        viewModelScope.launch { testHttp(userName, password) }
-        Log.d("HttpTest", "login")
+    fun login(userName: String, password: String): Boolean {
+        var worked = false
 
+        runBlocking { worked = loginRequest(userName, password) }
+
+        return worked
+    }
+
+    fun checkAlreadyLoggedIn(): Boolean {
+        var worked = false
+        runBlocking {
+            var newUser = repository.getUser()
+            worked = loginRequest(newUser.userName, newUser.password)
+
+        }
+
+        return worked
     }
 }
