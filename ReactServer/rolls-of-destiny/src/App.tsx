@@ -7,6 +7,8 @@ import {profile} from "./types/profileTypes";
 import Game from "./pages/Game";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import Leaderboard from "./pages/Leaderboard";
+import Friendlist from "./pages/Friendlist";
 
 function App() {
     let p: profile = {username: "Bernd", biography: "H", picture:" H", rating:839}
@@ -24,6 +26,8 @@ function App() {
                 <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn} setGameInfo={setGameInfo} websocket={websocket} setWebsocket={setWebsocket}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
                 <Route path={"/game" } element={<Game/>}/>
+                <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>
+                <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn}/>}/>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/signup" element={<SignUp/>}/>
             </Routes>

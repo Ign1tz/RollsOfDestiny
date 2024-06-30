@@ -13,10 +13,10 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-const pages = ['Friends', 'Leaderboard'];
-const settings = ['Profile','Settings', 'Logout'];
+const pages = ["Home", 'Friends', 'Leaderboard'];
+const settings = ['Profile', 'Settings', 'Logout'];
 
-export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
+export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -35,9 +35,22 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
         setAnchorElUser(null);
     };
 
-    const relocate = () => {
-        console.log(loggedIn)
-        window.location.href = loggedIn ? "/profile": "/signup"
+    const relocate = (page: string) => {
+        console.log(loggedIn);
+        switch (page) {
+            case "Profile":
+                window.location.href = loggedIn ? "/profile" : "/login";
+                break;
+            case "Leaderboard":
+                window.location.href = "/leaderboard";
+                break;
+            case "Friends":
+                window.location.href = "/friendlist";
+                break;
+            case "Home":
+                window.location.href = "/";
+                break;
+        }
     }
 
     return (
@@ -49,7 +62,6 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                         variant="h6"
                         noWrap
                         component="a"
-                        // href="#app-bar-with-responsive-menu"
                         sx={{
                             mr: 2,
                             display: { xs: 'none', md: 'flex' },
@@ -93,7 +105,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                                <MenuItem key={page} onClick={() => relocate(page)}>
                                     <Typography textAlign="center">{page}</Typography>
                                 </MenuItem>
                             ))}
@@ -122,7 +134,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                         {pages.map((page) => (
                             <Button
                                 key={page}
-                                onClick={handleCloseNavMenu}
+                                onClick={() => relocate(page)}
                                 sx={{ my: 2, color: 'white', display: 'block' }}
                             >
                                 {page}
@@ -153,7 +165,7 @@ export default function TopAppBar({loggedIn}: {loggedIn: boolean}) {
                             onClose={handleCloseUserMenu}
                         >
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={setting==="Profile" ? relocate:handleCloseUserMenu}>
+                                <MenuItem key={setting} onClick={setting === "Profile" ? () => relocate(setting) : handleCloseUserMenu}>
                                     <Typography textAlign="center">{setting}</Typography>
                                 </MenuItem>
                             ))}
