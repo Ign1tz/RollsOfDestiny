@@ -1,9 +1,10 @@
-import "../css/Home.css";
-import { useState } from "react";
+import "../css/Home.css"
+import {useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
-import { Link } from "react-router-dom";
-import Button from "@mui/material/Button";
+import {Link} from "react-router-dom";
+import Button from '@mui/material/Button';
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
+import background from "../images/game.jpg";
 import TextField from "@mui/material/TextField";
 import * as React from "react";
 import Box from "@mui/material/Box";
@@ -11,8 +12,10 @@ import { profile } from "../types/profileTypes";
 import { Modal } from "@mui/material";
 import testImage from "../soundtracks/testImage.png"
 
-export default function Home({ loggedIn, setLoggedIn }: { loggedIn: boolean, setLoggedIn: Function }) {
-    const [playOpened, setPlayOpened] = useState<boolean>(false);
+export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, setWebsocket}: { loggedIn: boolean, setLoggedIn: Function, setGameInfo: Function, websocket: WebSocket|undefined, setWebsocket: Function }) {
+    const [playOpened, setPlayOpened] = useState<boolean>(false)
+    const [connected, setConnected] = useState(false)
+    const [websoketId, setWebsoketId] = useState("")
 
     const users: profile[] = [
         { username: "Bernd", rating: 839, picture: testImage, biography: "Bio for Bernd" },
@@ -27,6 +30,7 @@ export default function Home({ loggedIn, setLoggedIn }: { loggedIn: boolean, set
     const [resultsFound, setResultsFound] = useState(false);
     const [noResultsFound, setNoResultsFound] = useState(false);
 
+
     const relocate = () => {
         window.location.href = "/profile";
         setLoggedIn(!loggedIn);
@@ -36,15 +40,24 @@ export default function Home({ loggedIn, setLoggedIn }: { loggedIn: boolean, set
         if (playOpened) {
             return (
                 <>
-                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened} playOpened={playOpened} />
+                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
+                                           playOpened={playOpened}
+                                           connected={connected}
+                                           websocket={websocket}
+                                           setWebsocket={setWebsocket}
+                                           setConnected={setConnected}
+                                           websocketId={websoketId}
+                                           setWebsocketId={setWebsoketId}
+                    setGameInfo={setGameInfo}/>
                 </>
             );
         } else {
             return (
                 <Button variant="contained" color="secondary" onClick={() => setPlayOpened(!playOpened)}> Play </Button>
-            );
+            )
         }
     }
+
 
     function submitSearchBar() {
         // for connecting with backend
@@ -100,15 +113,18 @@ export default function Home({ loggedIn, setLoggedIn }: { loggedIn: boolean, set
                 <TopAppBar loggedIn={loggedIn} />
             </header>
             <div className="homepage">
-                <div className="homeText">
-                    <h1>Rolls of Destiny</h1>
-                    <h3>A game made by</h3>
-                    <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
-                </div>
-                <div className="homeButtons">
-                    {visibleButtons()}
+                <div className="textAndButtons">
+                    <div className="homeText">
+                        <h1>Rolls of Destiny</h1>
+                        <h3>A game made by</h3>
+                        <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
+                        <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link>
+                        </p>
+                        <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
+                    </div>
+                    <div className="homeButtons">
+                        {visibleButtons()}
+                    </div>
                 </div>
                 <Box id="searchBox">
                     <TextField id="filled-basic" label="Search for a player" variant="filled"
@@ -146,9 +162,6 @@ export default function Home({ loggedIn, setLoggedIn }: { loggedIn: boolean, set
                     </Box>
                 </Modal>
             </div>
-            <footer style={{ textAlign: "center", fontSize: "x-small" }}>
-                Copyright
-            </footer>
         </>
     );
 }

@@ -17,7 +17,7 @@ import "../css/ExtraTopAppBar.css"
 const pages = ["Home", 'Friends', 'Leaderboard', 'Rules'];
 const settings = ['Profile', 'Settings', 'Logout'];
 
-export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
+export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -142,7 +142,7 @@ export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
                             <Button
                                 key={page}
                                 onClick={() => relocate(page)}
-                                sx={{my: 2, color: 'white', display: 'block'}}
+                                sx={{ my: 2, color: 'white', display: 'block' }}
                             >
                                 {page}
                             </Button>
