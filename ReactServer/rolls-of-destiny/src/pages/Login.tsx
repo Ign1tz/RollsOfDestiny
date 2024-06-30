@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Modal, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
-import {authFetch, login} from "../auth"
+import {login} from "../auth"
 import "../css/LoginSignup.css"
 import {Link} from "react-router-dom";
 
@@ -51,31 +51,21 @@ export default function Login() {
                 body: JSON.stringify({username: username, password: password})
             }).then(r => {
                 if (r.status === 200) {
-                    return r.json()
-                }else {
-                    setPassword("")
-                    setIsError(true)
-                    return
-                }
-            }).then(token => {
-                console.log(token)
-                if (token && token.token) {
-                    login(token.token)
-                    authFetch("http://localhost:9090/isLoggedIn").then(response => {
-                        if (response.status === 200) {
+                    r.json().then(token => {
+                        if (token.token) {
+                            login(token.token)
+                            sessionStorage.setItem("username", username)
                             window.location.href = "/"
                         }
                     })
 
-                } /*else {
-                        window.alert(token.errors + "\nPlease try again!")
-                        setPassword("")
-                        setUsername("")
-                    }*/
+                    return
+                } else {
+                    setPassword("")
+                    setIsError(true)
+                    return
+                }
             })
-        } else {
-            setIsError(true)
-            setPassword("")
         }
     }
 

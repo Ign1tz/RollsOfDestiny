@@ -2,7 +2,6 @@ package SignUpLogic
 
 import (
 	"RollsOfDestiny/AccountServer/Database"
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -25,7 +24,6 @@ func (s *SignUpInfo) CheckUsername() bool {
 		return false
 	}
 	for _, u := range s.Username {
-		fmt.Println(string(u))
 		if !strings.Contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", string(u)) {
 			return false
 		}

@@ -3,33 +3,30 @@ package Server
 import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 	"github.com/google/uuid"
+	"log"
 )
 
 func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
-	fmt.Println("Adding to queue")
 	if alreadyInGame(queueEntry.UserId) {
-		fmt.Println("Already in game")
 		err := Database.UpdatePlayerWebsocketID(queueEntry.UserId, queueEntry.WebsocketConnectionId)
 		if err != nil {
 			panic(err)
 			return
 		}
 	} else {
-		fmt.Println("Not in game")
 		player, _ := Database.GetOldestEntry()
 
-		fmt.Println("userid:", player.UserId)
-
 		if player.UserId == "" {
-			fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 			err := Database.AddToQueueDatabase(queueEntry)
 			if err != nil {
-				fmt.Println(err)
+			}
+		} else if player.UserId == queueEntry.UserId {
+			err := Database.UpdateQueueEntry(queueEntry.UserId, queueEntry.WebsocketConnectionId)
+			if err != nil {
+				log.Println(err)
 			}
 		} else {
-			fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 			gridId1 := uuid.New().String()
 			hostGrid := Types.Grid{
 				Left: Types.Column{
@@ -87,7 +84,6 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				},
 				GridId: gridId2,
 			}
-			fmt.Println("After creating grid")
 
 			host := Types.Player{
 				Username:              "Host",
@@ -108,8 +104,6 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Grid:                  guestGrid,
 			}
 
-			fmt.Println("After creating player")
-
 			playfield := Types.Playfield{
 				Host:         host,
 				Guest:        guest,
@@ -119,12 +113,13 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				ActivePlayer: host,
 			}
 
-			fmt.Println("After creating stuff")
 			err := Database.InsertWholeGame(playfield)
 			if err != nil {
-				fmt.Println(err)
-				panic(err)
+				Database.DeleteGame(hostGrid.GridId)
+				Database.DeleteGame(guestGrid.GridId)
+				log.Println(err)
 			}
+			Database.DeleteFromQueue(player)
 
 			var msg = make(map[string]string)
 
@@ -135,15 +130,11 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			*c2 <- msg
 
 			var msg2 = make(map[string]string)
-			fmt.Println("first", msg["id"])
-			fmt.Println("After first message")
 			msg2["id"] = guest.WebsocketConnectionID
 			message = `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}}`
 			msg2["message"] = message
 
 			*c2 <- msg2
-			fmt.Println("second", msg2["id"])
-			fmt.Println("After second message")
 		}
 	}
 }

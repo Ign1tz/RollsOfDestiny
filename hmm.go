@@ -5,15 +5,10 @@ import (
 	Server2 "RollsOfDestiny/AccountServer/Server"
 	Database2 "RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Server"
-	"fmt"
 	"github.com/joho/godotenv"
-	"regexp"
 )
 
 func main() {
-	emailRegex, _ := regexp.Compile(`^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$`)
-	fmt.Println(emailRegex.MatchString("tester@test.tes"))
-
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)

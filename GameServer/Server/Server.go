@@ -16,9 +16,7 @@ var c2 = make(chan map[string]string, 5)
 
 func queueForGame(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Println(r.Method)
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
@@ -35,8 +33,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Raw body: %s\n", body)
 
 		var t Types.QueueInfo
-
-		fmt.Println(string(body))
 
 		err = json.Unmarshal(body, &t)
 		if err != nil {
@@ -77,14 +73,12 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupRoutes() {
-	fmt.Println("handle something")
 	http.HandleFunc("/queue", queueForGame)
 	http.HandleFunc("/ws", wsEndpoint)
 }
 
 func Server() {
 
-	fmt.Println("starting")
 	setupRoutes()
 	go func() {
 		var somekindofstorrage = map[string]*websocket.Conn{}
@@ -96,7 +90,10 @@ func Server() {
 				fmt.Println("s", msg["id"])
 				fmt.Println("s", msg["message"])
 				err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
-				fmt.Println(err)
+				if err != nil {
+					log.Println(err)
+
+				}
 			}
 		}
 	}()
