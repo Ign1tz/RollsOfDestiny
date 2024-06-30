@@ -12,7 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import ProfileButton from "../components/ProfileButton";
 import LoginSignUpButton from "../components/LoginSignUpButton";
-
+import "../css/ExtraTopAppBar.css"
 
 const pages = ["Home", 'Friends', 'Leaderboard', 'Rules'];
 const settings = ['Profile', 'Settings', 'Logout'];
@@ -148,6 +148,7 @@ export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
                             </Button>
                         ))}
                     </Box>
+
                     {loggedIn ? <ProfileButton anchorElUser={anchorElUser} handleOpenUserMenu={handleOpenUserMenu}
                                                handleCloseUserMenu={handleCloseUserMenu} settings={settings}
                                                relocate={relocate}/> : <LoginSignUpButton></LoginSignUpButton>}

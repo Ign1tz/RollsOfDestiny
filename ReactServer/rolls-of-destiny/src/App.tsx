@@ -9,9 +9,10 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Rules from "./pages/Rules";
 import Settings from "./pages/Settings";
+import testImage from "./soundtracks/testImage.png"
 
 function App() {
-    let p: profile = {username: "Bernd", picture: "profilePic", biography: "This is the bio", rating:839}
+    let p: profile = {username: "Bernd", picture: testImage, biography: "This is the bio", rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (true)
     
     return (

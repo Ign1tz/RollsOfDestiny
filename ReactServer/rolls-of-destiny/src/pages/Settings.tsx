@@ -1,10 +1,10 @@
 import TopAppBar from "../bars/TopAppBar";
-import {Modal, Slider, Stack, TextField} from "@mui/material";
+import {Modal, TextField} from "@mui/material";
 import React, {useState} from "react";
 import Button from "@mui/material/Button";
 import "../css/Settings.css"
-import {VolumeDown, VolumeUp} from "@mui/icons-material";
 import {profile} from "../types/profileTypes";
+import VolumeSlider from "../components/VolumeSlider";
 
 export default function Settings({profile}: {profile:profile }) {
 
@@ -12,18 +12,11 @@ export default function Settings({profile}: {profile:profile }) {
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword ] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [isUsernameError, setIsUsernameError] = useState(false)
-    const [isPasswordError, setIsPasswordError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
-
-    const [volume, setVolume] = React.useState<number>(30);
-
-    const handleVolumeChange = (event: Event, newValue: number | number[]) => {
-        setVolume(newValue as number);
-    };
+    const [isUsernameError, setIsUsernameError] = useState(false);
+    const [isPasswordError, setIsPasswordError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     function checkPasswordChange() {
-
         // return false if oldPassword is incorrect
         // if (oldPassword != database entry password ...)
 
@@ -31,7 +24,7 @@ export default function Settings({profile}: {profile:profile }) {
             return false;
         }
         if (newPassword.length < 6 || newPassword.length > 50) {
-            return false
+            return false;
         }
 
         for (let character of newPassword) {
@@ -41,11 +34,10 @@ export default function Settings({profile}: {profile:profile }) {
         }
 
         return true;
-
     }
 
     function checkUsernameChange() {
-        if (profile.username === newUsername || newUsername == "") {
+        if (profile.username === newUsername || newUsername === "") {
             return false;
         }
 
@@ -55,18 +47,16 @@ export default function Settings({profile}: {profile:profile }) {
             }
         }
         return true;
-
     }
 
     function closeError() {
-        setIsUsernameError(false)
-        setIsPasswordError(false)
-        setErrorMessage("")
+        setIsUsernameError(false);
+        setIsPasswordError(false);
+        setErrorMessage("");
     }
 
     function submitNewUsername() {
         if (checkUsernameChange()) {
-            console.log("Here")
             fetch("http://localhost:9090/changeUsername", {
                 method: "POST",
                 headers: {
@@ -76,13 +66,13 @@ export default function Settings({profile}: {profile:profile }) {
                 body: JSON.stringify({oldUsername: profile.username, newUsername: newUsername})
             }).then(r => {
                 if (r.status === 404) {
-                    return r.json()
+                    return r.json();
                 }
-                setErrorMessage("Username already taken.")
-            })
+                setErrorMessage("Username already taken.");
+            });
         } else {
-            setIsUsernameError(true)
-            setErrorMessage("New username not valid.")
+            setIsUsernameError(true);
+            setErrorMessage("New username not valid.");
         }
     }
 
@@ -97,18 +87,17 @@ export default function Settings({profile}: {profile:profile }) {
                 body: JSON.stringify({oldPassword: oldPassword, newPassword: newPassword})
             }).then(r => {
                 if (r.status === 404) {
-                    return r.json()
+                    return r.json();
                 }
-                setErrorMessage("Something went wrong while trying to save your password. Please try again.")
-            })
+                setErrorMessage("Something went wrong while trying to save your password. Please try again.");
+            });
         } else {
-            setIsPasswordError(true)
+            setIsPasswordError(true);
             if (oldPassword !== "" && newPassword !=="" && confirmNewPassword!=="") {
-                setErrorMessage( "New Password may not be valid. Old Password may be false. Maybe Password and Confirm Password are not the same.")
+                setErrorMessage("New Password may not be valid. Old Password may be false. Maybe Password and Confirm Password are not the same.");
             } else {
-                setErrorMessage("Please fill out every field if you want to change your password.")
+                setErrorMessage("Please fill out every field if you want to change your password.");
             }
-
         }
     }
 
@@ -129,13 +118,17 @@ export default function Settings({profile}: {profile:profile }) {
                     </div>
                 </Modal>
                 <div className="grid-container">
+                    <div className="profilePicture">
+                        <h2 id={"h2Text"}>Profile Picture</h2>
+                        <h3 id={"h3Text"}>Your current Profile Picture:</h3>
+                        <img src={profile.picture} alt={"profile picture current"}/>
+                        <h3 id={"h3Text"}>Upload a new picture</h3>
+                        <h4>Coming soon...</h4>
+                    </div>
                     <div className="volume">
                         <h2 id={"h2Text"}>Volume</h2>
-                        <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
-                            <VolumeDown />
-                            <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
-                            <VolumeUp />
-                        </Stack>
+                        <VolumeSlider/>
+                        <h5>Attention: it is required to "slide" the bar, not click it.</h5>
                     </div>
                     <div className="username">
                         <h2 id={"h2Text"}>Username</h2>
@@ -168,5 +161,5 @@ export default function Settings({profile}: {profile:profile }) {
                 </div>
             </div>
         </>
-    )
+    );
 }
