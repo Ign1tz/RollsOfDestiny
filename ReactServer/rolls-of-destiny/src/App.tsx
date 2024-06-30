@@ -13,6 +13,7 @@ import testImage from "./soundtracks/testImage.png"
 import Leaderboard from "./pages/Leaderboard";
 import Friendlist from "./pages/Friendlist";
 import {authFetch} from "./auth";
+import Decks from "./pages/Decks";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/signup" element={<SignUp/>}/>
                 <Route path="/rules" element={<Rules/>}/>
                 <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
+                <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
             </Routes>
         </BrowserRouter>
     </>

@@ -1,0 +1,9 @@
+.differentDecks {
+    display: grid;
+    grid-template-columns: repeat(3, 4fr);
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+}

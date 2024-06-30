@@ -10,6 +10,7 @@ import background_music from "../soundtracks/background_music.mp3";
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
+import VolumeSlider from "../components/VolumeSlider";
 
 
 export default function Game() {
@@ -177,11 +178,9 @@ export default function Game() {
                     <Modal open={isPaused} onClose={togglePause}>
                         <div className="pauseMenu">
                             <h2>Pause Menu</h2>
+                            <VolumeSlider/>
                             <Button variant="contained" onClick={togglePause}>
                                 Continue playing
-                            </Button>
-                            <Button variant="contained" onClick={() => console.log("Go to Settings")}>
-                                Settings
                             </Button>
                             <Button variant="contained" onClick={() => {
                                 toggleSurrender();

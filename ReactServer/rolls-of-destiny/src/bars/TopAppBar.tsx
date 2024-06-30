@@ -15,7 +15,7 @@ import LoginSignUpButton from "../components/LoginSignUpButton";
 import "../css/ExtraTopAppBar.css"
 
 const pages = ["Home", 'Friends', 'Leaderboard', 'Rules'];
-const settings = ['Profile', 'Settings', 'Logout'];
+const settings = ['Profile', 'Decks', 'Settings', 'Logout'];
 
 export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -56,6 +56,9 @@ export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
                 break;
             case "Rules":
                 window.location.href = "/rules";
+                break;
+            case "Decks":
+                window.location.href = "/decks";
                 break;
         }
     }
