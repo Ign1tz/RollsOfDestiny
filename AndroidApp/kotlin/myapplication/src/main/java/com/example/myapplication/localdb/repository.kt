@@ -15,4 +15,5 @@ class Repository (private val dao: dao) {
     fun returnInsert (user:User) = dao.Insert(user)
     fun returnUpdate (user:User) = dao.Update(user)
     fun returnDelete (user:User) = dao.Delete(user)
+    fun getUserById (id: Long): Flow<User> = dao.getUserById(id.toString())
 }

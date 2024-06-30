@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -15,12 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.android.volley.Request
-import com.example.myapplication.connection.performHttpRequest
 import com.example.myapplication.viewmodels.LoginViewModel
 import org.json.JSONObject
 
@@ -32,45 +37,41 @@ fun LoginBox (navController: NavController, viewModel: LoginViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        var nameState by remember { mutableStateOf(TextFieldValue()) }
-        var pwState by remember { mutableStateOf(TextFieldValue()) }
+        var nameState by remember { mutableStateOf("") }
+        var pwState by remember { mutableStateOf("") }
 
         TextField(value = nameState,
-            onValueChange = { nameState = it},
+            onValueChange = { newName ->
+                nameState = newName },
             label = {Text("username")},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp))
 
         TextField(value = pwState,
-            onValueChange = { pwState = it},
+            onValueChange = { newPassword -> pwState = newPassword},
             label = {Text("password")},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp))
 
         Spacer(modifier = Modifier.padding(padding))
-        RegisterButton()
+        Button(
+            modifier = Modifier.size(130.dp,50.dp),
+            onClick = { viewModel.login(nameState, pwState)},
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black
+            )
+        ) {
+            Text("Login",
+                color = Color.White,
+                fontSize = 25.sp,
+                fontFamily = FontFamily.Serif
+            )
+        }
         Spacer(Modifier.padding(padding))
         LoginButton(viewModel)
     }
 }
 
-fun makeRequest(context: Context) {
-    val url = "https://www.google.com"
-    val requestBody = JSONObject()
-
-    performHttpRequest(
-        context,
-        url,
-        Request.Method.GET,
-        requestBody,
-        onSuccess = { response ->
-            println("Response: $response")
-        },
-        onError = { error ->
-            println("Error: $error")
-        }
-    )
-}
 

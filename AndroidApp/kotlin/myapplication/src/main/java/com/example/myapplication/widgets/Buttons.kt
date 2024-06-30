@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.myapplication.connection.VolleySingleton
 import com.example.myapplication.viewmodels.LoginViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -29,19 +28,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginButton (viewModel: LoginViewModel) {
-    Button(
-        modifier = Modifier.size(130.dp,50.dp),
-        onClick = { viewModel.testenWirZusammen() },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black
-        )
-    ) {
-        Text("Login",
-            color = Color.White,
-            fontSize = 25.sp,
-            fontFamily = FontFamily.Serif
-        )
-    }
+
 }
 
 

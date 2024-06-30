@@ -4,7 +4,7 @@ import androidx.room.Entity
 import com.example.myapplication.localdb.User
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
-@Entity
+
 data class User(
     val id: Long,
     var userName: String,
