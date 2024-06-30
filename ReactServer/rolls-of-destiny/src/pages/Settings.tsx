@@ -65,7 +65,7 @@ export default function Settings({profile}: {profile:profile }) {
                 },
                 body: JSON.stringify({oldUsername: profile.username, newUsername: newUsername})
             }).then(r => {
-                if (r.status === 404) {
+                if (r.status === 200) {
                     return r.json();
                 }
                 setErrorMessage("Username already taken.");
@@ -84,9 +84,9 @@ export default function Settings({profile}: {profile:profile }) {
                     'Accept': 'application/json, text/plain',
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
-                body: JSON.stringify({oldPassword: oldPassword, newPassword: newPassword})
+                body: JSON.stringify({oldPassword: oldPassword, newPassword: newPassword, confirmNewPassword: confirmNewPassword})
             }).then(r => {
-                if (r.status === 404) {
+                if (r.status === 200) {
                     return r.json();
                 }
                 setErrorMessage("Something went wrong while trying to save your password. Please try again.");

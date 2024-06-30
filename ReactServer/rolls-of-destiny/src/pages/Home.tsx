@@ -69,7 +69,7 @@ export default function Home({loggedIn, setLoggedIn, setGameInfo, websocket, set
             },
             body: JSON.stringify({searchText: searchBar})
         }).then(r => {
-            if (r.status === 404) {
+            if (r.status === 200) {
                 return r.json();
             }
         }); */

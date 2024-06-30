@@ -15,7 +15,7 @@ import Friendlist from "./pages/Friendlist";
 
 function App() {
     let p: profile = {username: "Bernd", picture: testImage, biography: "This is the bio", rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    const [loggedIn, setLoggedIn] = useState<boolean> (true)
     const [ingame, setIngame] = useState<boolean> (false)
     const [gameInfo, setGameInfo] = useState<string> ("")
     const [websocket, setWebsocket] = useState<WebSocket>()
