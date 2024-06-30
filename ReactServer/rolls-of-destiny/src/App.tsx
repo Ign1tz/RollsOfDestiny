@@ -27,7 +27,7 @@ function App() {
     <>
         <BrowserRouter>
             <Routes>
-                <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn} setGameInfo={setGameInfo} websocket={websocket} setWebsocket={setWebsocket}/>}/>
+                <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
                 <Route path={"/game" } element={<Game/>}/>
                 <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>

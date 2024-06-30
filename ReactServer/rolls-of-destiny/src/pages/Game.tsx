@@ -178,7 +178,7 @@ export default function Game() {
                             <h2>{player1.username + " (Opponent)"}</h2>
                             <p>Rating: {player1.rating}</p>
                         </div>
-                        <img src={player1.picture} alt={player1.username}/>
+                        <img src={player1.profilePicture} alt={player1.username}/>
                     </div>
                     <div className="playerActions">
                         <div className="playerCards">
@@ -209,7 +209,7 @@ export default function Game() {
                         </div>
                     </div>
                     <div className="playerInfo">
-                        <img src={player2.picture} alt={player2.username}/>
+                        <img src={player2.profilePicture} alt={player2.username}/>
                         <div className="playerInfoUsernameRating">
                             <h2>{player2.username + " (You)"}</h2>
                             <p>Rating: {player2.rating}</p>
