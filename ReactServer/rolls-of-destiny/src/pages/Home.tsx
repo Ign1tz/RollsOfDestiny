@@ -1,11 +1,12 @@
 import "../css/Home.css"
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
 import HomeScreenButtonGroup from "../components/homeScreenButtonGroup";
 import {authFetch} from "../auth";
 import {profile} from "../types/profileTypes";
+import background from "../images/game.jpg";
 
 export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLoggedIn: Function}) {
     const [playOpened, setPlayOpened] = useState<boolean>(false)
@@ -48,23 +49,23 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     return (
         <>
             <header>
-                <TopAppBar loggedIn={loggedIn}/>
+                <TopAppBar loggedIn={loggedIn} />
             </header>
             <div className="homepage">
-                <div className="homeText">
-                    <h1>Rolls of Destiny</h1>
-                    <h3>A game made by</h3>
-                    <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link></p>
-                    <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
-                </div>
-                <div className="homeButtons">
-                    {visibleButtons()}
+                <div className="textAndButtons">
+                    <div className="homeText">
+                        <h1>Rolls of Destiny</h1>
+                        <h3>A game made by</h3>
+                        <p className={"contributor"}><Link to={"https://github.com/Ign1tz"}>Moritz Pertl</Link></p>
+                        <p className={"contributor"}><Link to={"https://github.com/LukasBrezina"}>Lukas Brezina</Link>
+                        </p>
+                        <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
+                    </div>
+                    <div className="homeButtons">
+                        {visibleButtons()}
+                    </div>
                 </div>
             </div>
-            <footer style={{textAlign: "center", fontSize: "x-small"}}>
-                Copyright
-            </footer>
         </>
     )
 }
