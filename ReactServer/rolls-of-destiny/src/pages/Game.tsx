@@ -23,27 +23,19 @@ export default function Game() {
     const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
-    const [session, setSession] = useState("")
     const [userID, setUserID] = useState("")
     const [gameId, setGameId] = useState("")
     const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
     const [rolled, setRolled] = useState(false)
     const [placed, setPlaced] = useState(false)
     const [player1Score, setPlayer1Score] = useState(0);
-    const [player2Score, setPlayer2Score] = useState(0);
-    const [diceRoll, setDiceRoll] = useState<number | null>(null);
-    const [disableRoll, setDisableRoll] = useState(false);
-    const [canPlace, setCanPlace] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
     const [yourInfo, setYourInfo] = useState<yourInfo | null>(null)
     const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>(null)
     const [gameEnded, setGameEnded] = useState(false)
     const [endResults, setEndResults] = useState<endResults | null>()
-    const handleRoll = (player: 'player1' | 'player2', value: number) => {
-        setDiceRoll(value);
-        setDisableRoll(true);
-    };
+
 
     const togglePause = () => {
         setIsPaused(!isPaused);

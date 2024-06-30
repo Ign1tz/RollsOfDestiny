@@ -9,7 +9,7 @@ func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTIN
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
 	var player Types.Player
 	var gridId string
-	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, gridId, &player.WebsocketConnectionID); err != nil {
+	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridId, &player.WebsocketConnectionID); err != nil {
 		return Types.Player{}, err
 	}
 	return player, nil
@@ -124,6 +124,46 @@ func GetPlayer(playerId string) (Types.Player, error) {
 
 func GetPlayfield(gameId string) (Types.Playfield, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
+	var game Types.Game
+	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
+	fmt.Println(err)
+	if err != nil {
+		return Types.Playfield{}, err
+	}
+	var playfield Types.Playfield
+	playfield.GameID = game.GameID
+	playfield.LastRoll = game.LastRoll
+	fmt.Println(game.ActivePlayer)
+	activePlayer, err := GetPlayer(game.ActivePlayer)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.ActivePlayer = activePlayer
+	hostPlayer, err := GetPlayer(game.HostId)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Host = hostPlayer
+	guestPlayer, err := GetPlayer(game.GuestId)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Guest = guestPlayer
+	hostGrid, err := GetGrid(game.HostGrid)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.HostGrid = hostGrid
+	guestGrid, err := GetGrid(game.GuestGrid)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.GuestGrid = guestGrid
+	return playfield, nil
+}
+
+func GetPlayfieldByUserid(userid string) (Types.Playfield, error) {
+	dbGame := Database.QueryRow("Select * from games where host = $1 or guest = $1", userid)
 	var game Types.Game
 	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
 	fmt.Println(err)

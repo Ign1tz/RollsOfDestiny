@@ -5,6 +5,7 @@ import (
 	"RollsOfDestiny/GameServer/Types"
 	"github.com/google/uuid"
 	"log"
+	"strconv"
 )
 
 func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
@@ -14,6 +15,28 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			panic(err)
 			return
 		}
+		playfield, err := Database.GetPlayfieldByUserid(queueEntry.UserId)
+
+		if playfield.Host.UserID == queueEntry.UserId {
+			active := playfield.ActivePlayer.UserID == playfield.Host.UserID
+			var msg = make(map[string]string)
+			msg["id"] = queueEntry.WebsocketConnectionId
+			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(active) + `, "roll": "` + playfield.LastRoll + `"}}`
+			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
+			msg["message"] = infoMessage
+
+			*c2 <- msg
+		} else {
+			active := playfield.ActivePlayer.UserID == playfield.Guest.UserID
+			var msg2 = make(map[string]string)
+			msg2["id"] = queueEntry.WebsocketConnectionId
+			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(active) + `, "roll": "` + playfield.LastRoll + `"}}`
+			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
+			msg2["message"] = infoMessage
+
+			*c2 <- msg2
+		}
+
 	} else {
 		player, _ := Database.GetOldestEntry()
 
@@ -138,5 +161,6 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 
 func alreadyInGame(userID string) bool {
 	_, err := Database.GetDBPlayer(userID)
+	log.Println(err)
 	return err == nil
 }

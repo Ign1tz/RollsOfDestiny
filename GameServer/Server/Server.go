@@ -13,8 +13,8 @@ import (
 	"strings"
 )
 
-var c = make(chan *websocket.Conn, 5) //5 is an arbitrary buffer size
-var c2 = make(chan map[string]string, 5)
+var c = make(chan *websocket.Conn, 50) //5 is an arbitrary buffer size
+var c2 = make(chan map[string]string, 50)
 
 func startBot(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
@@ -134,6 +134,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Client Successfully Connected")
 	reader(ws, &c2)
+	log.Println("Websocket Closed")
 	Database.DeleteFromQueueWebsocket(strings.Split(ws.RemoteAddr().String(), ":")[len(strings.Split(ws.RemoteAddr().String(), ":"))-1])
 }
 

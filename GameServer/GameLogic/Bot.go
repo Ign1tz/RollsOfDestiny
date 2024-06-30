@@ -74,7 +74,25 @@ func BotTurn(gameInfo Types.Resp) bool {
 
 func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 
-	fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+	_, err := Database.GetPlayer(queueEntry.Userid)
+
+	if err == nil {
+		playfield, err := Database.GetPlayfieldByUserid(queueEntry.Userid)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		Database.UpdatePlayerWebsocketID(queueEntry.Userid, queueEntry.WebsocketConnectionId)
+		var msg = make(map[string]string)
+		msg["id"] = queueEntry.WebsocketConnectionId
+		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
+		infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
+		msg["message"] = infoMessage
+
+		*c2 <- msg
+		return
+	}
+
 	gridId1 := uuid.New().String()
 	hostGrid := Types.Grid{
 		Left: Types.Column{
@@ -126,7 +144,6 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 		},
 		GridId: gridId2,
 	}
-	fmt.Println("After creating grid")
 
 	host := Types.Player{
 		Username:              "Host",
@@ -147,8 +164,6 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 		Grid:                  guestGrid,
 	}
 
-	fmt.Println("After creating player")
-
 	playfield := Types.Playfield{
 		Host:         host,
 		Guest:        guest,
@@ -159,8 +174,7 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 		LastRoll:     Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}}.Throw(),
 	}
 
-	fmt.Println("After creating stuff")
-	err := Database.InsertWholeGame(playfield)
+	err = Database.InsertWholeGame(playfield)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
