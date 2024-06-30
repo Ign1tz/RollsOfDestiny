@@ -1,0 +1,25 @@
+.rules-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f3e5f5;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rules-header {
+    text-align: center;
+    color: #4a148c;
+    margin-bottom: 20px;
+}
+
+.rules-content {
+    color: #6a1b9a;
+    line-height: 1.6;
+}
+
+footer {
+    text-align: center;
+    font-size: x-small;
+    margin-top: 20px;
+}
