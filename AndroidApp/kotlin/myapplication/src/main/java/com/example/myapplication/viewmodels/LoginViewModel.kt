@@ -15,10 +15,14 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
 
+    private val ipAddress = "192.168.0.181"
     suspend private fun testHttp (userName: String, password: String) {
         val client = HttpClient(CIO)
 
-        val response: HttpResponse = client.post("http://" + System.getenv("LOCAL_IP") + ":9090/login") {
+
+        //Log.d("HttpTest", System.getenv("LOCAL_IP"))
+
+        val response: HttpResponse = client.post("http://" + ipAddress + ":9090/login") {
             setBody("{\"username\":\"" + userName +"\", \"password\":\"" + password+"\"}")
         }
 
