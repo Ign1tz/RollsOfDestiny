@@ -1,0 +1,67 @@
+.homepage {
+    text-align: center;
+    padding: 12px;
+    background-color: rgb(85, 70, 93);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.textAndButtons {
+    background-color: rgba(12, 3, 3, 0.56);
+    width:60%;
+    height:70%;
+    border-radius: 40px;
+}
+
+.homeText {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.homeText h1 {
+    font-size: 5rem;
+    margin-bottom: 10px;
+}
+
+.homeText h3 {
+    font-size: 2rem;
+}
+
+.contributor {
+    margin: 5px 0;
+    font-size: 1.5rem;
+}
+
+.homeButtons {
+    margin-top: 20px;
+}
+
+.buttonInHomeScreenGroup {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+.MuiButton-containedSecondary {
+    background-color: #f44336;
+    color: white;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 15px 30px;
+    transition: background-color 0.3s ease;
+}
+
+.MuiButton-containedSecondary:hover {
+    background-color: #e53935;
+}
+
+.loginSignUpDivision {
+    align-items: center;
+    text-align: center;
+}
