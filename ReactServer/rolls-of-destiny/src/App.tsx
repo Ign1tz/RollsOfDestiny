@@ -16,7 +16,7 @@ import {authFetch} from "./auth";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> (true)
+    const [loggedIn, setLoggedIn] = useState<boolean> (false)
 
     useEffect(() => {
         if (localStorage.getItem("access_token")) {
