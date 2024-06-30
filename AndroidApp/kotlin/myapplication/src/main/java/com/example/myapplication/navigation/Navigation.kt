@@ -22,7 +22,7 @@ fun Navigation() {
 
 
     NavHost(navController = navController,
-        startDestination = Screen.LoginScreen.route) {
+        startDestination = Screen.GameScreen.route) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController = navController, loginViewModel = loginViewModel)
         }

@@ -8,14 +8,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,8 +30,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.myapplication.R
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
@@ -44,7 +50,7 @@ fun PlayField (int: Int) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            NewGrid()
+            EnemyField()
         }
         HorizontalDivider(
             color = Color.Black,
@@ -56,11 +62,12 @@ fun PlayField (int: Int) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ){
-            NewGrid()
+            OwnField()
         }
         Column (
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(5.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Box() {
@@ -74,11 +81,12 @@ fun PlayField (int: Int) {
             }
 
         }
+
     }
 }
 
 @Composable
-fun NewGrid () {
+fun OwnField () {
     Box() {
         val image: Painter = painterResource(id = R.drawable.grid_image)
         Image(
@@ -96,9 +104,89 @@ fun NewGrid () {
                         .height(170.dp)
                         .width(57.dp)
                         .clickable {
-                            Log.d("grid", "$index")
+                            addingDice()
                         }
                         .background(Color.Transparent)
+                )
+            }
+        }
+    }
+}
+
+
+fun addingDice () {
+
+}
+
+@Composable
+fun EnemyField () {
+    Box() {
+        val image: Painter = painterResource(id = R.drawable.grid_image)
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier
+                .width(170.dp)
+                .height(170.dp),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun ProfileRow(
+    profileImage: Int,
+    username: String,
+    score: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .background(Color.Gray, shape = RoundedCornerShape(2.dp))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = profileImage),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(55.dp)
+                    .padding(1.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "Username",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
+                )
+                Text(
+                    text = username,
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Column {
+                Text(
+                    text = "Score:",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
+                )
+                Text(
+                    text = score,
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
                 )
             }
         }
