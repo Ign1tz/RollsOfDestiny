@@ -56,7 +56,7 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 func login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
@@ -103,8 +103,8 @@ func isLoggedIn(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-
-	if checkToken(w, r) {
+	_, valid := checkToken(w, r)
+	if valid {
 		w.WriteHeader(http.StatusOK)
 	}
 }
@@ -116,7 +116,8 @@ func accountInfo(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	if checkToken(w, r) {
+	_, valid := checkToken(w, r)
+	if valid {
 		myUrl, _ := url.Parse(r.URL.String())
 		params, _ := url.ParseQuery(myUrl.RawQuery)
 		account, err := Database.GetAccountByUsername(params.Get("username"))
@@ -134,14 +135,14 @@ func accountInfo(w http.ResponseWriter, r *http.Request) {
 func changeUsername(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
 
 	if r.Method == "POST" {
-		if checkToken(w, r) {
+		username, valid := checkToken(w, r)
+		if valid {
 			// Read the raw body
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -159,7 +160,42 @@ func changeUsername(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
+			t.OldUsername = username
+			AccountLogic.ChangeUsername(t)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
 
+func changePassword(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		username, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer r.Body.Close()
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t AccountLogic.NewPasswordMessage
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			AccountLogic.ChangePasswprd(t, username)
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -176,7 +212,8 @@ func setupRoutes() {
 	http.HandleFunc("/isLoggedIn", isLoggedIn)
 	http.HandleFunc("/refresh", refresh)
 	http.HandleFunc("/userInfo", accountInfo)
-
+	http.HandleFunc("/changeUsername", changeUsername)
+	http.HandleFunc("/changePassword", changePassword)
 }
 
 func Server() {

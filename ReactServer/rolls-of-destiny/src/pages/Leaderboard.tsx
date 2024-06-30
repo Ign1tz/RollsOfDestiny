@@ -6,11 +6,11 @@ import '../css/Leaderboard.css';
 export default function Leaderboard({ loggedIn }: { loggedIn: boolean }) {
 
     const users: profile[] = [
-        { username: "Bernd", rating: 839, picture: "https://via.placeholder.com/100", biography: "Bio for Bernd" },
-        { username: "Anna", rating: 902, picture: "https://via.placeholder.com/100", biography: "Bio for Anna" },
-        { username: "Carlos", rating: 756, picture: "https://via.placeholder.com/100", biography: "Bio for Carlos" },
-        { username: "Diana", rating: 820, picture: "https://via.placeholder.com/100", biography: "Bio for Diana" },
-        { username: "Edward", rating: 890, picture: "https://via.placeholder.com/100", biography: "Bio for Edward" }
+        { username: "Bernd", rating: 839, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Anna", rating: 902, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100" },
+        { username: "Diana", rating: 820, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
     ];
 
     return (
@@ -21,11 +21,10 @@ export default function Leaderboard({ loggedIn }: { loggedIn: boolean }) {
                 <ul className="leaderboard">
                     {users.map((user, index) => (
                         <li key={index} className="leaderboard-item">
-                            <img src={user.picture} alt={user.username} className="leaderboard-picture" />
+                            <img src={user.profilePicture} alt={user.username} className="leaderboard-picture" />
                             <div className="leaderboard-info">
                                 <h2 className="leaderboard-username">{user.username}</h2>
                                 <p className="leaderboard-rating">Rating: {user.rating}</p>
-                                <p className="leaderboard-biography">{user.biography}</p>
                             </div>
                         </li>
                     ))}

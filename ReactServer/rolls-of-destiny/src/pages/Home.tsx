@@ -1,5 +1,5 @@
 import "../css/Home.css"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TopAppBar from "../bars/TopAppBar";
 import {Link} from "react-router-dom";
 import Button from '@mui/material/Button';
@@ -10,7 +10,6 @@ import background from "../images/game.jpg";
 import TextField from "@mui/material/TextField";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { profile } from "../types/profileTypes";
 import { Modal } from "@mui/material";
 import testImage from "../soundtracks/testImage.png"
 
@@ -20,11 +19,11 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     const [websoketId, setWebsoketId] = useState("")
 
     const users: profile[] = [
-        { username: "Bernd", rating: 839, picture: testImage, biography: "Bio for Bernd" },
-        { username: "Anna", rating: 902, picture: testImage, biography: "Bio for Anna" },
-        { username: "Carlos", rating: 756, picture: "https://via.placeholder.com/100", biography: "Bio for Carlos" },
-        { username: "Diana", rating: 820, picture: testImage, biography: "Bio for Diana" },
-        { username: "Edward", rating: 890, picture: "https://via.placeholder.com/100", biography: "Bio for Edward" }
+        { username: "Bernd", rating: 839, profilePicture: testImage},
+        { username: "Anna", rating: 902, profilePicture: testImage},
+        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Diana", rating: 820, profilePicture: testImage},
+        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
     ];
 
     const [searchBar, setSearchBar] = useState("");
@@ -151,7 +150,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
                         <div className="results">
                             { resultsFound && searchResults.map(profile => (
                                 <Box key={profile.username} className="profileBoxHome">
-                                    <img src={profile.picture} alt="profile picture" className="profilePictureHome" />
+                                    <img src={profile.profilePicture} alt="profile picture" className="profilePictureHome" />
                                     <div className="profileDetailsHome">
                                         <h3>{profile.username}</h3>
                                         <p>Rating: {profile.rating}</p>
