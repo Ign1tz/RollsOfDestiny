@@ -18,7 +18,7 @@ interface dao {
     @Update
     fun Update (user: User)
 
-    @Query("Select * from user where userId=:id")
-    fun getUserById (id: String): Flow<User>
+    @Query("Select * from user")
+    fun getUser (): User
 
 }

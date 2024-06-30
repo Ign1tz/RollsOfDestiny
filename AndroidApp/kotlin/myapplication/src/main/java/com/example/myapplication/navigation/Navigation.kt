@@ -22,7 +22,7 @@ fun Navigation() {
 
 
     NavHost(navController = navController,
-        startDestination = Screen.LoginScreen.route) {
+        startDestination = if (loginViewModel.alreadyLoggedIn()) {Screen.HomeScreen.route} else {Screen.LoginScreen.route}) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController = navController, loginViewModel = loginViewModel)
         }
