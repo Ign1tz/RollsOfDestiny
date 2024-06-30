@@ -80,7 +80,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			}
 
 			host := Types.Player{
-				Username:              "Host",
+				Username:              player.Username,
 				UserID:                player.UserId,
 				Mana:                  0,
 				Deck:                  Types.Deck{},
@@ -89,7 +89,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Grid:                  hostGrid,
 			}
 			guest := Types.Player{
-				Username:              "Guest",
+				Username:              queueEntry.Username,
 				UserID:                queueEntry.UserId,
 				Mana:                  0,
 				Deck:                  Types.Deck{},
@@ -98,9 +98,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				Grid:                  guestGrid,
 			}
 
-			fmt.Println("After creating player")
 			diceTrow := Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}}.Throw()
-			fmt.Println("diceTh", diceTrow)
 			playfield := Types.Playfield{
 				Host:         host,
 				Guest:        guest,

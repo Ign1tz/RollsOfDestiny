@@ -1,13 +1,13 @@
 package Database
 
 func DeleteQueue() {
-	Database.Exec("TRUNCATE TABLE queue")
+	Database.Exec("DELETE From queue")
 }
 func DeleteGames() {
-	Database.Exec("TRUNCATE TABLE grids")
+	Database.Exec("DELETE From grids")
 }
 
-func DeleteFromQueue(websocketId string) {
+func DeleteFromQueueWebsocket(websocketId string) {
 	Database.Exec("Delete from queue where websocketconnectionid = $1", websocketId)
 }
 

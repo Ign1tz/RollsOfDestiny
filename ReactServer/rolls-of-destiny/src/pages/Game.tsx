@@ -16,16 +16,15 @@ import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 export default function Game() {
     sessionStorage.setItem("gameInfo", "")
     console.log(sessionStorage.getItem("gameInfo"))
-    let gameInfo = sessionStorage.getItem("gameInfo")
-    if (!gameInfo) {
-        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    let startGameInfo = sessionStorage.getItem("gameInfo")
+    if (!startGameInfo) {
+        startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
     const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [session, setSession] = useState("")
     const [userID, setUserID] = useState("")
-    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
     const [gameId, setGameId] = useState("")
     const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
     const [rolled, setRolled] = useState(false)
@@ -89,14 +88,6 @@ export default function Game() {
     }, []);
 
     useEffect(() => {
-        if (!gameInfoJson) {
-            console.log(gameInfoJson)
-            let tempPlayer: profile = JSON.parse(gameInfoJson)
-            setPlayer1(tempPlayer)
-        }
-    }, [gameInfoJson])
-
-    useEffect(() => {
         console.log(websocket)
         if (connected && websocket) {
             console.log("test")
@@ -130,15 +121,13 @@ export default function Game() {
                 setWebsocketId(message.message.id)
             } else if (message.info == "gameInfo") {
                 console.log(message.message.gameInfo)
-                localStorage.setItem("gameInfo", message.message.gameInfo)
-                setGameInfoJson(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
                 setGameId(message.message.gameInfo.gameid)
                 console.log("setGameInfo")
                 setGameInfo(message.message.gameInfo)
             } else if (message.info == "gameEnded") {
                 console.log(message.message.gameInfo)
-                localStorage.setItem("gameInfo", message.message.gameInfo)
-                setGameInfoJson(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
                 setGameId(message.message.gameInfo.gameid)
                 console.log("endResults", message.message.endResults)
                 setGameInfo(message.message.gameInfo)
@@ -168,7 +157,7 @@ export default function Game() {
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId, username: JSON.parse(userinfo).username
                 })
             });
         } else {
@@ -225,6 +214,8 @@ export default function Game() {
             }
             setYourInfo(gameInfo.YourInfo)
             setEnemyInfo(gameInfo.EnemyInfo)
+            console.log(gameInfo.EnemyInfo)
+            setPlayer1(prevState => ({...prevState, username: gameInfo.EnemyInfo.Username}))
         }
     }, [gameInfo]);
 
@@ -304,7 +295,7 @@ export default function Game() {
                                 <p>Rating: {player1.rating}</p>
                                 <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                             </div>
-                            <img src={player1.picture} alt={player1.username}/>
+                            <img src={player1.profilePicture} alt={player1.username}/>
                         </div>
                         <div className="playerActions">
                             <div className="playerCards">
@@ -342,7 +333,7 @@ export default function Game() {
                             </div>
                         </div>
                         <div className="playerInfo">
-                            <img src={player2.picture} alt={player2.username}/>
+                            <img src={player2.profilePicture} alt={player2.username}/>
                             <div className="playerInfoUsernameRating">
                                 <h2>{player2.username + " (You)"}</h2>
                                 <p>Rating: {player2.rating}</p>

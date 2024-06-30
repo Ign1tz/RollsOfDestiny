@@ -22,7 +22,7 @@ function App() {
     const [websocket, setWebsocket] = useState<WebSocket>()
 
     useEffect(() => {
-        if (localStorage.getItem("access_token")) {
+        if (sessionStorage.getItem("access_token")) {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
             })

@@ -134,7 +134,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Client Successfully Connected")
 	reader(ws, &c2)
-	Database.DeleteFromQueue(strings.Split(ws.RemoteAddr().String(), ":")[len(strings.Split(ws.RemoteAddr().String(), ":"))-1])
+	Database.DeleteFromQueueWebsocket(strings.Split(ws.RemoteAddr().String(), ":")[len(strings.Split(ws.RemoteAddr().String(), ":"))-1])
 }
 
 func setupRoutes() {

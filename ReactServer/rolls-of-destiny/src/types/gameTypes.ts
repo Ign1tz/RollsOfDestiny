@@ -28,7 +28,7 @@ type column = {
 }
 
 type enemyInfo = {
-    username: string,
+    Username: string,
     websocketId: string,
     LeftColumn: column,
     MiddleColumn: column,
