@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"RollsOfDestiny/AccountServer/AccountLogic"
 	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/SignUpLogic"
 	"encoding/json"
@@ -127,6 +128,40 @@ func accountInfo(w http.ResponseWriter, r *http.Request) {
 		}
 		accInfo := fmt.Sprintf("{\"username\": \"%s\", \"email\": \"%s\", \"profilePicture\": \"%s\", \"rating\": \"%s\", \"userid\": \"%s\"}", account.Username, account.Email, account.ProfilePicture, strconv.Itoa(account.Rating), account.UserID)
 		fmt.Fprint(w, accInfo)
+	}
+}
+
+func changeUsername(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		fmt.Println("OPTIONS request")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		if checkToken(w, r) {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer r.Body.Close()
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t AccountLogic.NewUsernameMessage
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+		}
 	}
 }
 
