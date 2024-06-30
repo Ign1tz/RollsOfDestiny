@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.android.volley.Request
+import com.example.myapplication.navigation.Screen
 import com.example.myapplication.viewmodels.LoginViewModel
 import org.json.JSONObject
 
@@ -58,7 +59,7 @@ fun LoginBox (navController: NavController, viewModel: LoginViewModel) {
         Spacer(modifier = Modifier.padding(padding))
         Button(
             modifier = Modifier.size(130.dp,50.dp),
-            onClick = { viewModel.login(nameState, pwState)},
+            onClick = { if (viewModel.login(nameState, pwState)) {navController.navigate(Screen.HomeScreen.route)} },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black
             )
