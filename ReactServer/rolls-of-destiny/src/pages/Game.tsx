@@ -34,7 +34,7 @@ export default function Game() {
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
 
-    const [rollValue, setRollValue] = useState<1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
+    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
 
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
