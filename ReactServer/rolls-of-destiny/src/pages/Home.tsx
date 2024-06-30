@@ -38,9 +38,9 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("access_token")) {
+        if (localStorage.getItem("access_token")) {
             console.log("Access token", localStorage.getItem("access_token"));
-            authFetch("http://localhost:9090/userInfo?username=" + sessionStorage.getItem("username")).then(r => {
+            authFetch("http://localhost:9090/userInfo").then(r => {
 
                 return r.json()
             }).then(response => {

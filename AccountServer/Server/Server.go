@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 )
@@ -116,11 +115,9 @@ func accountInfo(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	_, valid := checkToken(w, r)
+	username, valid := checkToken(w, r)
 	if valid {
-		myUrl, _ := url.Parse(r.URL.String())
-		params, _ := url.ParseQuery(myUrl.RawQuery)
-		account, err := Database.GetAccountByUsername(params.Get("username"))
+		account, err := Database.GetAccountByUsername(username)
 
 		if err != nil {
 			log.Println(err)
