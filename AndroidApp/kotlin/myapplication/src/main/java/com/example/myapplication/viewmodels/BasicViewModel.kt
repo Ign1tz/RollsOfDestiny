@@ -1,0 +1,3 @@
+package com.example.myapplication.viewmodels
+
+interface BasicViewModel
