@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/GameLogic"
 	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
@@ -47,7 +48,7 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		GameLogic.BotStartGame(t)
+		GameLogic.BotStartGame(t, &c2)
 	}
 }
 
@@ -117,12 +118,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		/*err = GameLogic.PickColumn(t.Gameid, t.ColumnKey)
-
-		if err != nil {
-			panic(err)
-		}
-		*/
 		log.Printf("Received gameid: %s\n", t.UserId)
 		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
 
@@ -141,8 +136,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	reader(ws, &c2)
 	log.Println("Client Successfully Connected")
+	reader(ws, &c2)
+	Database.DeleteFromQueue(strings.Split(ws.RemoteAddr().String(), ":")[len(strings.Split(ws.RemoteAddr().String(), ":"))-1])
 }
 
 func setupRoutes() {
@@ -155,7 +151,8 @@ func setupRoutes() {
 }
 
 func Server() {
-
+	Database.DeleteGames()
+	Database.DeleteQueue()
 	fmt.Println("starting")
 	setupRoutes()
 	go func() {

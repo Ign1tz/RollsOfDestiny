@@ -87,7 +87,11 @@ export default function Game() {
     useEffect(() => {
         if (websocketId !== "") {
             console.log("queuing websocket")
-            queueForGame()
+            if (sessionStorage.getItem("GameType") === "bot"){
+                startBot()
+            }else {
+                queueForGame()
+            }
         }
     }, [websocketId])
 
@@ -129,24 +133,46 @@ export default function Game() {
         if (websocket && connected && gameInfo){
             console.log(gameId)
             setPlaced(true)
-            websocket.send(JSON.stringify({type: "pickColumn", messageBody: key.toString(), gameId: gameId}))
+            websocket.send(JSON.stringify({type: sessionStorage.getItem("GameType") + "PickColumn", messageBody: key.toString(), gameId: gameId}))
         }
     };
 
     async function queueForGame() {
-        console.log("test")
-        const response = await fetch("http://localhost:8080/queue", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({
-                userid: "testasdasfasasdasd".split('').sort(function () {
-                    return 0.5 - Math.random()
-                }).join(''), websocketconnectionid: websocketId
-            })
-        });
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/queue", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId
+                })
+            });
+        }else {
+            window.location.href = "/login"
+        }
+    }
+
+    async function startBot() {
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/startBot", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId
+                })
+            });
+        }else {
+            window.location.href = "/login"
+        }
     }
 
     const parseRoll = (roll: string) : 1 | 2 | 3 | 4 | 5 | 6 | undefined => {

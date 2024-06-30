@@ -50,31 +50,22 @@ export default function Login() {
                 body: JSON.stringify({username: username, password: password})
             }).then(r => {
                 if (r.status === 200) {
-                    return r.json()
-                }else {
-                    setPassword("")
-                    setIsError(true)
-                    return
-                }
-            }).then(token => {
-                console.log(token)
-                if (token && token.token) {
-                    login(token.token)
-                    authFetch("http://localhost:9090/isLoggedIn").then(response => {
-                        if (response.status === 200) {
+                    r.json().then(token => {
+                        if (token.token) {
+                            login(token.token)
+                            sessionStorage.setItem("username", username)
+                            authFetch("http://localhost:9090/userInfo")
                             window.location.href = "/"
                         }
                     })
 
-                } /*else {
-                        window.alert(token.errors + "\nPlease try again!")
-                        setPassword("")
-                        setUsername("")
-                    }*/
+                    return
+                } else {
+                    setPassword("")
+                    setIsError(true)
+                    return
+                }
             })
-        } else {
-            setIsError(true)
-            setPassword("")
         }
     }
 

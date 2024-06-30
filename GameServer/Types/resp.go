@@ -6,5 +6,6 @@ type Resp struct {
 }
 
 type BotResp struct {
-	Userid string `json:"Userid"`
+	Userid                string `json:"Userid"`
+	WebsocketConnectionId string `json:"websocketConnectionId"`
 }

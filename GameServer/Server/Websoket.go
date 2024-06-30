@@ -2,6 +2,7 @@ package Server
 
 import (
 	"RollsOfDestiny/GameServer/Database"
+	"RollsOfDestiny/GameServer/GameLogic"
 	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
 	"fmt"
@@ -56,10 +57,54 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 			log.Println(string(p))
 			return
 		}
-		msg, msg2 := categorizeMessage(message, connectionID)
-		*c2 <- msg
-		if msg2 != nil {
-			*c2 <- msg2
+		log.Println(message.Type)
+		if message.Type == "botPickColumn" {
+			ended := GameLogic.BotTurn(
+				Types.Resp{Gameid: message.GameId, ColumnKey: message.MessageBody})
+
+			playfield, err := Database.GetPlayfield(message.GameId)
+
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			var hostMsg = make(map[string]string)
+			log.Println(ended)
+			if ended {
+				hostWon := playfield.Host.Grid.Value() > playfield.Guest.Grid.Value()
+				guestWon := playfield.Host.Grid.Value() < playfield.Guest.Grid.Value()
+				tie := playfield.Host.Grid.Value() == playfield.Guest.Grid.Value()
+
+				var hostWonMessage string
+
+				if tie {
+					hostWonMessage = "Its a Tie!"
+				} else if guestWon {
+					hostWonMessage = "You Lost!"
+				} else if hostWon {
+					hostWonMessage = "You Won!"
+				}
+
+				hostMsg["id"] = playfield.Host.WebsocketConnectionID
+				playfieldMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(false) + `, "roll": "` + playfield.LastRoll + `"}}`
+				newMessage := `{"yourScore": ` + strconv.Itoa(playfield.Host.Grid.Value()) + `, "enemyScore": ` + strconv.Itoa(playfield.Guest.Grid.Value()) + `, "youWon": "` + hostWonMessage + `"}`
+				infoMessage := `{"info": "gameEnded", "message": {"gameInfo": ` + playfieldMessage + `, "endResults": ` + newMessage + `}}`
+				hostMsg["message"] = infoMessage
+				*c2 <- hostMsg
+			} else {
+				hostMsg["id"] = playfield.Host.WebsocketConnectionID
+				newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(true) + `, "roll": "` + playfield.LastRoll + `"}}`
+				infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+				hostMsg["message"] = infoMessage
+				*c2 <- hostMsg
+			}
+		} else {
+
+			msg, msg2 := categorizeMessage(message, connectionID)
+			*c2 <- msg
+			if msg2 != nil {
+				*c2 <- msg2
+			}
 		}
 
 		log.Println("reader end:", string(p))
@@ -72,7 +117,7 @@ func categorizeMessage(message websocketMessage, connectionId string) (map[strin
 	case "id":
 		msg["id"] = connectionId
 		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
-	case "pickColumn":
+	case "PickColumn":
 		return handlePickedColumn(message)
 	}
 	return msg, nil

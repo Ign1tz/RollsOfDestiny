@@ -5,19 +5,25 @@ import (
 	"RollsOfDestiny/GameServer/Types"
 	"fmt"
 	"github.com/google/uuid"
+	"log"
 	"math/rand"
 	"strconv"
 )
 
-func BotTurn(gameInfo Types.Resp) {
+func BotTurn(gameInfo Types.Resp) bool {
 
-	err := PickColumn(gameInfo.Gameid, gameInfo.ColumnKey)
+	log.Println(gameInfo.Gameid, gameInfo.ColumnKey)
+	ended, err := PickColumn(gameInfo.Gameid, gameInfo.ColumnKey)
 
 	if err != nil {
 		panic(err)
 	}
-
 	gamefield, err := Database.GetPlayfield(gameInfo.Gameid)
+	if ended {
+		gamefield.ActivePlayer = gamefield.EnemyPlayer()
+		Database.UpdateActivePlayerGames(gamefield)
+		return true
+	}
 
 	if err != nil {
 		panic(err)
@@ -36,26 +42,38 @@ func BotTurn(gameInfo Types.Resp) {
 			columnErr = gamefield.ActivePlayer.Grid.Left.Add(roll)
 			if columnErr == nil {
 				enemy.Grid.Left.Remove(roll)
+				Database.UpdateColumn(gamefield.ActivePlayer.Grid.Left)
+				Database.UpdateColumn(enemy.Grid.Left)
 				pickedValidColumn = true
 			}
 		} else if columnNumber == 1 {
 			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(roll)
 			if columnErr == nil {
 				enemy.Grid.Middle.Remove(roll)
+				Database.UpdateColumn(gamefield.ActivePlayer.Grid.Middle)
+				Database.UpdateColumn(enemy.Grid.Middle)
 				pickedValidColumn = true
 			}
 		} else if columnNumber == 2 {
-			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(roll)
+			columnErr = gamefield.ActivePlayer.Grid.Right.Add(roll)
 			if columnErr == nil {
 				enemy.Grid.Right.Remove(roll)
+				Database.UpdateColumn(gamefield.ActivePlayer.Grid.Right)
+				Database.UpdateColumn(enemy.Grid.Right)
 				pickedValidColumn = true
 			}
 		}
 	}
+	player := gamefield.ActivePlayer
 	gamefield.ActivePlayer = enemy
+	gamefield.LastRoll = gamefield.ActivePlayer.Die.Throw()
+	Database.UpdateLastRollGames(gamefield)
+	Database.UpdateActivePlayerGames(gamefield)
+	return player.Grid.IsFull()
 }
 
-func BotStartGame(queueEntry Types.BotResp) {
+func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
+
 	fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 	gridId1 := uuid.New().String()
 	hostGrid := Types.Grid{
@@ -116,7 +134,7 @@ func BotStartGame(queueEntry Types.BotResp) {
 		Mana:                  0,
 		Deck:                  Types.Deck{},
 		Die:                   Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}},
-		WebsocketConnectionID: "",
+		WebsocketConnectionID: queueEntry.WebsocketConnectionId,
 		Grid:                  hostGrid,
 	}
 	guest := Types.Player{
@@ -138,6 +156,7 @@ func BotStartGame(queueEntry Types.BotResp) {
 		GuestGrid:    guestGrid,
 		GameID:       "bot: " + uuid.New().String(),
 		ActivePlayer: host,
+		LastRoll:     Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}}.Throw(),
 	}
 
 	fmt.Println("After creating stuff")
@@ -146,4 +165,11 @@ func BotStartGame(queueEntry Types.BotResp) {
 		fmt.Println(err)
 		panic(err)
 	}
+	var msg = make(map[string]string)
+	msg["id"] = playfield.Host.WebsocketConnectionID
+	newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
+	infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
+	msg["message"] = infoMessage
+
+	*c2 <- msg
 }
