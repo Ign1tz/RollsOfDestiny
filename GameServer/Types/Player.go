@@ -35,16 +35,12 @@ func (p *Player) RemoveMana(spent int) error {
 }
 
 func (p Player) ToJson(extraInfo bool) string {
-
 	var extra string
-
 	if extraInfo {
 		extra = `, "userId": "` + p.UserID + `"`
 	} else {
 		extra = ""
 	}
-
-	message := `{ "WebsocketId": "` + p.WebsocketConnectionID + `", "Username": "` + p.Username + `", "LeftColumn": { "First": "` + strconv.Itoa(p.Grid.Left.First) + `", "Second": "` + strconv.Itoa(p.Grid.Left.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Left.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Left.IsFull) + `}, "MiddleColumn": { "First": "` + strconv.Itoa(p.Grid.Middle.First) + `", "Second": "` + strconv.Itoa(p.Grid.Middle.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Middle.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Middle.IsFull) + `}, "RightColumn": { "First": "` + strconv.Itoa(p.Grid.Right.First) + `", "Second": "` + strconv.Itoa(p.Grid.Right.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Right.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Right.IsFull) + `}` + extra + `}`
-
+	message := `{ "WebsocketId": "` + p.WebsocketConnectionID + `", "Username": "` + p.Username + `", "Score": ` + strconv.Itoa(p.Grid.Value()) + `, "LeftColumn": { "First": "` + strconv.Itoa(p.Grid.Left.First) + `", "Second": "` + strconv.Itoa(p.Grid.Left.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Left.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Left.IsFull()) + `}, "MiddleColumn": { "First": "` + strconv.Itoa(p.Grid.Middle.First) + `", "Second": "` + strconv.Itoa(p.Grid.Middle.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Middle.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Middle.IsFull()) + `}, "RightColumn": { "First": "` + strconv.Itoa(p.Grid.Right.First) + `", "Second": "` + strconv.Itoa(p.Grid.Right.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Right.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Right.IsFull()) + `}` + extra + `}`
 	return message
 }

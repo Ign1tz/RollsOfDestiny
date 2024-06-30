@@ -2,6 +2,7 @@ package Server
 
 import (
 	"RollsOfDestiny/GameServer/Database"
+	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -99,6 +100,7 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 			panic(err)
 		}
 		enemy.Grid.Middle.Remove(columnInt)
+		fmt.Println("websocket placement", playfield.ActivePlayer.Grid.Middle.Placement)
 		Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
 		Database.UpdateColumn(enemy.Grid.Middle)
 	case "2":
@@ -114,25 +116,79 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 	}
 	var hostIsActive bool
 	if playfield.ActivePlayer.UserID == playfield.Host.UserID {
+		log.Println("HOST WAS ACTIVE")
 		playfield.Host = playfield.ActivePlayer
-		hostIsActive = true
-	} else {
-		playfield.Guest = playfield.ActivePlayer
+		playfield.Guest = enemy
 		hostIsActive = false
+	} else {
+		log.Println("GUEST WAS ACTIVE")
+		playfield.Guest = playfield.ActivePlayer
+		playfield.Host = enemy
+		hostIsActive = true
 	}
+	gameEnded := playfield.ActivePlayer.Grid.IsFull()
+	playfield.ActivePlayer = playfield.EnemyPlayer()
+
+	playfield.LastRoll = playfield.Host.Die.Throw()
+
+	Database.UpdateActivePlayerGames(playfield)
+	Database.UpdateLastRollGames(playfield)
 
 	fmt.Println(playfield.Host.Grid.Left.First)
-	var msg = make(map[string]string)
-	msg["id"] = playfield.Host.WebsocketConnectionID
-	newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": "` + strconv.FormatBool(hostIsActive) + `", "roll": "` + playfield.LastRoll + `"}}`
-	infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
-	msg["message"] = infoMessage
 
-	var msg2 = make(map[string]string)
-	msg2["id"] = playfield.Guest.WebsocketConnectionID
-	newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": "` + strconv.FormatBool(!hostIsActive) + `", "roll": "` + playfield.LastRoll + `"}}`
-	infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
-	msg2["message"] = infoMessage
+	var hostMsg = make(map[string]string)
+	var guestMsg = make(map[string]string)
+	if gameEnded {
+		fmt.Println("game ended")
+		hostMsg, guestMsg = handleGameEnded(playfield)
+	} else {
+		hostMsg["id"] = playfield.Host.WebsocketConnectionID
+		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+		infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+		hostMsg["message"] = infoMessage
 
-	return msg, msg2
+		guestMsg["id"] = playfield.Guest.WebsocketConnectionID
+		newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(!hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+		infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+		guestMsg["message"] = infoMessage
+	}
+	return hostMsg, guestMsg
+}
+
+func handleGameEnded(playfield Types.Playfield) (map[string]string, map[string]string) {
+	var hostMsg = make(map[string]string)
+	var guestMsg = make(map[string]string)
+
+	hostWon := playfield.Host.Grid.Value() > playfield.Guest.Grid.Value()
+	guestWon := playfield.Host.Grid.Value() < playfield.Guest.Grid.Value()
+	tie := playfield.Host.Grid.Value() == playfield.Guest.Grid.Value()
+
+	var hostWonMessage string
+	var guestWonMessage string
+
+	if tie {
+		hostWonMessage = "Its a Tie!"
+		guestWonMessage = "Its a Tie!"
+	} else if guestWon {
+		guestWonMessage = "You Won!"
+		hostWonMessage = "You Lost!"
+	} else if hostWon {
+		hostWonMessage = "You Won!"
+		guestWonMessage = "You Lost!"
+	}
+
+	hostMsg["id"] = playfield.Host.WebsocketConnectionID
+
+	playfieldMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(false) + `, "roll": "` + playfield.LastRoll + `"}}`
+	newMessage := `{"yourScore": ` + strconv.Itoa(playfield.Host.Grid.Value()) + `, "enemyScore": ` + strconv.Itoa(playfield.Guest.Grid.Value()) + `, "youWon": "` + hostWonMessage + `"}`
+	infoMessage := `{"info": "gameEnded", "message": {"gameInfo": ` + playfieldMessage + `, "endResults": ` + newMessage + `}}`
+	hostMsg["message"] = infoMessage
+
+	guestMsg["id"] = playfield.Guest.WebsocketConnectionID
+	playfieldMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(false) + `, "roll": "` + playfield.LastRoll + `"}}`
+	newMessage = `{"yourScore": ` + strconv.Itoa(playfield.Guest.Grid.Value()) + `, "enemyScore": ` + strconv.Itoa(playfield.Host.Grid.Value()) + `, "youWon": "` + guestWonMessage + `"}`
+	infoMessage = `{"info": "gameEnded", "message": {"gameInfo": ` + playfieldMessage + `, "endResults": ` + newMessage + `}}`
+	guestMsg["message"] = infoMessage
+
+	return hostMsg, guestMsg
 }

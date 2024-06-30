@@ -14,6 +14,6 @@ type DieLogic interface {
 }
 
 func (d Die) Throw() string {
-	res := rand.Intn(len(d.PossibleThrows))
-	return strconv.Itoa(d.PossibleThrows[res])
+	res := rand.Intn(6)
+	return strconv.Itoa([]int{1, 2, 3, 4, 5, 6}[res])
 }

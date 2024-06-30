@@ -1,8 +1,3 @@
-type GameInfo = {
-    messageType: string,
-    messageBody: messageBody,
-    gameId: string
-}
 
 type messageBody = {
     ActivePlayer: activePlayer,
@@ -16,27 +11,35 @@ type activePlayer = {
 }
 
 type yourInfo = {
-    username: string,
-    websocketId: string,
+    Username: string,
+    WebsocketId: string,
     userId: string,
-    left: column,
-    middle: column,
-    right: column
+    LeftColumn: column,
+    MiddleColumn: column,
+    RightColumn: column,
+    Score: number
 }
 
 type column = {
-    first: string,
-    second: string,
-    third: string,
-    isFull: boolean
+    First: string,
+    Second: string,
+    Third: string,
+    IsFull: boolean
 }
 
 type enemyInfo = {
     username: string,
     websocketId: string,
-    left: column,
-    middle: column,
-    right: column
+    LeftColumn: column,
+    MiddleColumn: column,
+    RightColumn: column,
+    Score: number
 }
 
-export type { GameInfo , messageBody }
+type endResults = {
+    yourScore: number,
+    enemyScore: number,
+    youWon: string
+}
+
+export type {messageBody, column , yourInfo, enemyInfo, endResults }

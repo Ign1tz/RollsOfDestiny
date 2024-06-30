@@ -9,14 +9,13 @@ import "../css/Game.css";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
 import {useEffect, useState} from "react";
-import {GameInfo, messageBody} from "../types/gameTypes";
+import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 
 
 
 
 export default function Game() {
     localStorage.setItem("gameInfo", "")
-    console.log(localStorage.getItem("gameInfo"))
     let startGameInfo = localStorage.getItem("gameInfo")
     if (!startGameInfo) {
         startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
@@ -36,9 +35,10 @@ export default function Game() {
     const [canPlace, setCanPlace] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
-
-    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined >(undefined);
-
+    const [yourInfo, setYourInfo] = useState<yourInfo | null>( null )
+    const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>( null )
+    const [gameEnded, setGameEnded] = useState(false)
+    const [endResults, setEndResults] = useState<endResults | null>()
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
         setDisableRoll(true);
@@ -80,13 +80,13 @@ export default function Game() {
         console.log(websocket)
         if (connected && websocket) {
             console.log("test")
-            websocket.send("test")
+            //websocket.send("test")
         }
     }, [connected])
 
     useEffect(() => {
-        console.log("queuing websocket")
         if (websocketId !== "") {
+            console.log("queuing websocket")
             queueForGame()
         }
     }, [websocketId])
@@ -109,13 +109,23 @@ export default function Game() {
                 localStorage.setItem("gameInfo", message.message.gameInfo)
                 setGameInfoJson(message.message.gameInfo)
                 setGameId(message.message.gameInfo.gameid)
+                console.log("setGameInfo")
                 setGameInfo(message.message.gameInfo)
+            } else if (message.info == "gameEnded") {
+                console.log(message.message.gameInfo)
+                localStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameInfoJson(message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                console.log("endResults", message.message.endResults)
+                setGameInfo(message.message.gameInfo)
+                setGameEnded(true)
+                setEndResults(message.message.endResults)
             }
         }
     }
 
     const handleColumnClick = (key: number) => {
-        console.log(connected)
+        console.log("handleColumnClicK", connected)
         if (websocket && connected && gameInfo){
             console.log(gameId)
             setPlaced(true)
@@ -157,11 +167,22 @@ export default function Game() {
     }
 
     useEffect(() => {
-        console.log(gameInfo)
         if (gameInfo.ActivePlayer){
             console.log(gameInfo.ActivePlayer.active)
+            if (gameInfo.ActivePlayer.active) {
+                console.log("setFalse")
+                setRolled(false)
+                setPlaced(false)
+            }else{
+                setRolled(true)
+                setPlaced(true)
+            }
+            setYourInfo(gameInfo.YourInfo)
+            setEnemyInfo(gameInfo.EnemyInfo)
         }
     }, [gameInfo]);
+
+    useEffect(() => { console.log(rolled)}, [rolled])
 
     return (
         <div className="gameDivision" style={{
@@ -177,6 +198,17 @@ export default function Game() {
                 </Button>
             </div>
             <div className="content">
+                <Modal open={gameEnded} >
+                    <div className="pauseMenu">
+                        <h2>Game finished</h2>
+                        <h2>{endResults?.youWon}</h2>
+                        <h2>Score</h2>
+                        <h2>{endResults?.yourScore} to {endResults?.enemyScore}</h2>
+                        <Button variant="contained" onClick={() => window.location.href = "/"}>
+                            Menu
+                        </Button>
+                    </div>
+                </Modal>
                 <Modal open={confirmSurrender} onClose={toggleSurrender}>
                     <div className="confirmSurrenderMenu">
                         <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
@@ -209,7 +241,7 @@ export default function Game() {
                         <div className="playerInfoUsernameRating">
                             <h2>{player1.username + " (Opponent)"}</h2>
                             <p>Rating: {player1.rating}</p>
-                            <p>Score: <span id="player1Score">0</span></p>
+                            <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                         </div>
                         <img src={player1.picture} alt={player1.username}/>
                     </div>
@@ -219,11 +251,11 @@ export default function Game() {
                             <SimpleBox diceValue={null}/>
                         </div>
                         <div className="grid">
-                            <OpponentGrid diceRoll={diceRoll}/>
+                            <OpponentGrid grid={enemyInfo ? enemyInfo: null}/>
                         </div>
                         <div className="diceWrapper">
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
-                                  cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll): undefined}/>
+                                  cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll): undefined} disabled = {true}/>
                         </div>
                     </div>
                 </div>
@@ -237,7 +269,7 @@ export default function Game() {
                                   cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll): undefined} disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>
                         </div>
                         <div className="grid">
-                            <Gridwebsocket={websocket} connected={connected} handleColumnClick={handleColumnClick} active={rolled && !placed}/>
+                            <Grid handleColumnClick={handleColumnClick} active={rolled && !placed} grid={yourInfo ? yourInfo: null}/>
                         </div>
                         <div className="playerCards">
                             <h3>Deck</h3>
@@ -251,7 +283,7 @@ export default function Game() {
                             <p>Rating: {player2.rating}</p>
                         </div>
                         <div className="score">
-                            <p>Score: <span id="player2Score">{player2Score}</span></p>
+                            <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
                         </div>
                     </div>
                 </div>

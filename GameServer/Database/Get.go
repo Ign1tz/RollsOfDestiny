@@ -42,10 +42,13 @@ func GetGrid(gridId string) (Types.Grid, error) {
 		}
 		if placement == 0 {
 			grid.Left = col
+			grid.Left.Placement = placement
 		} else if placement == 1 {
-			grid.Right = col
-		} else if placement == 2 {
 			grid.Middle = col
+			grid.Middle.Placement = placement
+		} else if placement == 2 {
+			grid.Right = col
+			grid.Right.Placement = placement
 		}
 	}
 	return grid, nil
