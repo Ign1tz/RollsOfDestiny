@@ -17,6 +17,8 @@ export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
 
     const online = true;
 
+    // TODO: remove from friendlist button
+
 
     return (
         <>
