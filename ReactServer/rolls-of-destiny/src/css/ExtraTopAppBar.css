@@ -1,0 +1,8 @@
+#searchBox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-inline: 5%;
+    height: 70%;
+}
+

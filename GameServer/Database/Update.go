@@ -35,3 +35,8 @@ func UpdateLastRollGames(playfield Types.Playfield) error {
 	_, err := Database.Exec("Update games set lastRoll = $1 where gameid = $2", playfield.LastRoll, playfield.GameID)
 	return err
 }
+
+func UpdateQueueEntry(userId string, websocketId string) error {
+	_, err := Database.Exec("Update queue set websocketconnectionid = $1 where userid = $2", websocketId, userId)
+	return err
+}

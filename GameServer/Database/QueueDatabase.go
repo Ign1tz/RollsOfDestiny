@@ -2,7 +2,6 @@ package Database
 
 import (
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 )
 
 func GetOldestEntry() (Types.QueueInfo, error) {
@@ -13,12 +12,15 @@ func GetOldestEntry() (Types.QueueInfo, error) {
 	if err != nil {
 		player = Types.QueueInfo{}
 	}
-	fmt.Println(player.UserId)
-	Database.Exec("Delete from queue where userid = $1", player.UserId)
 	return player, err
 }
 
 func AddToQueueDatabase(player Types.QueueInfo) error {
 	_, err := Database.Exec("INSERT INTO queue (userid, websocketconnectionid) VALUES ($1, $2)", player.UserId, player.WebsocketConnectionId)
+	return err
+}
+
+func DeleteFromQueue(player Types.QueueInfo) error {
+	_, err := Database.Exec("Delete from queue where userid = $1", player.UserId)
 	return err
 }

@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import {Modal, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
-import {authFetch, login} from "../auth"
+import {login} from "../auth"
 import "../css/LoginSignup.css"
+import {Link} from "react-router-dom";
 
 export default function Login() {
 
@@ -54,7 +55,6 @@ export default function Login() {
                         if (token.token) {
                             login(token.token)
                             sessionStorage.setItem("username", username)
-                            authFetch("http://localhost:9090/userInfo")
                             window.location.href = "/"
                         }
                     })
@@ -99,6 +99,10 @@ export default function Login() {
             <br/>
             <br/>
             <Button variant="contained" onClick={submit}>Login</Button>
+            <p className={"link"}> Don't have an account yet?
+                <br/>
+                <Link to="http://localhost:3000/signup">Sign Up Here</Link>
+            </p>
         </div>
     )
 }

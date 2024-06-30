@@ -90,9 +90,7 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 
 func queueForGame(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Println(r.Method)
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
@@ -109,8 +107,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Raw body: %s\n", body)
 
 		var t Types.QueueInfo
-
-		fmt.Println(string(body))
 
 		err = json.Unmarshal(body, &t)
 		if err != nil {
@@ -165,7 +161,10 @@ func Server() {
 				fmt.Println("s", msg["id"])
 				fmt.Println("s", msg["message"])
 				err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
-				fmt.Println("send message", err)
+				if err != nil {
+					log.Println(err)
+
+				}
 			}
 		}
 	}()

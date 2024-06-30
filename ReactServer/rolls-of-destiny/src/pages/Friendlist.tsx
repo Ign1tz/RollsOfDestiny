@@ -8,11 +8,11 @@ import offlineImage from "../images/red.jpeg"
 export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
 
     const users: profile[] = [
-        { username: "Bernd", rating: 839, picture: "https://via.placeholder.com/100", biography: "Bio for Bernd" },
-        { username: "Anna", rating: 902, picture: "https://via.placeholder.com/100", biography: "Bio for Anna" },
-        { username: "Carlos", rating: 756, picture: "https://via.placeholder.com/100", biography: "Bio for Carlos" },
-        { username: "Diana", rating: 820, picture: "https://via.placeholder.com/100", biography: "Bio for Diana" },
-        { username: "Edward", rating: 890, picture: "https://via.placeholder.com/100", biography: "Bio for Edward" }
+        { username: "Bernd", rating: 839, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Anna", rating: 902, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
+        { username: "Diana", rating: 820, profilePicture: "https://via.placeholder.com/100" },
+        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
     ];
 
     const online = true;
@@ -27,11 +27,10 @@ export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
                     {users.map((user, index) => (
                         <li key={index} className="friendlist-item">
                             <div className="friendlist-image-info">
-                                <img src={user.picture} alt={user.username} className="leaderboard-picture"/>
+                                <img src={user.profilePicture} alt={user.username} className="leaderboard-picture"/>
                                 <div className="friendlist-info">
                                     <h2 className="friendlist-username">{user.username}</h2>
                                     <p className="friendlist-rating">Rating: {user.rating}</p>
-                                    <p className="friendlist-biography">{user.biography}</p>
                                 </div>
                             </div>
                             <img src={online ? onlineImage : offlineImage} className="online-status"

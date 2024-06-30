@@ -3,33 +3,30 @@ package Server
 import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 	"github.com/google/uuid"
+	"log"
 )
 
 func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
-	fmt.Println("Adding to queue")
 	if alreadyInGame(queueEntry.UserId) {
-		fmt.Println("Already in game")
 		err := Database.UpdatePlayerWebsocketID(queueEntry.UserId, queueEntry.WebsocketConnectionId)
 		if err != nil {
 			panic(err)
 			return
 		}
 	} else {
-		fmt.Println("Not in game")
 		player, _ := Database.GetOldestEntry()
 
-		fmt.Println("userid:", player.UserId)
-
 		if player.UserId == "" {
-			fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 			err := Database.AddToQueueDatabase(queueEntry)
 			if err != nil {
-				fmt.Println(err)
+			}
+		} else if player.UserId == queueEntry.UserId {
+			err := Database.UpdateQueueEntry(queueEntry.UserId, queueEntry.WebsocketConnectionId)
+			if err != nil {
+				log.Println(err)
 			}
 		} else {
-			fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 			gridId1 := uuid.New().String()
 			hostGrid := Types.Grid{
 				Left: Types.Column{
@@ -81,7 +78,6 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				},
 				GridId: gridId2,
 			}
-			fmt.Println("After creating grid")
 
 			host := Types.Player{
 				Username:              "Host",
@@ -115,12 +111,13 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				LastRoll:     diceTrow,
 			}
 
-			fmt.Println("After creating stuff")
 			err := Database.InsertWholeGame(playfield)
 			if err != nil {
-				fmt.Println(err)
-				panic(err)
+				Database.DeleteGame(hostGrid.GridId)
+				Database.DeleteGame(guestGrid.GridId)
+				log.Println(err)
 			}
+			Database.DeleteFromQueue(player)
 
 			var msg = make(map[string]string)
 			msg["id"] = playfield.Host.WebsocketConnectionID
@@ -137,8 +134,6 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			msg2["message"] = infoMessage
 
 			*c2 <- msg2
-			fmt.Println("second", msg2["id"])
-			fmt.Println("After second message")
 		}
 	}
 }
