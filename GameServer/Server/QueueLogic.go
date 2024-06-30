@@ -109,7 +109,8 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			}
 
 			fmt.Println("After creating player")
-
+			diceTrow := Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}}.Throw()
+			fmt.Println("diceTh", diceTrow)
 			playfield := Types.Playfield{
 				Host:         host,
 				Guest:        guest,
@@ -117,6 +118,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				GuestGrid:    guestGrid,
 				GameID:       uuid.New().String(),
 				ActivePlayer: host,
+				LastRoll:     diceTrow,
 			}
 
 			fmt.Println("After creating stuff")
@@ -127,20 +129,17 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			}
 
 			var msg = make(map[string]string)
-
-			msg["id"] = host.WebsocketConnectionID
-			message := `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}}`
-			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + message + `}}`
+			msg["id"] = playfield.Host.WebsocketConnectionID
+			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
+			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg["message"] = infoMessage
 
 			*c2 <- msg
 
 			var msg2 = make(map[string]string)
-			fmt.Println("first", msg["id"])
-			fmt.Println("After first message")
-			msg2["id"] = guest.WebsocketConnectionID
-			message = `{"gameid": "` + playfield.GameID + `", "YourInfo": { "WebsocketId": "` + playfield.Guest.WebsocketConnectionID + `", "Username": "` + playfield.Guest.Username + `"}, "EnemyInfo": { "WebsocketId": "` + playfield.Host.WebsocketConnectionID + `", "Username": "` + playfield.Host.Username + `"}}`
-			infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + message + `}}`
+			msg2["id"] = playfield.Guest.WebsocketConnectionID
+			newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": false, "roll": "` + playfield.LastRoll + `"}}`
+			infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg2["message"] = infoMessage
 
 			*c2 <- msg2

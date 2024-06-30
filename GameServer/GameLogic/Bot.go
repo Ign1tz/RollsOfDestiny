@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"math/rand"
+	"strconv"
 )
 
 func BotTurn(gameInfo Types.Resp) {
@@ -28,25 +29,25 @@ func BotTurn(gameInfo Types.Resp) {
 
 	enemy := gamefield.EnemyPlayer()
 	var columnErr error
-
+	roll, _ := strconv.Atoi(currentRoll)
 	for !pickedValidColumn {
 		columnNumber := rand.Intn(3)
 		if columnNumber == 0 {
-			columnErr = gamefield.ActivePlayer.Grid.Left.Add(currentRoll)
+			columnErr = gamefield.ActivePlayer.Grid.Left.Add(roll)
 			if columnErr == nil {
-				enemy.Grid.Left.Remove(currentRoll)
+				enemy.Grid.Left.Remove(roll)
 				pickedValidColumn = true
 			}
 		} else if columnNumber == 1 {
-			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(currentRoll)
+			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(roll)
 			if columnErr == nil {
-				enemy.Grid.Middle.Remove(currentRoll)
+				enemy.Grid.Middle.Remove(roll)
 				pickedValidColumn = true
 			}
 		} else if columnNumber == 2 {
-			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(currentRoll)
+			columnErr = gamefield.ActivePlayer.Grid.Middle.Add(roll)
 			if columnErr == nil {
-				enemy.Grid.Right.Remove(currentRoll)
+				enemy.Grid.Right.Remove(roll)
 				pickedValidColumn = true
 			}
 		}

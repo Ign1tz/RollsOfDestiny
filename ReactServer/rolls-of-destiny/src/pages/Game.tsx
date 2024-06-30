@@ -5,20 +5,26 @@ import SimpleBox from "../components/SimpleBox";
 import {profile} from "../types/profileTypes";
 import "../css/Game.css";
 import {useEffect, useState} from "react";
+import {GameInfo, messageBody} from "../types/gameTypes";
+
+
 
 
 export default function Game() {
     localStorage.setItem("gameInfo", "")
     console.log(localStorage.getItem("gameInfo"))
-    let gameInfo = localStorage.getItem("gameInfo")
-    if (!gameInfo) {
-        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    let startGameInfo = localStorage.getItem("gameInfo")
+    if (!startGameInfo) {
+        startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
     const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
-    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
+    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(startGameInfo))
     const [gameId, setGameId] = useState("")
+    const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
+    const [rolled, setRolled] = useState(false)
+    const [placed, setPlaced] = useState(false)
     let player1: profile = {
         username: gameInfoJson.EnemyInfo.Username,
         rating: 3450913,
@@ -44,7 +50,7 @@ export default function Game() {
         console.log(websocket)
         if (connected && websocket) {
             console.log("test")
-            websocket.send("test")
+            //websocket.send("test")
         }
     }, [connected])
 
@@ -72,15 +78,18 @@ export default function Game() {
                 console.log(message.message.gameInfo)
                 localStorage.setItem("gameInfo", message.message.gameInfo)
                 setGameInfoJson(message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                setGameInfo(message.message.gameInfo)
             }
         }
     }
 
     const handleColumnClick = (key: number) => {
         console.log(connected)
-        if (websocket && connected){
-            console.log(websocket)
-            websocket.send("test " + key)
+        if (websocket && connected && gameInfo){
+            console.log(gameId)
+            setPlaced(true)
+            websocket.send(JSON.stringify({type: "pickColumn", messageBody: key.toString(), gameId: gameId}))
         }
     };
 
@@ -100,6 +109,29 @@ export default function Game() {
         });
     }
 
+    const parseRoll = (roll: string) : 1 | 2 | 3 | 4 | 5 | 6 | undefined => {
+        switch (roll) {
+            case "1":
+                return 1
+            case "2":
+                return 2
+            case "3":
+                return 3
+            case "4":
+                return 4
+            case "5":
+                return 5
+            case "6":
+                return 6
+        }
+    }
+
+    useEffect(() => {
+        console.log(gameInfo)
+        if (gameInfo.ActivePlayer){
+            console.log(gameInfo.ActivePlayer.active)
+        }
+    }, [gameInfo]);
 
     return (<div className="gameDivision">
             <div className="header">
@@ -121,9 +153,9 @@ export default function Game() {
                     <div className="playerActions">
                         <div className="diceWrapper">
                             <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
-                                  cheatValue={undefined} disabled={true}/>
+                                  cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll): undefined} />
                         </div>
-                        <Grid handleColumnClick={handleColumnClick}/>
+                        <Grid/>
                         <div className="playerCards">
                             {/* Placeholder for player's cards */}
                             <SimpleBox/>
@@ -135,10 +167,12 @@ export default function Game() {
                 <div className="playerSection">
                     <div className="playerActions">
                         <div className="diceWrapper">
-                            <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
-                                  cheatValue={undefined}/>
+                            <Dice onRoll={(value) => {
+                                console.log(value); setRolled(true)
+                            }} defaultValue={6} size={100}
+                                  cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll): undefined} disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>
                         </div>
-                        <Grid websocket={websocket} connected={connected} handleColumnClick={handleColumnClick}/>
+                        <Grid websocket={websocket} connected={connected} handleColumnClick={handleColumnClick} active={rolled && !placed}/>
                         <div className="playerCards">
                             <SimpleBox/>
                             <SimpleBox/>

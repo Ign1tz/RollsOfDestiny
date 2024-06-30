@@ -1,6 +1,9 @@
 package Database
 
-import "RollsOfDestiny/GameServer/Types"
+import (
+	"RollsOfDestiny/GameServer/Types"
+	"fmt"
+)
 
 func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTING IF ALREADY IN GAME
 	dbPlayer := Database.QueryRow("Select * from players where userid = $1", playerId)
@@ -33,15 +36,15 @@ func GetGrid(gridId string) (Types.Grid, error) {
 	}
 	for dbColumns.Next() {
 		var col Types.Column
-		var placement string
-		if err := dbColumns.Scan(&col.GridId, &col.First, &col.Second, &col.Third, &placement); err != nil {
+		var placement int
+		if err := dbColumns.Scan(&col.GridId, &placement, &col.First, &col.Second, &col.Third); err != nil {
 			return grid, err
 		}
-		if placement == "left" {
+		if placement == 0 {
 			grid.Left = col
-		} else if placement == "right" {
+		} else if placement == 1 {
 			grid.Right = col
-		} else if placement == "middle" {
+		} else if placement == 2 {
 			grid.Middle = col
 		}
 	}
@@ -101,11 +104,11 @@ func GetPlayer(playerId string) (Types.Player, error) {
 	if err := dbPlayer.Scan(&player.UserID, &player.Username, &player.Mana, &gridid, &player.WebsocketConnectionID); err != nil {
 		return Types.Player{}, err
 	}
-	deck, err := GetDeckByPlayerId(player.UserID)
+	/*deck, err := GetDeckByPlayerId(player.UserID)
 	if err != nil {
 		return player, err
 	}
-	player.Deck = deck
+	player.Deck = deck*/
 
 	grid, err := GetGrid(gridid)
 	if err != nil {
@@ -119,12 +122,15 @@ func GetPlayer(playerId string) (Types.Player, error) {
 func GetPlayfield(gameId string) (Types.Playfield, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
-	if err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll); err != nil {
+	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
+	fmt.Println(err)
+	if err != nil {
 		return Types.Playfield{}, err
 	}
 	var playfield Types.Playfield
 	playfield.GameID = game.GameID
 	playfield.LastRoll = game.LastRoll
+	fmt.Println(game.ActivePlayer)
 	activePlayer, err := GetPlayer(game.ActivePlayer)
 	if err != nil {
 		return playfield, err

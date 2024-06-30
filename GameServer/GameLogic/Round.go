@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func RollDie(gameId string) int {
+func RollDie(gameId string) string {
 	gamefield, err := Database.GetPlayfield(gameId)
 
 	if err != nil {

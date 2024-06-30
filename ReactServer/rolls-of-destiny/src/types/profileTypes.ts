@@ -5,4 +5,6 @@ type profile = {
     biography: string
 }
 
+
+
 export type { profile }

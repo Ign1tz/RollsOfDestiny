@@ -2,6 +2,7 @@ package Types
 
 import (
 	"math/rand"
+	"strconv"
 )
 
 type Die struct {
@@ -12,7 +13,7 @@ type DieLogic interface {
 	Throw()
 }
 
-func (d Die) Throw() int {
+func (d Die) Throw() string {
 	res := rand.Intn(len(d.PossibleThrows))
-	return d.PossibleThrows[res]
+	return strconv.Itoa(d.PossibleThrows[res])
 }
