@@ -17,10 +17,8 @@ export default function Game() {
     let volume = sessionStorage.getItem("volume");
     let masterVolume = 99
     if (volume) {
-        masterVolume = parseInt(volume)/100
+        masterVolume = parseInt(volume) / 100
     }
-
-    // TODO: volume does not get set correctly visually in settings
 
     const player1: profile = {
         username: "Lukas",
@@ -43,7 +41,6 @@ export default function Game() {
                 src={background_music}
                 autoPlay={true}
                 loop={true}
-                controls
                 volume={masterVolume}
             />
             <div className="gameDivision">
