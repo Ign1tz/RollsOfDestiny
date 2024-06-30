@@ -1,16 +1,41 @@
-import {profile} from "../types/profileTypes";
-import Button from '@mui/material/Button'
+import { profile } from "../types/profileTypes";
+import Button from '@mui/material/Button';
+import TopAppBar from "../bars/TopAppBar";
+import "../css/Profile.css";
 
-// mua.com for styling
+export default function Profile({ user }: { user: profile }) {
 
-export default function Profile({user}: { user: profile }) {
-    const relocate = () => {
-        window.location.href = "/"
-    }
+    const matches = ["Win", "Win", "Lose", "Lose", "Win", "Lose", "Win", "Lose"];
+
     return (
         <>
-            <h1> {user.username} </h1>
-            <Button variant="outlined" onClick={relocate}> Back button</Button>
+            <TopAppBar loggedIn={true}></TopAppBar>
+            <div className="profilePage">
+                <div className="profileDiv">
+                    <img src={user.picture} alt={"profile picture"} />
+                    <h1>{user.username}</h1>
+                    <div className="list">
+                        <h4>Rating: {user.rating}</h4>
+                        <h4>Friends: 5</h4>
+                    </div>
+                    <div className="biography">
+                        <h4>{user.biography}</h4>
+                    </div>
+                    <div className="lastMatches">
+                        <h3>Last Matches:</h3>
+                        <div className="matchesList">
+                            {matches.map((result, index) => (
+                                <div
+                                    key={index}
+                                    className={`match ${result.toLowerCase()}`}
+                                >
+                                    {result}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
-    )
+    );
 }

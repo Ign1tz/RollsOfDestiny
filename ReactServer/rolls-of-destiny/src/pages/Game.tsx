@@ -1,14 +1,15 @@
-import { Button, Modal } from "@mui/material"; // Assuming you're using Material-UI components
-
+import {Button, Modal} from "@mui/material"; // Assuming you're using Material-UI components
 import Grid from "../components/Grid";
 import OpponentGrid from "../components/OpponentGrid";
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
 import {profile} from "../types/profileTypes";
 import "../css/Game.css";
+import React, {useEffect, useState} from "react";
+import background_music from "../soundtracks/background_music.mp3";
+import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
-import {useEffect, useState} from "react";
 
 
 export default function Game() {
@@ -33,7 +34,7 @@ export default function Game() {
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
 
-    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined >(undefined);
+    const [rollValue, setRollValue] = useState<1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
 
     const handleRoll = (player: 'player1' | 'player2', value: number) => {
         setDiceRoll(value);
@@ -47,6 +48,14 @@ export default function Game() {
     const handleQuit = () => {
         window.location.href = "/";
     };
+
+
+    let volume = sessionStorage.getItem("volume");
+    let masterVolume = 99
+    if (volume) {
+        masterVolume = parseInt(volume) / 100
+    }
+
 
     const toggleSurrender = () => {
         setConfirmSurrender(!confirmSurrender)
@@ -132,94 +141,108 @@ export default function Game() {
 
 
     return (
-        <div className="gameDivision" style={{
-            backgroundImage: `url(${background})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100%',
-            width: '100%'
-        }} >
-            <div className="header">
-                <Button variant="contained" onClick={togglePause}>
-                    Pause
-                </Button>
-            </div>
-            <div className="content">
-                <Modal open={confirmSurrender} onClose={toggleSurrender}>
-                    <div className="confirmSurrenderMenu">
-                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
-                            Cancel
-                        </Button>
-                        <Button variant="contained" onClick={handleQuit}>
-                            Confirm Surrender
-                        </Button>
+        <>
+            <ReactAudioPlayer
+                src={background_music}
+                autoPlay={true}
+                loop={true}
+                volume={masterVolume}
+            />
+            <div className="gameDivision" style={{
+                backgroundImage: `url(${background})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '100%',
+                width: '100%'
+            }}>
+                <div className="header">
+                    <Button variant="contained" onClick={togglePause}>
+                        Pause
+                    </Button>
+                </div>
+                <div className="content">
+                    <Modal open={confirmSurrender} onClose={toggleSurrender}>
+                        <div className="confirmSurrenderMenu">
+                            <Button variant="contained" onClick={() => {
+                                toggleSurrender();
+                                togglePause()
+                            }}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" onClick={handleQuit}>
+                                Confirm Surrender
+                            </Button>
+                        </div>
+                    </Modal>
+                    <Modal open={isPaused} onClose={togglePause}>
+                        <div className="pauseMenu">
+                            <h2>Pause Menu</h2>
+                            <Button variant="contained" onClick={togglePause}>
+                                Continue playing
+                            </Button>
+                            <Button variant="contained" onClick={() => console.log("Go to Settings")}>
+                                Settings
+                            </Button>
+                            <Button variant="contained" onClick={() => {
+                                toggleSurrender();
+                                togglePause()
+                            }}>
+                                Surrender
+                            </Button>
+                        </div>
+                    </Modal>
+                    <div className="playerSection">
+                        <div className="playerInfoOpp">
+                            <div className="score">
+                                <p>Score: <span id="player1Score">{player1Score}</span></p>
+                            </div>
+                            <div className="playerInfoUsernameRating">
+                                <h2>{player1.username + " (Opponent)"}</h2>
+                                <p>Rating: {player1.rating}</p>
+                            </div>
+                            <img src={player1.profilePicture} alt={player1.username}/>
+                        </div>
+                        <div className="playerActions">
+                            <div className="playerCards">
+                                <h3>Deck </h3>
+                                <SimpleBox diceValue={null}/>
+                            </div>
+                            <div className="grid">
+                                <OpponentGrid diceRoll={diceRoll}/>
+                            </div>
+                            <div className="diceWrapper">
+                                <Dice defaultValue={6} size={100} cheatValue={undefined} disabled={true}/>
+                            </div>
+                        </div>
                     </div>
-                </Modal>
-                <Modal open={isPaused} onClose={togglePause}>
-                    <div className="pauseMenu">
-                        <h2>Pause Menu</h2>
-                        <Button variant="contained" onClick={togglePause}>
-                            Continue playing
-                        </Button>
-                        <Button variant="contained" onClick={() => console.log("Go to Settings")}>
-                            Settings
-                        </Button>
-                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
-                        Surrender
-                        </Button>
-                    </div>
-                </Modal>
-                <div className="playerSection">
-                    <div className="playerInfoOpp">
-                        <div className="score">
-                            <p>Score: <span id="player1Score">{player1Score}</span></p>
+                    <div className="divider"></div>
+                    <div className="playerSection">
+                        <div className="playerActions">
+                            <div className="diceWrapper">
+                                <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
+                                      cheatValue={rollValue} disabled={disableRoll}/>
+                            </div>
+                            <div className="grid">
+                                <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
+                            </div>
+                            <div className="playerCards">
+                                <h3>Deck</h3>
+                                <SimpleBox diceValue={null}/>
+                            </div>
                         </div>
-                        <div className="playerInfoUsernameRating">
-                            <h2>{player1.username + " (Opponent)"}</h2>
-                            <p>Rating: {player1.rating}</p>
-                        </div>
-                        <img src={player1.profilePicture} alt={player1.username}/>
-                    </div>
-                    <div className="playerActions">
-                        <div className="playerCards">
-                            <h3>Deck </h3>
-                            <SimpleBox diceValue={null}/>
-                        </div>
-                        <div className="grid">
-                            <OpponentGrid diceRoll={diceRoll}/>
-                        </div>
-                        <div className="diceWrapper">
-                            <Dice defaultValue={6} size={100} cheatValue={undefined} disabled={true}/>
+                        <div className="playerInfo">
+                            <img src={player2.profilePicture} alt={player2.username}/>
+                            <div className="playerInfoUsernameRating">
+                                <h2>{player2.username + " (You)"}</h2>
+                                <p>Rating: {player2.rating}</p>
+                            </div>
+                            <div className="score">
+                                <p>Score: <span id="player2Score">{player2Score}</span></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="divider"></div>
-                <div className="playerSection">
-                    <div className="playerActions">
-                        <div className="diceWrapper">
-                            <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
-                                  cheatValue={rollValue} disabled={disableRoll}/>
-                        </div>
-                        <div className="grid">
-                            <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
-                        </div>
-                        <div className="playerCards">
-                            <h3>Deck</h3>
-                            <SimpleBox diceValue={null}/>
-                        </div>
-                    </div>
-                    <div className="playerInfo">
-                        <img src={player2.profilePicture} alt={player2.username}/>
-                        <div className="playerInfoUsernameRating">
-                            <h2>{player2.username + " (You)"}</h2>
-                            <p>Rating: {player2.rating}</p>
-                        </div>
-                        <div className="score">
-                            <p>Score: <span id="player2Score">{player2Score}</span></p>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
+        </>
     );
 }

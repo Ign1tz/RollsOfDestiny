@@ -61,7 +61,80 @@
     background-color: #e53935;
 }
 
-.loginSignUpDivision {
+#searchBox {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    text-align: center;
+    margin: 20px;
+}
+
+#searchBox .MuiTextField-root {
+    margin-right: 20px;
+}
+
+.searchResultsModal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+    background-color: #55465d;
+    padding: 20px;
+    border: 2px solid #000;
+    border-radius: 3%;
+    color: white;
+    overflow-y: auto;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.results {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.profileBoxHome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.profilePictureHome {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.profileDetailsHome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.profileDetails h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.profileDetails p {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+}
+
+.profileBox button {
+    margin-left: 20px;
 }
