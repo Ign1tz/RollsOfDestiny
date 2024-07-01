@@ -42,12 +42,13 @@ export default function Game() {
     };
 
     const handleQuit = () => {
+        websocket.send(JSON.stringify({type:"surrender", message: {}, gameId: gameId}))
         window.location.href = "/";
     };
 
 
     let volume = sessionStorage.getItem("volume");
-    let masterVolume = .99
+    let masterVolume = .30
     if (volume) {
         masterVolume = parseInt(volume) / 100
     }

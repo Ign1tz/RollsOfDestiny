@@ -121,6 +121,13 @@ func categorizeMessage(message websocketMessage, connectionId string) (map[strin
 		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
 	case "PickColumn":
 		return handlePickedColumn(message)
+	case "surrender":
+		playfield, err := Database.GetPlayfield(message.GameId)
+		if err != nil {
+			log.Println(err)
+			return nil, nil
+		}
+		return handleGameEnded(playfield)
 	}
 	return msg, nil
 }
@@ -231,11 +238,19 @@ func handleGameEnded(playfield Types.Playfield) (map[string]string, map[string]s
 	infoMessage := `{"info": "gameEnded", "message": {"gameInfo": ` + playfieldMessage + `, "endResults": ` + newMessage + `}}`
 	hostMsg["message"] = infoMessage
 
+	if playfield.Guest.WebsocketConnectionID == "" {
+		Database.DeleteGame(playfield.Host.Grid.GridId)
+		Database.DeleteGame(playfield.Guest.Grid.GridId)
+		return hostMsg, nil
+	}
+
 	guestMsg["id"] = playfield.Guest.WebsocketConnectionID
 	playfieldMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(false) + `, "roll": "` + playfield.LastRoll + `"}}`
 	newMessage = `{"yourScore": ` + strconv.Itoa(playfield.Guest.Grid.Value()) + `, "enemyScore": ` + strconv.Itoa(playfield.Host.Grid.Value()) + `, "youWon": "` + guestWonMessage + `"}`
 	infoMessage = `{"info": "gameEnded", "message": {"gameInfo": ` + playfieldMessage + `, "endResults": ` + newMessage + `}}`
 	guestMsg["message"] = infoMessage
 
+	Database.DeleteGame(playfield.Host.Grid.GridId)
+	Database.DeleteGame(playfield.Guest.Grid.GridId)
 	return hostMsg, guestMsg
 }

@@ -3,7 +3,7 @@ package Database
 func DeleteQueue() {
 	Database.Exec("DELETE From queue")
 }
-func DeleteGames() {
+func DeleteAllGames() {
 	Database.Exec("DELETE From grids")
 }
 
