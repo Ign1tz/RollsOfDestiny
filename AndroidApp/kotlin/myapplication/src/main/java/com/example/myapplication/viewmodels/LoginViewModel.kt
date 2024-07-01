@@ -73,7 +73,7 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         var worked = false
 
         runBlocking { worked = loginRequest(userName, password) }
-
+        Log.d("test", worked.toString())
         return worked
     }
 

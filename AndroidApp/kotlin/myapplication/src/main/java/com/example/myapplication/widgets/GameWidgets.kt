@@ -116,7 +116,9 @@ fun OwnField (viewModel: GameViewModel) {
                             Box(modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Transparent)
-                            )
+                            ){
+
+                            }
                         }
                     }
                 }
