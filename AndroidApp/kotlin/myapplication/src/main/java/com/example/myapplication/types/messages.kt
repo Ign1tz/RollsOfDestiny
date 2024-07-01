@@ -16,8 +16,14 @@ data class idMessageBody(
 @Serializable
 data class gameMessageBody(
     val ActivePlayer: ActivePlayer,
-    val yourInfo: YourInfo,
-    val enemyInfo: EnemyInfo
+    val YourInfo: yourInfo,
+    val EnemyInfo: enemyInfo,
+    val gameid: String
+)
+
+@Serializable
+data class gameInfo(
+    val gameInfo: String
 )
 
 @Serializable
@@ -27,9 +33,9 @@ data class ActivePlayer(
 )
 
 @Serializable
-data class YourInfo(
-    val Username: String,
+data class yourInfo(
     val WebsocketId: String,
+    val Username: String,
     val userId: String,
     val LeftColumn: Column,
     val MiddleColumn: Column,
@@ -46,9 +52,9 @@ data class Column(
 )
 
 @Serializable
-data class EnemyInfo(
+data class enemyInfo(
     val Username: String,
-    val websocketId: String,
+    val WebsocketId: String,
     val LeftColumn: Column,
     val MiddleColumn: Column,
     val RightColumn: Column,
@@ -65,4 +71,13 @@ data class EndResults(
 data class EndResultsBody(
     val gameInfo: String,
     val endResults: String,
+)
+
+@Serializable
+data class userInfoMessage(
+    val username: String,
+    val email: String,
+    val profilePicture: String,
+    val rating: String,
+    val userid: String
 )

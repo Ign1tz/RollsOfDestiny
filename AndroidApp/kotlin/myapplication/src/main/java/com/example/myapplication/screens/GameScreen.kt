@@ -1,11 +1,13 @@
 package com.example.myapplication.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
@@ -17,20 +19,18 @@ import java.net.URI
 
 @Composable
 fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
-
-    val webSocketClient = gameViewModel.websocket()
-
+    gameViewModel.websocket()
     Scaffold (
 
-        topBar = { ProfileRow(profileImage = R.drawable.caught, username = "Enemy", score = "50")},
+        topBar = { ProfileRow(profileImage = R.drawable.caught, username = gameViewModel.gameInfo?.EnemyInfo?.Username ?: "", score = gameViewModel.gameInfo?.EnemyInfo?.Score ?: 0)},
 
-        bottomBar = { ProfileRow(profileImage = R.drawable.xdd, username = "eziekel", score = "120") }
+        bottomBar = { ProfileRow(profileImage = R.drawable.xdd, username = gameViewModel.user.userName, score =  gameViewModel.gameInfo?.YourInfo?.Score ?: 0) }
 
 
 
     ){innerPadding ->
-        Column (modifier = Modifier.padding(innerPadding)) {
-            PlayField(6,gameViewModel)
+        Column (modifier = Modifier.padding(innerPadding).background(Color.White)) {
+            PlayField(gameViewModel)
 
         }
     }

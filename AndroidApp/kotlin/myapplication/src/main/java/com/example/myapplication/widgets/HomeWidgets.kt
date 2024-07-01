@@ -9,20 +9,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.viewmodels.GameViewModel
 
 @Composable
-fun HomeScreenButtons (navController: NavController) {
+fun HomeScreenButtons (navController: NavController, gameViewModel: GameViewModel) {
     val padding = 10.dp
     Column (
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.padding(20.dp))
-        QuickPlayButton(navController)
+        QuickPlayButton(navController, gameViewModel)
         Spacer(Modifier.padding(padding))
         FriendPlayButton()
         Spacer(Modifier.padding(padding))
-        RankedPlayButton()
+        RankedPlayButton(navController, gameViewModel)
         Spacer(Modifier.padding(padding))
         ScoreboardButton()
         Spacer(Modifier.padding(padding))

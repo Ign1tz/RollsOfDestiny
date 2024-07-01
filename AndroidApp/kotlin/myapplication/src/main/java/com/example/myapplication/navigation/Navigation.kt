@@ -30,10 +30,14 @@ fun Navigation() {
         }
 
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen(navController = navController, homeViewModel = homeViewModel)
+            HomeScreen(navController = navController, homeViewModel = homeViewModel,gameViewModel)
         }
 
         composable(route = Screen.GameScreen.route) {
+            GameScreen(navController = navController, gameViewModel = gameViewModel)
+        }
+        composable(route = "game/bot") {
+            gameViewModel.GameType.value = "bot"
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
     }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -91,10 +92,11 @@ fun UpButton () {
 }
 
 @Composable
-fun QuickPlayButton (navController: NavController) {
+fun QuickPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+    gameViewModel.GameType.value = "bot"
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {navController.navigate(route = "game")},
+        onClick = {navController.navigate(route = "game/bot")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -125,10 +127,11 @@ fun FriendPlayButton () {
 }
 
 @Composable
-fun RankedPlayButton () {
+fun RankedPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+    gameViewModel.GameType.value = ""
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {},
+        onClick = {navController.navigate(route = "game")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )

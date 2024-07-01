@@ -3,6 +3,7 @@ package com.example.myapplication.widgets
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,59 +30,59 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.myapplication.R
 import com.example.myapplication.viewmodels.GameViewModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.localdb.Repository
+import com.example.myapplication.types.Column
+import kotlinx.coroutines.delay
 
 @Composable
-fun PlayField (int: Int, viewModel: GameViewModel) {
+fun PlayField(viewModel: GameViewModel) {
 
-    Column {
-        Column (
+    Column(verticalArrangement = Arrangement.SpaceBetween) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.5f),
+                .fillMaxHeight(0.4f)
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            EnemyField()
+            EnemyField(viewModel)
         }
-        HorizontalDivider(
-            color = Color.Black,
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxWidth())
-        Column (
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color.Red)
+        )
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ){
+        ) {
             OwnField(viewModel)
         }
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Box() {
-                var originStateOfDie by remember { mutableStateOf(false) }
 
-                if (originStateOfDie) {
-                    Dice(int = int)
+                if (viewModel.hasRolled.value && viewModel.gameInfo?.ActivePlayer?.active ?: false) {
+                    Die(gameViewModel = viewModel)
                 } else {
-                    DefaultDie(onClick = {originStateOfDie = true})
+                    DefaultDie(gameViewModel = viewModel)
                 }
             }
 
@@ -91,44 +92,124 @@ fun PlayField (int: Int, viewModel: GameViewModel) {
 }
 
 @Composable
-fun OwnField (viewModel: GameViewModel) {
+fun OwnField(viewModel: GameViewModel) {
+    val info = viewModel.gameInfo
     Box() {
-        val image: Painter = painterResource(id = R.drawable.grid_image)
-        Image(
+        //val image: Painter = painterResource(id = R.drawable.grid_image)
+        /*Image(
             painter = image,
             contentDescription = null,
             modifier = Modifier
                 .width(170.dp)
                 .height(170.dp),
             contentScale = ContentScale.Crop
-        )
+        )*/
         Row() {
-            repeat(3) { index ->
-                Box(
-                    modifier = Modifier
-                        .height(170.dp)
-                        .width(57.dp)
-                        .clickable { }
-                        .background(Color.Transparent)
-                ) {
-                    Column () {
-                        repeat(3) {index ->
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Transparent)
-                            ){
+            column(
+                if (info != null) {
+                    info.YourInfo.LeftColumn
+                } else null,
+                { handleColumnClick(viewModel, info?.YourInfo?.LeftColumn, 0) }
+            )
+            column(
+                if (info != null) {
+                    info.YourInfo.MiddleColumn
+                } else null,
+                { handleColumnClick(viewModel, info?.YourInfo?.MiddleColumn, 1) }
+            )
+            column(
+                if (info != null) {
+                    info.YourInfo.RightColumn
+                } else null,
+                { handleColumnClick(viewModel, info?.YourInfo?.RightColumn, 2) }
+            )
+        }
+    }
+}
 
-                            }
-                        }
-                    }
-                }
+fun handleColumnClick(viewModel: GameViewModel, column: Column?, key: Int){
+    Log.d("isFull?", column?.IsFull.toString())
+    if (column?.IsFull ?: true){
+        return
+    }
+    viewModel.WebSocketClient!!.sendMessage("{\"type\":\"${viewModel.GameType.value}PickColumn\", \"messageBody\":\"${key.toString()}\", \"gameId\":\"${viewModel.gameInfo?.gameid}\"}")
+}
+
+@Composable
+fun column(column: Column?, onClick: () -> Unit = {}) {
+
+    Log.d("columnInfo", column.toString())
+    var first = column?.First
+    var second = column?.Second
+    var third = column?.Third
+    Log.d("columnInfoSeperate", first.toString() + second.toString() + third.toString())
+
+    if (first == null) {
+        first = "0"
+    }
+    if (second == null) {
+        second = "0"
+    }
+    if (third == null) {
+        third = "0"
+    }
+    Box( //woks as one column
+        modifier = Modifier
+            .height(170.dp)
+            .width(57.dp)
+            .clickable { onClick() }
+            .background(Color.Transparent)
+    ) {
+        Column(
+            Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                gridBox(first)
+            }
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center,
+
+            ) {
+                gridBox(second)
+            }
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                gridBox(third)
             }
         }
     }
 }
 
+
 @Composable
-fun addingDice (int: Int) {
+fun gridBox(value: String) {
+    Box(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth()
+            .padding(start = 3.dp, top = 3.dp, end = 0.dp, bottom = 0.dp)
+    ) {
+        getDice(int = value.toInt())
+    }
+}
+
+@Composable
+fun getDice(int: Int) {
 
     val image1: Painter = painterResource(id = R.drawable.appdie1)
     val image2: Painter = painterResource(id = R.drawable.appdie2)
@@ -138,19 +219,56 @@ fun addingDice (int: Int) {
     val image6: Painter = painterResource(id = R.drawable.appdie6)
 
     when (int) {
-        1 -> Image(painter = image1, contentDescription = "die 1")
-        2 -> Image(painter = image2, contentDescription = "die 2")
-        3 -> Image(painter = image3, contentDescription = "die 3")
-        4 -> Image(painter = image4, contentDescription = "die 4")
-        5 -> Image(painter = image5, contentDescription = "die 5")
-        6 -> Image(painter = image6, contentDescription = "die 6")
+        0 -> return
+        1 -> return Image(
+            painter = image1,
+            contentDescription = "die 1",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
+
+        2 -> return Image(
+            painter = image2,
+            contentDescription = "die 2",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
+
+        3 -> return Image(
+            painter = image3,
+            contentDescription = "die 3",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
+
+        4 -> return Image(
+            painter = image4,
+            contentDescription = "die 4",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
+
+        5 -> return Image(
+            painter = image5,
+            contentDescription = "die 5",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
+
+        6 -> return Image(
+            painter = image6,
+            contentDescription = "die 6",
+            Modifier.size(50.dp),
+            alignment = Alignment.Center
+        )
     }
 }
 
 @Composable
-fun EnemyField () {
+fun EnemyField(viewModel: GameViewModel) {
+    val info = viewModel.gameInfo
     Box() {
-        val image: Painter = painterResource(id = R.drawable.grid_image)
+        /*val image: Painter = painterResource(id = R.drawable.grid_image)
         Image(
             painter = image,
             contentDescription = null,
@@ -158,7 +276,70 @@ fun EnemyField () {
                 .width(170.dp)
                 .height(170.dp),
             contentScale = ContentScale.Crop
-        )
+        )*/
+        Row() {
+            enemyColumn(
+                if (info != null) {
+                    info.EnemyInfo.LeftColumn
+                } else null
+            )
+            enemyColumn(
+                if (info != null) {
+                    info.EnemyInfo.MiddleColumn
+                } else null
+            )
+            enemyColumn(
+                if (info != null) {
+                    info.EnemyInfo.RightColumn
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+fun enemyColumn(column: Column?) {
+
+    Log.d("columnInfo", column.toString())
+    var first = column?.First
+    var second = column?.Second
+    var third = column?.Third
+
+    if (first == null) {
+        first = "0"
+    }
+    if (second == null) {
+        second = "0"
+    }
+    if (third == null) {
+        third = "0"
+    }
+    Box( //woks as one column
+        modifier = Modifier
+            .height(170.dp)
+            .width(57.dp)
+            .background(Color.Transparent)
+    ) {
+        Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier
+                .height(170.dp * 0.33333f)
+                .fillMaxWidth()
+                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                gridBox(third)
+            }
+            Row(Modifier
+                .height(170.dp * 0.33333f)
+                .fillMaxWidth()
+                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                gridBox(second)
+            }
+            Row(Modifier
+                .height(170.dp * 0.33333f)
+                .fillMaxWidth()
+                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                gridBox(first)
+            }
+        }
     }
 }
 
@@ -166,7 +347,7 @@ fun EnemyField () {
 fun ProfileRow(
     profileImage: Int,
     username: String,
-    score: String
+    score: Int
 ) {
     Box(
         modifier = Modifier
@@ -212,7 +393,7 @@ fun ProfileRow(
                     fontFamily = FontFamily.Serif
                 )
                 Text(
-                    text = score,
+                    text = score.toString(),
                     fontSize = 20.sp,
                     color = Color.White,
                     fontFamily = FontFamily.Serif
@@ -223,94 +404,115 @@ fun ProfileRow(
 }
 
 @Composable
-fun DefaultDie (onClick: () -> Unit) {
-    Box (modifier = Modifier.clickable(onClick = onClick)) {
+fun DefaultDie(gameViewModel: GameViewModel) {
+    Log.d("die", "hhhhhhhhhahsdhfahdf")
+    Box() {
         val image: Painter = painterResource(id = R.drawable.die_picture)
-        Image(painter = image,
+        Image(
+            painter = image,
             contentDescription = null,
             modifier = Modifier
                 .width(90.dp)
-                .height(90.dp),
+                .height(90.dp)
+                .clickable { gameViewModel.hasRolled.value = true },
             contentScale = ContentScale.FillBounds
         )
     }
 }
 
+fun handleDieRoll(gameViewModel: GameViewModel) {
+    Log.d("game", gameViewModel.roll.value.toString())
+    gameViewModel.roll.value = true
+    Log.d("game", gameViewModel.roll.value.toString())
+}
+
 @Composable
-fun Dice (int: Int) {
-    Box (
+fun Die(gameViewModel: GameViewModel) {
+    Box(
+        modifier = Modifier.clickable(onClick = { handleDieRoll(gameViewModel) })
     ) {
 
         val diceSize = 90.dp
-        when (int) {
-            1 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice1
-                    ),
+        if (gameViewModel.roll.value || true) {
+            Log.d("game", gameViewModel.gameInfo?.ActivePlayer?.roll.toString())
+            when (gameViewModel.gameInfo?.ActivePlayer?.roll) {
+                "1" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice1
+                        ),
 
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.size(diceSize)
-            )
-            2 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice2
-                    )
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(diceSize)
-            )
-            3 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice3
-                    )
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(diceSize)
-            )
-            4 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice4
-                    )
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(diceSize)
-            )
-            5 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice5
-                    )
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(diceSize)
-            )
-            6 -> Image(
-                painter = rememberDrawablePainter(
-                    drawable = getDrawable(
-                        LocalContext.current,
-                        R.drawable.dice6
-                    )
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(diceSize)
-            )
+                        ),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.size(diceSize)
+                )
+
+                "2" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice2
+                        )
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(diceSize)
+                )
+
+                "3" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice3
+                        )
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(diceSize)
+                )
+
+                "4" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice4
+                        )
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(diceSize)
+                )
+
+                "5" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice5
+                        )
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(diceSize)
+                )
+
+                "6" -> Image(
+                    painter = rememberDrawablePainter(
+                        drawable = getDrawable(
+                            LocalContext.current,
+                            R.drawable.dice6
+                        )
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(diceSize)
+                )
+            }
+            gameViewModel.delayRoll()
         }
     }
 }
+
+
 
