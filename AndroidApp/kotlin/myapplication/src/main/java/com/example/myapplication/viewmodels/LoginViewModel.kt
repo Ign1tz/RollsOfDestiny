@@ -1,6 +1,7 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
@@ -31,7 +32,7 @@ import okhttp3.Credentials.basic
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
-    private val IPADDRESS = "10.0.0.2"
+    val IPADDRESS = "10.0.0.2"
 
 
     suspend private fun loginRequest(userName: String, password: String): Boolean {
@@ -119,4 +120,5 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         }
         return worked
     }
+
 }
