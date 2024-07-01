@@ -95,6 +95,7 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
+	log.Println("try to queue")
 	if r.Method == "POST" {
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)

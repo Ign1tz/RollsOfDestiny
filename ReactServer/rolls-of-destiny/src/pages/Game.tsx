@@ -47,7 +47,7 @@ export default function Game() {
 
 
     let volume = sessionStorage.getItem("volume");
-    let masterVolume = .99
+    let masterVolume = .30
     if (volume) {
         masterVolume = parseInt(volume) / 100
     }
