@@ -18,7 +18,7 @@ func InsertDeck(deck Types.Deck) error {
 }
 
 func InsertCard(card Types.Card) error {
-	_, err := Database.Exec("INSERT INTO accountcards (userid, name, effect, deckid, count) Values ($1, $2, $3, $4, $5)",
+	_, err := Database.Exec("INSERT INTO accountcards (userid, name, effect, deckids, count) Values ($1, $2, $3, $4, $5)",
 		card.UserID, card.Name, card.Effect, card.DeckID, card.Count)
 	return err
 }

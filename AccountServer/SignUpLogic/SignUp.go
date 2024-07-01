@@ -26,9 +26,50 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 			Rating:         1000,
 		}
 		err := Database.InsertAccount(newAccount)
+		cards := createDefaultCards(newAccount)
+		for card := range cards {
+			err := Database.InsertCard(cards[card])
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}
 		if err != nil {
 			log.Println(err)
 			panic(err)
 		}
 	}
+}
+
+func createDefaultCards(account Types.Account) []Types.Card {
+	rollAgain := Types.Card{
+		UserID: account.UserID,
+		Name:   "Roll Again",
+		Effect: "rollAgain",
+		DeckID: "",
+		Count:  0,
+	}
+	doubleMana := Types.Card{
+		UserID: account.UserID,
+		Name:   "Double Mana",
+		Effect: "doubleMana",
+		DeckID: "",
+		Count:  0,
+	}
+	destroyColumn := Types.Card{
+		UserID: account.UserID,
+		Name:   "Destroy Column",
+		Effect: "destroyColumn",
+		DeckID: "",
+		Count:  0,
+	}
+	flipClockwise := Types.Card{
+		UserID: account.UserID,
+		Name:   "Flip Clockwise",
+		Effect: "flipClockwise",
+		DeckID: "",
+		Count:  0,
+	}
+	cards := []Types.Card{rollAgain, doubleMana, destroyColumn, flipClockwise}
+	return cards
 }
