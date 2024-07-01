@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
-import com.example.myapplication.types.token
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -25,11 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import token
 
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
-    private val IPADDRESS = "10.0.0.2"
+    private val IPADDRESS = "192.168.0.181"
 
 
     suspend private fun testHttp(userName: String, password: String): Boolean {
@@ -88,12 +88,14 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         return worked
     }
 
-    fun alreadyLoggedIn(): Boolean {
+    fun checkAlreadyLoggedIn(): Boolean {
         var worked = false
         runBlocking {
-            var newUser = repository.getUser()
-            worked = testHttp(newUser.userName, newUser.password)
-
+            val isEmpty = repository.isEmpty()
+            if (!isEmpty) {
+                val newUser = repository.getUser()
+                worked = testHttp(newUser.userName, newUser.password)
+            }
         }
 
         return worked

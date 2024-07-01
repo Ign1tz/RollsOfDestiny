@@ -26,6 +26,6 @@ fun HomeScreenButtons (navController: NavController) {
         Spacer(Modifier.padding(padding))
         ScoreboardButton()
         Spacer(Modifier.padding(padding))
-        SettingsButton()
+        SettingsButton(navController)
     }
 }

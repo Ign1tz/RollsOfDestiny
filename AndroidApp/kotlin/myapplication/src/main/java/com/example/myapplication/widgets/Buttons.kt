@@ -159,10 +159,10 @@ fun ScoreboardButton () {
 }
 
 @Composable
-fun SettingsButton () {
+fun SettingsButton (navController: NavController) {
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {},
+        onClick = {navController.navigate(route = "setting")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -170,6 +170,40 @@ fun SettingsButton () {
         Text("Settings",
             color = Color.White,
             fontSize = 20.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun PasswordConfirmation (navController: NavController) {
+    Button(
+        modifier = Modifier.size(230.dp,40.dp),
+        onClick = {navController.navigate(route = "home")},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text("Confirm Password",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun UsernameConfirmation (navController: NavController) {
+    Button(
+        modifier = Modifier.size(230.dp,40.dp),
+        onClick = {navController.navigate(route = "home")},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text("Confirm Username",
+            color = Color.White,
+            fontSize = 18.sp,
             fontFamily = FontFamily.Serif
         )
     }

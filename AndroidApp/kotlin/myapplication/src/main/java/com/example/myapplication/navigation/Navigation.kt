@@ -9,9 +9,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.screens.GameScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
+import com.example.myapplication.screens.SettingScreen
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.Injector
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.SettingViewModel
 
 @Composable
 fun Navigation() {
@@ -19,10 +21,12 @@ fun Navigation() {
 
     val loginViewModel: LoginViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val homeViewModel: HomeViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+
 
 
     NavHost(navController = navController,
-        startDestination = if (loginViewModel.alreadyLoggedIn()) {Screen.HomeScreen.route} else {Screen.LoginScreen.route}) {
+        startDestination = if (loginViewModel.checkAlreadyLoggedIn()) {Screen.HomeScreen.route} else {Screen.LoginScreen.route}) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController = navController, loginViewModel = loginViewModel)
         }
@@ -31,8 +35,12 @@ fun Navigation() {
             HomeScreen(navController = navController, homeViewModel = homeViewModel)
         }
 
-        composable(route = Screen.GameScreen.route) {
-            GameScreen(navController = navController)
+//        composable(route = Screen.GameScreen.route) {
+//            GameScreen(navController = navController)
+//        }
+
+        composable(route = Screen.SettingScreen.route) {
+            SettingScreen(navController = navController, settingViewModel = settingViewModel)
         }
     }
 }
