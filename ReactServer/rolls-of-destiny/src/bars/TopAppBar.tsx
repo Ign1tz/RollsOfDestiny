@@ -14,7 +14,8 @@ import ProfileButton from "../components/ProfileButton";
 import LoginSignUpButton from "../components/LoginSignUpButton";
 import "../css/ExtraTopAppBar.css"
 
-const pages = ["Home", 'Friends', 'Leaderboard', 'Rules'];
+const pages = ["Home", "Landing Page", 'Friends', 'Leaderboard', 'Rules'];
+const pagesLogOut = ['Leaderboard', 'Rules']
 const settings = ['Profile', 'Decks', 'Settings', 'Logout'];
 
 export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
@@ -59,6 +60,9 @@ export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
                 break;
             case "Decks":
                 window.location.href = "/decks";
+                break;
+            case "Landing Page":
+                window.location.href = "/landingpage"
                 break;
         }
     }
@@ -114,7 +118,7 @@ export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
                                 display: {xs: 'block', md: 'none'},
                             }}
                         >
-                            {pages.map((page) => (
+                            { (loggedIn ? pages : pagesLogOut).map((page) => (
                                 <MenuItem key={page} onClick={() => relocate(page)}>
                                     <Typography textAlign="center">{page}</Typography>
                                 </MenuItem>
@@ -141,7 +145,7 @@ export default function TopAppBar({ loggedIn }: { loggedIn: boolean }) {
                         Rolls of Destiny
                     </Typography>
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        {pages.map((page) => (
+                        {(loggedIn ? pages : pagesLogOut).map((page) => (
                             <Button
                                 key={page}
                                 onClick={() => relocate(page)}

@@ -14,10 +14,11 @@ import Leaderboard from "./pages/Leaderboard";
 import Friendlist from "./pages/Friendlist";
 import {authFetch} from "./auth";
 import Decks from "./pages/Decks";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> (true)
+    const [loggedIn, setLoggedIn] = useState<boolean> (false)
     const [ingame, setIngame] = useState<boolean> (false)
     const [gameInfo, setGameInfo] = useState<string> ("")
     const [websocket, setWebsocket] = useState<WebSocket>()
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/rules" element={<Rules/>}/>
                 <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
                 <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
+                <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn}/>}/>
             </Routes>
         </BrowserRouter>
     </>

@@ -1,6 +1,6 @@
 import TopAppBar from "../bars/TopAppBar";
 import {Modal, TextField} from "@mui/material";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
 import "../css/Settings.css"
 import {profile} from "../types/profileTypes";
@@ -16,6 +16,13 @@ export default function Settings({profile}: {profile:profile }) {
     const [isUsernameError, setIsUsernameError] = useState(false);
     const [isPasswordError, setIsPasswordError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [volume, setVolume] = useState<number>(30)
+
+    useEffect(() => {
+        setVolume(Number(sessionStorage.getItem("volume")) || 30)
+    }, []);
+
+
 
     function checkPasswordChange() {
         // return false if oldPassword is incorrect
@@ -126,7 +133,7 @@ export default function Settings({profile}: {profile:profile }) {
                     </div>
                     <div className="volume">
                         <h2 id={"h2Text"}>Volume</h2>
-                        <VolumeSlider/>
+                        <VolumeSlider volume={volume} setVolume={setVolume}/>
                         <h5>Attention: it is required to "slide" the bar, not click it.</h5>
                     </div>
                     <div className="username">

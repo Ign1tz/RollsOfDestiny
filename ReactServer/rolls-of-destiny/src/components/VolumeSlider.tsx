@@ -3,10 +3,8 @@ import {Slider, Stack} from "@mui/material";
 import React, {useState} from "react";
 
 
-export default function VolumeSlider() {
+export default function VolumeSlider({volume, setVolume} : {volume: number, setVolume: Function}) {
 
-    const initialVolume = Number(sessionStorage.getItem("volume")) || 99;
-    const [volume, setVolume] = useState<number>(initialVolume);
 
     const handleVolumeChange = (event: Event, newValue: number | number[]) => {
         setVolume(newValue as number);

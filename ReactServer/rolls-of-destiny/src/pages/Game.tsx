@@ -34,6 +34,7 @@ export default function Game() {
     const [canPlace, setCanPlace] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
+    const [volume, setVolume] = useState<number>(30);
 
     const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
 
@@ -49,14 +50,6 @@ export default function Game() {
     const handleQuit = () => {
         window.location.href = "/";
     };
-
-
-    let volume = sessionStorage.getItem("volume");
-    let masterVolume = .99
-    if (volume) {
-        masterVolume = parseInt(volume) / 100
-    }
-
 
     const toggleSurrender = () => {
         setConfirmSurrender(!confirmSurrender)
@@ -82,7 +75,15 @@ export default function Game() {
             setPlayer2(JSON.parse(user))
             setUserID(JSON.parse(user).userid)
         }
+
+        setVolume(Number(sessionStorage.getItem("volume")) || 30)
+
     }, []);
+
+
+    useEffect(() => {
+        console.log(volume)
+    }, [volume]);
 
     useEffect(() => {
         if (!gameInfoJson) {
@@ -147,7 +148,7 @@ export default function Game() {
                 src={background_music}
                 autoPlay={true}
                 loop={true}
-                volume={masterVolume}
+                volume={volume/100}
             />
             <div className="gameDivision" style={{
                 backgroundImage: `url(${background})`,
@@ -178,7 +179,7 @@ export default function Game() {
                     <Modal open={isPaused} onClose={togglePause}>
                         <div className="pauseMenu">
                             <h2>Pause Menu</h2>
-                            <VolumeSlider/>
+                            <VolumeSlider volume={volume} setVolume={setVolume}/>
                             <Button variant="contained" onClick={togglePause}>
                                 Continue playing
                             </Button>
