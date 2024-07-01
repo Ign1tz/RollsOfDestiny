@@ -22,7 +22,7 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 			Username:       newInfo.Username,
 			Password:       hashedPassword,
 			Email:          newInfo.Email,
-			ProfilePicture: "default",
+			ProfilePicture: "https://via.placeholder.com/100",
 			Rating:         1000,
 		}
 		err := Database.InsertAccount(newAccount)

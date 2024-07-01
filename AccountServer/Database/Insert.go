@@ -22,3 +22,9 @@ func InsertCard(card Types.Card) error {
 		card.UserID, card.Name, card.Effect, card.DeckID, card.Count)
 	return err
 }
+
+func InsertNewFriend(userid string, friendid string) error {
+	_, err := Database.Exec("INSERT INTO accountfriends (userid, friendid) Values ($1, $2)",
+		userid, friendid)
+	return err
+}

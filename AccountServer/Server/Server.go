@@ -4,11 +4,13 @@ import (
 	"RollsOfDestiny/AccountServer/AccountLogic"
 	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/SignUpLogic"
+	"RollsOfDestiny/AccountServer/Types"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -229,6 +231,152 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getFriends(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	userid, valid := checkToken(w, r)
+	if valid {
+		friends, err := Database.GetFriendsByUserID(userid)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var friendsString string
+
+		for friend := range friends {
+			if friends[friend].UserID != "" {
+				friendsString = fmt.Sprintf(`%s, {"username": "%s", "rating": "%s", "profilePicture": "%s"}`, friendsString, friends[friend].Friend.Username, strconv.Itoa(friends[friend].Friend.Rating), friends[friend].Friend.ProfilePicture)
+			}
+		}
+		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", friendsString[2:])
+		log.Println(friendInfo)
+		fmt.Fprint(w, friendInfo)
+		return
+	}
+	w.WriteHeader(http.StatusForbidden)
+}
+
+func newFriend(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer r.Body.Close()
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.FriendInfo
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			friend, err := Database.GetAccountByUsername(t.FriendUsername)
+
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			Database.InsertNewFriend(userid, friend.UserID)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func deleteFriend(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer r.Body.Close()
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.FriendInfo
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			friend, err := Database.GetAccountByUsername(t.FriendUsername)
+
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			Database.DeleteFriend(userid, friend.UserID)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func getAccounts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	_, valid := checkToken(w, r)
+	if valid {
+		myUrl, _ := url.Parse(r.URL.String())
+		params, _ := url.ParseQuery(myUrl.RawQuery)
+		account := params.Get("username")
+
+		possibleAccounts, err := Database.GetAccountByPartUsername(account)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var accountString string
+		for accountId := range possibleAccounts {
+			if possibleAccounts[accountId].UserID != "" {
+				accountString = fmt.Sprintf(`%s, {"username": "%s", "rating": "%s", "profilePicture": "%s"}`, accountString, possibleAccounts[accountId].Username, strconv.Itoa(possibleAccounts[accountId].Rating), possibleAccounts[accountId].ProfilePicture)
+			}
+		}
+		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", accountString[2:])
+		log.Println(friendInfo)
+		fmt.Fprint(w, friendInfo)
+	}
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
@@ -239,6 +387,9 @@ func setupRoutes() {
 	http.HandleFunc("/changeUsername", changeUsername)
 	http.HandleFunc("/changePassword", changePassword)
 	http.HandleFunc("/deleteAccount", deleteAccount)
+	http.HandleFunc("/getFriends", getFriends)
+	http.HandleFunc("/getAccounts", getAccounts)
+	http.HandleFunc("/addFriend", newFriend)
 }
 
 func Server() {

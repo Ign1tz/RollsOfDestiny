@@ -68,20 +68,23 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
 
     function submitSearchBar() {
         // for connecting with backend
-        /* fetch("http://localhost:9090/users", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({searchText: searchBar})
-        }).then(r => {
+        authFetch("http://localhost:9090/getAccounts?username=" + searchBar).then(r => {
             if (r.status === 200) {
-                return r.json();
+                r.json().then(r => {
+                    console.log(r)
+                    setSearchResults(r.friends);
+                    if (r.friends.length > 0) {
+                        setResultsFound(true);
+                        setNoResultsFound(false);
+                    } else {
+                        setResultsFound(false);
+                        setNoResultsFound(true);
+                    }
+                })
             }
-        }); */
+        });
 
-        // but now with dummy data
+       /* // but now with dummy data
         const results = users.filter(user => user.username.toLowerCase().includes(searchBar.toLowerCase()));
         results.sort((a, b) => a.username.localeCompare(b.username));
         setSearchResults(results);
@@ -91,7 +94,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
         } else {
             setResultsFound(false);
             setNoResultsFound(true);
-        }
+        }*/
     }
 
     const handleCloseSearchModul = () => {
@@ -102,15 +105,13 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     };
 
     const addToFriendlist = (username: string) => {
-        fetch("http://localhost:9090/addToFriendlist", {
+        authFetch("http://localhost:9090/addFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({username: username})
-        }).then(r => {
-            return r.json()
         })
     };
 
