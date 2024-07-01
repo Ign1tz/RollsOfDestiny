@@ -7,12 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.widgets.ProfileRow
 import com.example.myapplication.widgets.PlayField
 
 
 @Composable
-fun GameScreen (navController: NavController) {
+fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
     Scaffold (
 
         topBar = { ProfileRow(profileImage = R.drawable.caught, username = "Enemy", score = "50")},

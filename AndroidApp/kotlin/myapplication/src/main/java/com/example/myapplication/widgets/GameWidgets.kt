@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,10 +38,14 @@ import androidx.core.content.ContextCompat.getDrawable
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.myapplication.R
+import com.example.myapplication.viewmodels.GameViewModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.localdb.Repository
 
 @Composable
-fun PlayField (int: Int) {
+fun PlayField (int: Int, viewModel: GameViewModel) {
 
     Column {
         Column (
@@ -62,7 +67,7 @@ fun PlayField (int: Int) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ){
-            OwnField()
+            OwnField(viewModel)
         }
         Column (
             modifier = Modifier
@@ -86,7 +91,7 @@ fun PlayField (int: Int) {
 }
 
 @Composable
-fun OwnField () {
+fun OwnField (viewModel: GameViewModel) {
     Box() {
         val image: Painter = painterResource(id = R.drawable.grid_image)
         Image(
@@ -103,19 +108,41 @@ fun OwnField () {
                     modifier = Modifier
                         .height(170.dp)
                         .width(57.dp)
-                        .clickable {
-                            addingDice()
-                        }
+                        .clickable { }
                         .background(Color.Transparent)
-                )
+                ) {
+                    Column () {
+                        repeat(3) {index ->
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
+@Composable
+fun addingDice (int: Int) {
 
-fun addingDice () {
+    val image1: Painter = painterResource(id = R.drawable.appdie1)
+    val image2: Painter = painterResource(id = R.drawable.appdie2)
+    val image3: Painter = painterResource(id = R.drawable.appdie3)
+    val image4: Painter = painterResource(id = R.drawable.appdie4)
+    val image5: Painter = painterResource(id = R.drawable.appdie5)
+    val image6: Painter = painterResource(id = R.drawable.appdie6)
 
+    when (int) {
+        1 -> Image(painter = image1, contentDescription = "die 1")
+        2 -> Image(painter = image2, contentDescription = "die 2")
+        3 -> Image(painter = image3, contentDescription = "die 3")
+        4 -> Image(painter = image4, contentDescription = "die 4")
+        5 -> Image(painter = image5, contentDescription = "die 5")
+        6 -> Image(painter = image6, contentDescription = "die 6")
+    }
 }
 
 @Composable
