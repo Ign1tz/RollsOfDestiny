@@ -1,6 +1,9 @@
 package Database
 
-import "RollsOfDestiny/GameServer/Types"
+import (
+	"RollsOfDestiny/GameServer/Types"
+	"fmt"
+)
 
 func UpdatePlayerMana(player Types.Player) error {
 	_, err := Database.Exec("Update players set mana = $1 where userid = $2", player.Mana, player.UserID)
@@ -13,6 +16,7 @@ func UpdatePlayerWebsocketID(userid string, websocketid string) error {
 }
 
 func UpdateColumn(column Types.Column) error {
+	fmt.Println(column.First, column.Second, column.Third, column.GridId, column.Placement)
 	_, err := Database.Exec("Update columns set first = $1, second = $2, third = $3 where gridid = $4 and placement = $5", column.First, column.Second, column.Third, column.GridId, column.Placement)
 	return err
 }
@@ -29,5 +33,10 @@ func UpdateActivePlayerGames(playfield Types.Playfield) error {
 
 func UpdateLastRollGames(playfield Types.Playfield) error {
 	_, err := Database.Exec("Update games set lastRoll = $1 where gameid = $2", playfield.LastRoll, playfield.GameID)
+	return err
+}
+
+func UpdateQueueEntry(userId string, websocketId string) error {
+	_, err := Database.Exec("Update queue set websocketconnectionid = $1 where userid = $2", websocketId, userId)
 	return err
 }

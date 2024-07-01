@@ -1,8 +1,9 @@
 type profile = {
     username: string,
     rating: number,
-    picture: string,
-    biography: string
+    profilePicture: string
 }
+
+
 
 export type { profile }

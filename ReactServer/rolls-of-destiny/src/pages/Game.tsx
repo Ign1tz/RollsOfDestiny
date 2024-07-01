@@ -1,42 +1,41 @@
-import { Button, Modal } from "@mui/material"; // Assuming you're using Material-UI components
-
+import {Button, Modal} from "@mui/material"; // Assuming you're using Material-UI components
 import Grid from "../components/Grid";
 import OpponentGrid from "../components/OpponentGrid";
 import Dice from "react-dice-roll";
 import SimpleBox from "../components/SimpleBox";
 import {profile} from "../types/profileTypes";
 import "../css/Game.css";
+import React, {useEffect, useState} from "react";
+import background_music from "../soundtracks/background_music.mp3";
+import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
-import {useEffect, useState} from "react";
+import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 
 
 export default function Game() {
-    localStorage.setItem("gameInfo", "")
-    console.log(localStorage.getItem("gameInfo"))
-    let gameInfo = localStorage.getItem("gameInfo")
-    if (!gameInfo) {
-        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    sessionStorage.setItem("gameInfo", "")
+    console.log(sessionStorage.getItem("gameInfo"))
+    let startGameInfo = sessionStorage.getItem("gameInfo")
+    if (!startGameInfo) {
+        startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
     const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
-    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
+    const [userID, setUserID] = useState("")
     const [gameId, setGameId] = useState("")
+    const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
+    const [rolled, setRolled] = useState(false)
+    const [placed, setPlaced] = useState(false)
     const [player1Score, setPlayer1Score] = useState(0);
-    const [player2Score, setPlayer2Score] = useState(0);
-    const [diceRoll, setDiceRoll] = useState<number | null>(null);
-    const [disableRoll, setDisableRoll] = useState(false);
-    const [canPlace, setCanPlace] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
+    const [yourInfo, setYourInfo] = useState<yourInfo | null>(null)
+    const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>(null)
+    const [gameEnded, setGameEnded] = useState(false)
+    const [endResults, setEndResults] = useState<endResults | null>()
 
-    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined >(undefined);
-
-    const handleRoll = (player: 'player1' | 'player2', value: number) => {
-        setDiceRoll(value);
-        setDisableRoll(true);
-    };
 
     const togglePause = () => {
         setIsPaused(!isPaused);
@@ -46,171 +45,298 @@ export default function Game() {
         window.location.href = "/";
     };
 
+
+    let volume = sessionStorage.getItem("volume");
+    let masterVolume = .99
+    if (volume) {
+        masterVolume = parseInt(volume) / 100
+    }
+
+
     const toggleSurrender = () => {
         setConfirmSurrender(!confirmSurrender)
     };
 
-
-    let player1: profile = {
-        username: gameInfoJson.EnemyInfo.Username,
+    const [player1, setPlayer1] = useState<profile>({
+        username: "Lukas",
         rating: 3450913,
-        picture: testImage,
-        biography: "Player 1's bio"
-    };
-
-    let player2: profile = {
-        username: gameInfoJson.YourInfo.Username,
-        rating: 1,
-        picture: "/path/to/player2.jpg",
-        biography: "Player 2's bio"
-    };
-
+        profilePicture: testImage
+    })
+    const [player2, setPlayer2] = useState<profile>({
+        username: "default",
+        rating: 0,
+        profilePicture: "/path/to/player1.jpg"
+    })
 
     useEffect(() => {
         console.log("Starting websocket")
         //setWebsocket(prevWebsocket => ([...prevWebsocket, ...new WebSocket('http://localhost:8080/ws')]))
-        localStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
-    }, [])
+        sessionStorage.setItem("gameInfo", '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}')
+        let user = sessionStorage.getItem("userInfo")
+        if (user) {
+            setPlayer2(JSON.parse(user))
+            setUserID(JSON.parse(user).userid)
+        }
+    }, []);
 
     useEffect(() => {
         console.log(websocket)
         if (connected && websocket) {
             console.log("test")
-            websocket.send("test")
+            //websocket.send("test")
         }
     }, [connected])
 
     useEffect(() => {
-        console.log("queuing websocket")
         if (websocketId !== "") {
-            queueForGame()
+            console.log("queuing websocket")
+            if (sessionStorage.getItem("GameType") === "bot") {
+                startBot()
+            } else {
+                queueForGame()
+            }
         }
     }, [websocketId])
 
     if (websocket) {
         websocket.onmessage = (e) => {
-            console.log("go a message")
-            console.log("message: " + e.data)
-            if (e.data == "connected") {
+            console.log(e.data)
+            let message = JSON.parse(e.data)
+            console.log("got a message")
+            console.log(message)
+            if (message.info == "connected") {
+                console.log("connected")
                 setConnected(true)
-                websocket.send("id")
-            } else if (e.data.includes("id:")) {
-                console.log(e.data.split(":")[e.data.split(":").length - 1])
-                setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
-            } else if (e.data.includes("{")) {
-                console.log(e.data)
-                localStorage.setItem("gameInfo", e.data)
-                setGameInfoJson(JSON.parse(e.data))
+                websocket.send(JSON.stringify({type: "id"}))
+            } else if (message.info == "id") {
+                console.log("id:", message.message.id)
+                setWebsocketId(message.message.id)
+            } else if (message.info == "gameInfo") {
+                console.log(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                console.log("setGameInfo")
+                setGameInfo(message.message.gameInfo)
+            } else if (message.info == "gameEnded") {
+                console.log(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                console.log("endResults", message.message.endResults)
+                setGameInfo(message.message.gameInfo)
+                setGameEnded(true)
+                setEndResults(message.message.endResults)
             }
         }
     }
 
+    const handleColumnClick = (key: number) => {
+        console.log("handleColumnClicK", connected)
+        if (websocket && connected && gameInfo){
+            console.log(gameId)
+            setPlaced(true)
+            websocket.send(JSON.stringify({type: sessionStorage.getItem("GameType") + "PickColumn", messageBody: key.toString(), gameId: gameId}))
+        }
+    };
+
     async function queueForGame() {
-        console.log("test")
-        const response = await fetch("http://localhost:8080/queue", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({
-                userid: "testasdasfasasdasd".split('').sort(function () {
-                    return 0.5 - Math.random()
-                }).join(''), websocketconnectionid: websocketId
-            })
-        });
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/queue", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId, username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
     }
 
+    async function startBot() {
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/startBot", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+    }
+
+    const parseRoll = (roll: string): 1 | 2 | 3 | 4 | 5 | 6 | undefined => {
+        switch (roll) {
+            case "1":
+                return 1
+            case "2":
+                return 2
+            case "3":
+                return 3
+            case "4":
+                return 4
+            case "5":
+                return 5
+            case "6":
+                return 6
+        }
+    }
+
+    useEffect(() => {
+        if (gameInfo.ActivePlayer) {
+            console.log(gameInfo.ActivePlayer.active)
+            if (gameInfo.ActivePlayer.active) {
+                console.log("setFalse")
+                setRolled(false)
+                setPlaced(false)
+            } else {
+                setRolled(true)
+                setPlaced(true)
+            }
+            setYourInfo(gameInfo.YourInfo)
+            setEnemyInfo(gameInfo.EnemyInfo)
+            console.log(gameInfo.EnemyInfo)
+            setPlayer1(prevState => ({...prevState, username: gameInfo.EnemyInfo.Username}))
+        }
+    }, [gameInfo]);
+
+    useEffect(() => {
+        console.log(rolled)
+    }, [rolled])
 
     return (
-        <div className="gameDivision" style={{
-            backgroundImage: `url(${background})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100%',
-            width: '100%'
-        }} >
-            <div className="header">
-                <Button variant="contained" onClick={togglePause}>
-                    Pause
-                </Button>
-            </div>
-            <div className="content">
-                <Modal open={confirmSurrender} onClose={toggleSurrender}>
-                    <div className="confirmSurrenderMenu">
-                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
-                            Cancel
-                        </Button>
-                        <Button variant="contained" onClick={handleQuit}>
-                            Confirm Surrender
-                        </Button>
+        <>
+            <ReactAudioPlayer
+                src={background_music}
+                autoPlay={true}
+                loop={true}
+                volume={masterVolume}
+            />
+            <div className="gameDivision" style={{
+                backgroundImage: `url(${background})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '100%',
+                width: '100%'
+            }}>
+                <div className="header">
+                    <Button variant="contained" onClick={togglePause}>
+                        Pause
+                    </Button>
+                </div>
+                <div className="content">
+                    <Modal open={gameEnded}>
+                        <div className="pauseMenu">
+                            <h2>Game finished</h2>
+                            <h2>{endResults?.youWon}</h2>
+                            <h2>Score</h2>
+                            <h2>{endResults?.yourScore} to {endResults?.enemyScore}</h2>
+                            <Button variant="contained" onClick={() => window.location.href = "/"}>
+                                Menu
+                            </Button>
+                        </div>
+                    </Modal>
+                    <Modal open={confirmSurrender} onClose={toggleSurrender}>
+                        <div className="confirmSurrenderMenu">
+                            <Button variant="contained" onClick={() => {
+                                toggleSurrender();
+                                togglePause()
+                            }}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" onClick={handleQuit}>
+                                Confirm Surrender
+                            </Button>
+                        </div>
+                    </Modal>
+                    <Modal open={isPaused} onClose={togglePause}>
+                        <div className="pauseMenu">
+                            <h2>Pause Menu</h2>
+                            <Button variant="contained" onClick={togglePause}>
+                                Continue playing
+                            </Button>
+                            <Button variant="contained" onClick={() => console.log("Go to Settings")}>
+                                Settings
+                            </Button>
+                            <Button variant="contained" onClick={() => {
+                                toggleSurrender();
+                                togglePause()
+                            }}>
+                                Surrender
+                            </Button>
+                        </div>
+                    </Modal>
+                    <div className="playerSection">
+                        <div className="playerInfoOpp">
+                            <div className="score">
+                                <p>Score: <span id="player1Score">{player1Score}</span></p>
+                            </div>
+                            <div className="playerInfoUsernameRating">
+                                <h2>{player1.username + " (Opponent)"}</h2>
+                                <p>Rating: {player1.rating}</p>
+                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
+                            </div>
+                            <img src={player1.profilePicture} alt={player1.username}/>
+                        </div>
+                        <div className="playerActions">
+                            <div className="playerCards">
+                                <h3>Deck </h3>
+                                <SimpleBox diceValue={null}/>
+                            </div>
+                            <div className="grid">
+                                <OpponentGrid grid={enemyInfo ? enemyInfo : null}/>
+                            </div>
+                            <div className="diceWrapper">
+                                <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                      cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
+                                      disabled={true}/>
+                            </div>
+                        </div>
                     </div>
-                </Modal>
-                <Modal open={isPaused} onClose={togglePause}>
-                    <div className="pauseMenu">
-                        <h2>Pause Menu</h2>
-                        <Button variant="contained" onClick={togglePause}>
-                            Continue playing
-                        </Button>
-                        <Button variant="contained" onClick={() => console.log("Go to Settings")}>
-                            Settings
-                        </Button>
-                        <Button variant="contained" onClick={() => {toggleSurrender(); togglePause()}}>
-                        Surrender
-                        </Button>
-                    </div>
-                </Modal>
-                <div className="playerSection">
-                    <div className="playerInfoOpp">
-                        <div className="score">
-                            <p>Score: <span id="player1Score">{player1Score}</span></p>
+                    <div className="divider"></div>
+                    <div className="playerSection">
+                        <div className="playerActions">
+                            <div className="diceWrapper">
+                                <Dice onRoll={(value) => {
+                                    console.log(value);
+                                    setRolled(true)
+                                }} defaultValue={6} size={100}
+                                      cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
+                                      disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>
+                            </div>
+                            <div className="grid">
+                                <Grid handleColumnClick={handleColumnClick} active={rolled && !placed}
+                                      grid={yourInfo ? yourInfo : null}/>
+                            </div>
+                            <div className="playerCards">
+                                <h3>Deck</h3>
+                                <SimpleBox diceValue={null}/>
+                            </div>
                         </div>
-                        <div className="playerInfoUsernameRating">
-                            <h2>{player1.username + " (Opponent)"}</h2>
-                            <p>Rating: {player1.rating}</p>
-                        </div>
-                        <img src={player1.picture} alt={player1.username}/>
-                    </div>
-                    <div className="playerActions">
-                        <div className="playerCards">
-                            <h3>Deck </h3>
-                            <SimpleBox diceValue={null}/>
-                        </div>
-                        <div className="grid">
-                            <OpponentGrid diceRoll={diceRoll}/>
-                        </div>
-                        <div className="diceWrapper">
-                            <Dice defaultValue={6} size={100} cheatValue={undefined} disabled={true}/>
+                        <div className="playerInfo">
+                            <img src={player2.profilePicture} alt={player2.username}/>
+                            <div className="playerInfoUsernameRating">
+                                <h2>{player2.username + " (You)"}</h2>
+                                <p>Rating: {player2.rating}</p>
+                            </div>
+                            <div className="score">
+                                <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="divider"></div>
-                <div className="playerSection">
-                    <div className="playerActions">
-                        <div className="diceWrapper">
-                            <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
-                                  cheatValue={rollValue} disabled={disableRoll}/>
-                        </div>
-                        <div className="grid">
-                            <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
-                        </div>
-                        <div className="playerCards">
-                            <h3>Deck</h3>
-                            <SimpleBox diceValue={null}/>
-                        </div>
-                    </div>
-                    <div className="playerInfo">
-                        <img src={player2.picture} alt={player2.username}/>
-                        <div className="playerInfoUsernameRating">
-                            <h2>{player2.username + " (You)"}</h2>
-                            <p>Rating: {player2.rating}</p>
-                        </div>
-                        <div className="score">
-                            <p>Score: <span id="player2Score">{player2Score}</span></p>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -21,3 +21,9 @@
 .errorMenu h2 {
     color: white;
 }
+
+.loginSignUpDivision {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}

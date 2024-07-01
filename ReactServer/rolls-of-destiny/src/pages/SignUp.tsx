@@ -2,6 +2,8 @@ import {Modal, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import React, {useState} from "react";
 import "../css/LoginSignup.css"
+import {Link} from "react-router-dom";
+
 
 export default function SignUp() {
 
@@ -126,6 +128,10 @@ export default function SignUp() {
                 <br/>
                 <br/>
                 <Button variant="contained" onClick={submit}>Submit</Button>
+                <p className={"link"}> Already have an account?
+                    <br/>
+                    <Link to="http://localhost:3000/login">Login Here</Link>
+                </p>
             </div>
         </div>
 

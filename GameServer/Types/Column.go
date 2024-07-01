@@ -9,7 +9,6 @@ type Column struct {
 	First     int
 	Second    int
 	Third     int
-	IsFull    bool
 	GridId    string
 	Placement int
 }
@@ -20,6 +19,7 @@ type ColumnLogic interface {
 	Clear()
 	Value()
 	shift()
+	IsFull()
 }
 
 func (c *Column) Remove(s int) {
@@ -68,7 +68,6 @@ func (c *Column) Add(s int) error {
 		c.Second = s
 	} else if c.Third == 0 {
 		c.Third = s
-		c.IsFull = true
 	} else {
 		return errors.New("Column is already full")
 	}
@@ -92,4 +91,7 @@ func (c Column) Value() int {
 		sum += num * count * count
 	}
 	return sum
+}
+func (c *Column) IsFull() bool {
+	return c.First != 0 && c.Second != 0 && c.Third != 0
 }
