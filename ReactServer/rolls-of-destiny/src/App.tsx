@@ -17,11 +17,13 @@ import {authFetch} from "./auth";
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    const [fetched, setFetched] = useState<boolean> (false)
 
     useEffect(() => {
         if (localStorage.getItem("access_token")) {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
+                setFetched(true)
                 console.log("userInfo")
                 if (response.status === 200) {
                     authFetch("http://localhost:9090/userInfo").then(r => {
@@ -29,6 +31,7 @@ function App() {
                         return r.json()
                     }).then(response => {
                         sessionStorage.setItem("userInfo", JSON.stringify(response))
+
                     })
                 }
             })
@@ -37,19 +40,19 @@ function App() {
 
     return (
     <>
-        <BrowserRouter>
+        {fetched && <BrowserRouter>
             <Routes>
                 <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
                 <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>
                 <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn}/>}/>
-                <Route path={"/game" } element={loggedIn ? <Game/> : <Login/>}/>
+                <Route path={"/game"} element={loggedIn ? <Game/> : <Login/>}/>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/signup" element={<SignUp/>}/>
                 <Route path="/rules" element={<Rules/>}/>
                 <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
             </Routes>
-        </BrowserRouter>
+        </BrowserRouter>}
     </>
   );
 }
