@@ -42,6 +42,7 @@ export default function Game() {
     };
 
     const handleQuit = () => {
+        websocket.send(JSON.stringify({type:"surrender", message: {}, gameId: gameId}))
         window.location.href = "/";
     };
 
