@@ -62,3 +62,45 @@ func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
 	}
 	return cards, err
 }
+
+func GetFriendsByUserID(userID string) ([]Types.Friend, error) {
+	dbDecks, err := Database.Query("Select * from accountfriends where userid = $1", userID)
+	if err != nil {
+		return []Types.Friend{}, err
+	}
+	var friends = make([]Types.Friend, 100)
+	id := 0
+	for dbDecks.Next() {
+		var userid string
+		if err := dbDecks.Scan(&friends[id].UserID, &userid); err != nil {
+			return []Types.Friend{}, err
+		}
+		account, err := GetAccountByUserID(userid)
+		if err != nil {
+
+		} else {
+			friends[id].Friend = account
+			id++
+		}
+	}
+	return friends, nil
+}
+
+func GetAccountByPartUsername(usernamePart string, userid string) ([]Types.Account, error) {
+	dbAccount, err := Database.Query("Select * from accounts where username ilike '%' || $1 || '%' and userid is distinct from $2 limit 10", usernamePart, userid)
+	if err != nil {
+		return []Types.Account{}, err
+	}
+	var accounts = make([]Types.Account, 10)
+	id := 0
+	for dbAccount.Next() {
+		var account Types.Account
+		if err := dbAccount.Scan(&account.UserID, &account.Username, &account.Password, &account.Email, &account.ProfilePicture, &account.Rating); err != nil {
+			return []Types.Account{}, err
+		}
+		accounts[id] = account
+		id++
+	}
+
+	return accounts, nil
+}
