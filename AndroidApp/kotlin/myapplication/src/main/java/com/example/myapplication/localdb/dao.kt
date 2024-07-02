@@ -21,4 +21,7 @@ interface dao {
     @Query("Select * from user")
     fun getUser (): User
 
+    @Query("SELECT (SELECT COUNT(*) FROM user) == 0")
+    fun isEmpty(): Boolean
+
 }
