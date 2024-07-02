@@ -38,9 +38,9 @@ func ChangeUsername(message NewUsernameMessage) {
 	}
 }
 
-func ChangePasswprd(message NewPasswordMessage, username string) {
+func ChangePasswprd(message NewPasswordMessage, userid string) {
 
-	account, err := Database.GetAccountByUsername(username)
+	account, err := Database.GetAccountByUserID(userid)
 
 	if err == nil && Encryption.CheckPasswordHash(message.OldPassword, account.Password) {
 	} else {
@@ -57,7 +57,7 @@ func ChangePasswprd(message NewPasswordMessage, username string) {
 
 	correct = correct && message.NewPassword == message.ConfirmNewPassword
 	hashedPassword, _ := Encryption.HashPassword(message.NewPassword)
-	err = Database.UpdatePassword(username, hashedPassword)
+	err = Database.UpdatePassword(userid, hashedPassword)
 
 	if err != nil {
 		log.Println(err)

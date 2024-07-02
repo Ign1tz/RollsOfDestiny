@@ -24,11 +24,11 @@ func verifyToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func createToken(username string) (string, error) {
+func createToken(userid string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"username": username,
-			"exp":      time.Now().Add(time.Hour * 24).Unix(),
+			"userid": userid,
+			"exp":    time.Now().Add(time.Hour * 24).Unix(),
 		})
 
 	tokenString, err := token.SignedString(secretKey)
@@ -41,6 +41,7 @@ func createToken(username string) (string, error) {
 
 func checkToken(w http.ResponseWriter, r *http.Request) (string, bool) {
 	tokenString := r.Header.Get("Authorization")
+	fmt.Println("tokenstrong", tokenString)
 	if tokenString == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "Missing authorization header")
@@ -54,23 +55,23 @@ func checkToken(w http.ResponseWriter, r *http.Request) (string, bool) {
 		fmt.Fprint(w, "Invalid token")
 		return "", false
 	}
-	username, err := getUsernameFromToken(token)
+	userid, err := getUserIDFromToken(token)
 	if err != nil {
 		log.Println(err)
 	}
-	return username, true
+	return userid, true
 }
 
-func getUsernameFromToken(token *jwt.Token) (string, error) {
+func getUserIDFromToken(token *jwt.Token) (string, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		return "", fmt.Errorf("invalid token claims")
 	}
 
-	username, ok := claims["username"].(string)
+	userid, ok := claims["userid"].(string)
 	if !ok {
-		return "", fmt.Errorf("username not found in token")
+		return "", fmt.Errorf("userid not found in token")
 	}
 
-	return username, nil
+	return userid, nil
 }

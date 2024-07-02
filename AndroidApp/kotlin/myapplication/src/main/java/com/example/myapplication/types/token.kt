@@ -1,3 +1,5 @@
+package com.example.myapplication.types
+
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,5 +1,7 @@
 package Types
 
+import "fmt"
+
 type Grid struct {
 	Left   Column
 	Middle Column
@@ -11,6 +13,7 @@ type GridLogic interface {
 	Clear()
 	Value()
 	IsFull()
+	PrettyPrint()
 }
 
 func (g *Grid) Clear() {
@@ -24,5 +27,12 @@ func (g Grid) Value() int {
 }
 
 func (g Grid) IsFull() bool {
-	return g.Left.IsFull && g.Middle.IsFull && g.Right.IsFull
+	return g.Left.IsFull() && g.Middle.IsFull() && g.Right.IsFull()
+}
+
+func (g Grid) PrettyPrint() {
+	fmt.Println(g.Left.First, g.Middle.First, g.Right.First)
+	fmt.Println(g.Left.Second, g.Middle.Second, g.Right.Second)
+	fmt.Println(g.Left.Third, g.Middle.Third, g.Right.Third)
+	fmt.Println()
 }

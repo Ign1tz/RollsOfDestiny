@@ -4,4 +4,6 @@ type profile = {
     profilePicture: string
 }
 
+
+
 export type { profile }

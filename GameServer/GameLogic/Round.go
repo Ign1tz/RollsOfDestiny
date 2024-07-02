@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func RollDie(gameId string) int {
+func RollDie(gameId string) string {
 	gamefield, err := Database.GetPlayfield(gameId)
 
 	if err != nil {
@@ -22,7 +22,7 @@ func RollDie(gameId string) int {
 	return currentRoll
 }
 
-func PickColumn(gameId string, columnNumber string) error {
+func PickColumn(gameId string, columnNumber string) (bool, error) {
 	gamefield, err := Database.GetPlayfield(gameId)
 
 	if err != nil {
@@ -32,7 +32,7 @@ func PickColumn(gameId string, columnNumber string) error {
 	rolls, err := strconv.Atoi(gamefield.LastRoll)
 
 	if err != nil {
-		return err
+		return false, err
 	}
 	var columnErr error
 	enemy := gamefield.EnemyPlayer()
@@ -63,16 +63,23 @@ func PickColumn(gameId string, columnNumber string) error {
 	} else {
 		columnErr = errors.New("wrong column number")
 	}
-
+	player := gamefield.ActivePlayer
+	gamefield.ActivePlayer = gamefield.EnemyPlayer()
 	if columnErr == nil {
 		err = Database.UpdateColumn(playerColumn)
 		if err != nil {
-			return err
+			return false, err
 		}
 		err = Database.UpdateColumn(enemyColumn)
 		if err != nil {
-			return err
+			return false, err
 		}
+		err = Database.UpdateActivePlayerGames(gamefield)
 	}
-	return columnErr
+
+	if player.Grid.IsFull() {
+		return true, nil
+	}
+
+	return false, columnErr
 }

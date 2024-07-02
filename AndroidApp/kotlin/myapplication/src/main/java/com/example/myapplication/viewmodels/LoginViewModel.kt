@@ -1,39 +1,44 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
+import com.example.myapplication.types.token
+import com.example.myapplication.types.userInfoMessage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.request
+import io.ktor.client.utils.EmptyContent.headers
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.InternalAPI
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
+import io.ktor.http.headers
 import kotlinx.coroutines.runBlocking
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.basic
+import io.ktor.client.plugins.auth.providers.bearer
+import okhttp3.Credentials.basic
 import kotlinx.coroutines.withContext
 import token
 
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
-    private val IPADDRESS = "192.168.0.181"
+    val IPADDRESS = "10.0.0.2"
 
 
-    suspend private fun testHttp(userName: String, password: String): Boolean {
-        val client = HttpClient(CIO) {
+    suspend private fun loginRequest(userName: String, password: String): Boolean {
+        var client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
@@ -42,39 +47,58 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
                         true // Useful if the JSON has more fields than the data class
                 })
             }
+
         }
 
-        try {
-            val responseText: HttpResponse = client.post("http://$IPADDRESS:9090/login") {
-                contentType(ContentType.Application.Json)
-                setBody("{\"username\":\"$userName\", \"password\":\"$password\"}")
+        val responseText: HttpResponse = client.post("http://$IPADDRESS:9090/login") {
+            contentType(ContentType.Application.Json)
+            setBody("{\"username\":\"$userName\", \"password\":\"$password\"}")
+        }
+
+        if (responseText.status.value != 200) {
+            return false
+        }
+        val token: token = Json.decodeFromString(responseText.body())
+        val newClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(token.token, token.token)
+                    }
+                    sendWithoutRequest { true }
+                }
             }
 
-            if (responseText.status.value != 200) {
-                return false
-            }
-            Log.d("HttpTest", "Response text: $responseText")
-
-            val token: token = Json.decodeFromString(responseText.body())
-            Log.d("HttpTest", "Received token: ${token.token}")
-            repository.returnDelete(
-                User(
-                    userName = userName,
-                    password = password,
-                    jwtToken = token.token
-                )
-            )
+        }
+        val response: HttpResponse = newClient.get("http://$IPADDRESS:9090/userInfo") {
+        }
+        Log.d("userinfo", response.status.value.toString())
+        if (response.status.value == 200) {
+            val userInfo: userInfoMessage = Json.decodeFromString(response.body())
+            repository.returnDelete()
             repository.returnInsert(
                 User(
-                    userName = userName,
+                    userName = userInfo.username,
                     password = password,
-                    jwtToken = token.token
+                    jwtToken = token.token,
+                    userid = userInfo.userid,
+                    email = userInfo.email,
+                    profilePicture = userInfo.profilePicture,
+                    rating = userInfo.rating
                 )
             )
             client.close()
             return true
-        } catch (e: Exception) {
-            Log.d("HttpTest", "Received error: ${e.message}")
+        } else {
+            return false
         }
         return false
     }
@@ -82,9 +106,8 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     fun login(userName: String, password: String): Boolean {
         var worked = false
 
-        runBlocking { worked = testHttp(userName, password) }
-        Log.d("HttpTest", worked.toString())
-
+        runBlocking { worked = loginRequest(userName, password) }
+        Log.d("test", worked.toString())
         return worked
     }
 
@@ -94,10 +117,10 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
             val isEmpty = repository.isEmpty()
             if (!isEmpty) {
                 val newUser = repository.getUser()
-                worked = testHttp(newUser.userName, newUser.password)
+                worked = loginRequest(newUser.userName, newUser.password)
             }
         }
-
         return worked
     }
+
 }

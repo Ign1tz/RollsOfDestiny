@@ -16,15 +16,21 @@ import {authFetch} from "./auth";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> (true)
-    const [ingame, setIngame] = useState<boolean> (false)
-    const [gameInfo, setGameInfo] = useState<string> ("")
-    const [websocket, setWebsocket] = useState<WebSocket>()
+    const [loggedIn, setLoggedIn] = useState<boolean> (false)
 
     useEffect(() => {
         if (localStorage.getItem("access_token")) {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
+                console.log("userInfo")
+                if (response.status === 200) {
+                    authFetch("http://localhost:9090/userInfo").then(r => {
+
+                        return r.json()
+                    }).then(response => {
+                        sessionStorage.setItem("userInfo", JSON.stringify(response))
+                    })
+                }
             })
         }
     }, []);
