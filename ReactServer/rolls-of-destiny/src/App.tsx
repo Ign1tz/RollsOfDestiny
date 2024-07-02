@@ -40,14 +40,14 @@ function App() {
         { (typeof loggedIn).toString() !== "undefined" &&
             <BrowserRouter>
                 <Routes>
-                    <Route index element={<Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route index element={ loggedIn ? <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/> : <LandingPage loggedIn={loggedIn || false}/>}/>
                     <Route path={"/profile"} element={<Profile user={p}/>}/>
                     <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn || false}/>}/>
                     <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn || false}/>}/>
                     <Route path={"/game" } element={loggedIn ? <Game/> : <Login/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
-                    <Route path="/rules" element={<Rules/>}/>
+                    <Route path="/rules" element={<Rules loggedIn={loggedIn || false}/>}/>
                     <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
                     <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
                     <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
