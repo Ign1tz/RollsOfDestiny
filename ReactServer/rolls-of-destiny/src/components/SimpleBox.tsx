@@ -26,9 +26,9 @@ export default function SimpleBox({diceValue}: { diceValue: number | null }) {
                 backgroundColor: "darkgray",
             }}
         >
-            {diceValue !== null && (
+            {diceValue && diceValue !== 0 ? (
                 <img src={diceImages[diceValue - 1]} alt={`Dice ${diceValue}`} height={80} width={80} style={{borderRadius: "10%" }}/>
-            )}
+            ): <></>}
         </Box>
     );
 }

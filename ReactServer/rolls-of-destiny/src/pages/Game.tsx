@@ -10,48 +10,45 @@ import background_music from "../soundtracks/background_music.mp3";
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
+import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 
 
 export default function Game() {
     sessionStorage.setItem("gameInfo", "")
     console.log(sessionStorage.getItem("gameInfo"))
-    let gameInfo = sessionStorage.getItem("gameInfo")
-    if (!gameInfo) {
-        gameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
+    let startGameInfo = sessionStorage.getItem("gameInfo")
+    if (!startGameInfo) {
+        startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
     const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
-    const [session, setSession] = useState("")
     const [userID, setUserID] = useState("")
-    const [gameInfoJson, setGameInfoJson] = useState(JSON.parse(gameInfo))
     const [gameId, setGameId] = useState("")
+    const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
+    const [rolled, setRolled] = useState(false)
+    const [placed, setPlaced] = useState(false)
     const [player1Score, setPlayer1Score] = useState(0);
-    const [player2Score, setPlayer2Score] = useState(0);
-    const [diceRoll, setDiceRoll] = useState<number | null>(null);
-    const [disableRoll, setDisableRoll] = useState(false);
-    const [canPlace, setCanPlace] = useState(true);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
+    const [yourInfo, setYourInfo] = useState<yourInfo | null>(null)
+    const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>(null)
+    const [gameEnded, setGameEnded] = useState(false)
+    const [endResults, setEndResults] = useState<endResults | null>()
 
-    const [rollValue, setRollValue] = useState< 1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
-
-    const handleRoll = (player: 'player1' | 'player2', value: number) => {
-        setDiceRoll(value);
-        setDisableRoll(true);
-    };
 
     const togglePause = () => {
         setIsPaused(!isPaused);
     };
 
     const handleQuit = () => {
+        websocket.send(JSON.stringify({type:"surrender", message: {}, gameId: gameId}))
         window.location.href = "/";
     };
 
 
     let volume = sessionStorage.getItem("volume");
-    let masterVolume = .99
+    let masterVolume = .30
     if (volume) {
         masterVolume = parseInt(volume) / 100
     }
@@ -84,61 +81,140 @@ export default function Game() {
     }, []);
 
     useEffect(() => {
-        if (!gameInfoJson) {
-            console.log(gameInfoJson)
-            let tempPlayer: profile = JSON.parse(gameInfoJson)
-            setPlayer1(tempPlayer)
-        }
-    }, [gameInfoJson])
-
-    useEffect(() => {
         console.log(websocket)
         if (connected && websocket) {
             console.log("test")
-            websocket.send("test")
+            //websocket.send("test")
         }
     }, [connected])
 
     useEffect(() => {
         if (websocketId !== "") {
             console.log("queuing websocket")
-            console.log("websocketid", websocketId)
-            queueForGame()
+            if (sessionStorage.getItem("GameType") === "bot") {
+                startBot()
+            } else {
+                queueForGame()
+            }
         }
     }, [websocketId])
 
     if (websocket) {
         websocket.onmessage = (e) => {
-            console.log("go a message")
-            console.log("message: " + e.data)
-            if (e.data == "connected") {
+            console.log(e.data)
+            let message = JSON.parse(e.data)
+            console.log("got a message")
+            console.log(message)
+            if (message.info == "connected") {
+                console.log("connected")
                 setConnected(true)
-                websocket.send("id")
-            } else if (e.data.includes("id:")) {
-                console.log(e.data.split(":")[e.data.split(":").length - 1])
-                setWebsocketId(e.data.split(":")[e.data.split(":").length - 1])
-            } else if (e.data.includes("{")) {
-                console.log(e.data)
-                sessionStorage.setItem("gameInfo", e.data)
-                setGameInfoJson(JSON.parse(e.data))
+                websocket.send(JSON.stringify({type: "id"}))
+            } else if (message.info == "id") {
+                console.log("id:", message.message.id)
+                setWebsocketId(message.message.id)
+            } else if (message.info == "gameInfo") {
+                console.log(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                console.log("setGameInfo")
+                setGameInfo(message.message.gameInfo)
+            } else if (message.info == "gameEnded") {
+                console.log(message.message.gameInfo)
+                sessionStorage.setItem("gameInfo", message.message.gameInfo)
+                setGameId(message.message.gameInfo.gameid)
+                console.log("endResults", message.message.endResults)
+                setGameInfo(message.message.gameInfo)
+                setGameEnded(true)
+                setEndResults(message.message.endResults)
             }
         }
     }
 
+    const handleColumnClick = (key: number) => {
+        console.log("handleColumnClicK", connected)
+        if (websocket && connected && gameInfo){
+            console.log(gameId)
+            setPlaced(true)
+            websocket.send(JSON.stringify({type: sessionStorage.getItem("GameType") + "PickColumn", messageBody: key.toString(), gameId: gameId}))
+        }
+    };
+
     async function queueForGame() {
-        console.log("test queue")
-        const response = await fetch("http://localhost:8080/queue", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({
-                userid: userID, websocketconnectionid: websocketId
-            })
-        });
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/queue", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId, username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
     }
 
+    async function startBot() {
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/startBot", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+    }
+
+    const parseRoll = (roll: string): 1 | 2 | 3 | 4 | 5 | 6 | undefined => {
+        switch (roll) {
+            case "1":
+                return 1
+            case "2":
+                return 2
+            case "3":
+                return 3
+            case "4":
+                return 4
+            case "5":
+                return 5
+            case "6":
+                return 6
+        }
+    }
+
+    useEffect(() => {
+        if (gameInfo.ActivePlayer) {
+            console.log(gameInfo.ActivePlayer.active)
+            if (gameInfo.ActivePlayer.active) {
+                console.log("setFalse")
+                setRolled(false)
+                setPlaced(false)
+            } else {
+                setRolled(true)
+                setPlaced(true)
+            }
+            setYourInfo(gameInfo.YourInfo)
+            setEnemyInfo(gameInfo.EnemyInfo)
+            console.log(gameInfo.EnemyInfo)
+            setPlayer1(prevState => ({...prevState, username: gameInfo.EnemyInfo.Username}))
+        }
+    }, [gameInfo]);
+
+    useEffect(() => {
+        console.log(rolled)
+    }, [rolled])
 
     return (
         <>
@@ -161,6 +237,17 @@ export default function Game() {
                     </Button>
                 </div>
                 <div className="content">
+                    <Modal open={gameEnded}>
+                        <div className="pauseMenu">
+                            <h2>Game finished</h2>
+                            <h2>{endResults?.youWon}</h2>
+                            <h2>Score</h2>
+                            <h2>{endResults?.yourScore} to {endResults?.enemyScore}</h2>
+                            <Button variant="contained" onClick={() => window.location.href = "/"}>
+                                Menu
+                            </Button>
+                        </div>
+                    </Modal>
                     <Modal open={confirmSurrender} onClose={toggleSurrender}>
                         <div className="confirmSurrenderMenu">
                             <Button variant="contained" onClick={() => {
@@ -199,6 +286,7 @@ export default function Game() {
                             <div className="playerInfoUsernameRating">
                                 <h2>{player1.username + " (Opponent)"}</h2>
                                 <p>Rating: {player1.rating}</p>
+                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
                         </div>
@@ -208,10 +296,12 @@ export default function Game() {
                                 <SimpleBox diceValue={null}/>
                             </div>
                             <div className="grid">
-                                <OpponentGrid diceRoll={diceRoll}/>
+                                <OpponentGrid grid={enemyInfo ? enemyInfo : null}/>
                             </div>
                             <div className="diceWrapper">
-                                <Dice defaultValue={6} size={100} cheatValue={undefined} disabled={true}/>
+                                <Dice onRoll={(value) => console.log(value)} defaultValue={6} size={100}
+                                      cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
+                                      disabled={true}/>
                             </div>
                         </div>
                     </div>
@@ -219,11 +309,16 @@ export default function Game() {
                     <div className="playerSection">
                         <div className="playerActions">
                             <div className="diceWrapper">
-                                <Dice onRoll={(value) => handleRoll('player2', value)} defaultValue={6} size={100}
-                                      cheatValue={rollValue} disabled={disableRoll}/>
+                                <Dice onRoll={(value) => {
+                                    console.log(value);
+                                    setRolled(true)
+                                }} defaultValue={6} size={100}
+                                      cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
+                                      disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>
                             </div>
                             <div className="grid">
-                                <Grid canPlace={canPlace} setCanPlace={setCanPlace} diceRoll={diceRoll}/>
+                                <Grid handleColumnClick={handleColumnClick} active={rolled && !placed}
+                                      grid={yourInfo ? yourInfo : null}/>
                             </div>
                             <div className="playerCards">
                                 <h3>Deck</h3>
@@ -237,7 +332,7 @@ export default function Game() {
                                 <p>Rating: {player2.rating}</p>
                             </div>
                             <div className="score">
-                                <p>Score: <span id="player2Score">{player2Score}</span></p>
+                                <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
                             </div>
                         </div>
                     </div>

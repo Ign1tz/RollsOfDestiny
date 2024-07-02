@@ -4,6 +4,15 @@ import (
 	"RollsOfDestiny/AccountServer/Types"
 )
 
+func GetAccountByUserID(userID string) (Types.Account, error) {
+	dbAccount := Database.QueryRow("Select * from accounts where userid = $1", userID)
+	var account Types.Account
+	if err := dbAccount.Scan(&account.UserID, &account.Username, &account.Password, &account.Email, &account.ProfilePicture, &account.Rating); err != nil {
+		return Types.Account{}, err
+	}
+	return account, nil
+}
+
 func GetAccountByUsername(username string) (Types.Account, error) {
 	dbAccount := Database.QueryRow("Select * from accounts where username = $1", username)
 	var account Types.Account

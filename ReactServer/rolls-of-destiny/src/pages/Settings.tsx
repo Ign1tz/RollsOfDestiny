@@ -67,6 +67,11 @@ export default function Settings({profile}: {profile:profile }) {
                 body: JSON.stringify({oldUsername: profile.username, newUsername: newUsername})
             }).then(r => {
                 if (r.status === 200) {
+                    authFetch("http://localhost:9090/userInfo").then(r => {
+                        return r.json()
+                    }).then(response => {
+                        sessionStorage.setItem("userInfo", JSON.stringify(response))
+                    })
                 }
                 setErrorMessage("Username already taken.");
             });
