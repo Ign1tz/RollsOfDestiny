@@ -15,12 +15,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     const [resultsFound, setResultsFound] = useState(false);
     const [noResultsFound, setNoResultsFound] = useState(false);
 
-    const [users, setUsers] = useState([
-        {username: "Bernd", rating: 839, profilePicture: "https://via.placeholder.com/100"},
-        {username: "Anna", rating: 902, profilePicture: "https://via.placeholder.com/100"},
-        {username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
-        {username: "Diana", rating: 820, profilePicture: "https://via.placeholder.com/100"},
-        {username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
+    const [users, setUsers] = useState<profile[]>([
     ])
 
     const online = true;

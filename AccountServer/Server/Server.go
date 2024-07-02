@@ -253,7 +253,13 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 				friendsString = fmt.Sprintf(`%s, {"username": "%s", "rating": "%s", "profilePicture": "%s"}`, friendsString, friends[friend].Friend.Username, strconv.Itoa(friends[friend].Friend.Rating), friends[friend].Friend.ProfilePicture)
 			}
 		}
-		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", friendsString[2:])
+		var array string
+		if len(friendsString) > 2 {
+			array = friendsString[2:]
+		} else {
+			array = ""
+		}
+		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
 		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 		return
@@ -375,7 +381,13 @@ func getAccounts(w http.ResponseWriter, r *http.Request) {
 				accountString = fmt.Sprintf(`%s, {"username": "%s", "rating": "%s", "profilePicture": "%s"}`, accountString, possibleAccounts[accountId].Username, strconv.Itoa(possibleAccounts[accountId].Rating), possibleAccounts[accountId].ProfilePicture)
 			}
 		}
-		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", accountString[2:])
+		var array string
+		if len(accountString) > 2 {
+			array = accountString[2:]
+		} else {
+			array = ""
+		}
+		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
 		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 	}
