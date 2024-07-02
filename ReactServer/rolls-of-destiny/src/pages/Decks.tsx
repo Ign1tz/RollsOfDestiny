@@ -4,6 +4,10 @@ import "../css/Deck.css"
 import {Modal, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import TopAppBar from "../bars/TopAppBar";
+import destroyColumnCard from "../cards/destroy_column.png"
+import doubleManaCard from "../cards/double_mana.png"
+import rollAgainCard from "../cards/roll_again.png"
+import rotateGridCard from "../cards/rotate_grid.png"
 
 export default function Decks() {
 
@@ -18,7 +22,8 @@ export default function Decks() {
     type CardType = {
         name: string,
         mana: number,
-        image: string
+        image: string,
+        description: string
     };
 
     const initialDeck: Deck = {
@@ -38,14 +43,15 @@ export default function Decks() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isError, setIsError] = useState(false)
 
+    let cards: CardType[] = [
+        {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
+        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."},
+        {name: "Roll again", mana: 7, image: rollAgainCard, description: "Your throwed die is destroyed. Roll again."},
+        {name: "Rotate Grid", mana: 5, image: rotateGridCard, description: "Flip board by 90° clockwise."}
+    ];
 
     let decks: Deck[] = [
-        {name: "Test", numberOfCards: 8, deckID: "1", cards: [
-                {name: "Test", mana: 7, image: "Not here yet"},
-                {name: "awdawd", mana: 8, image: "Not here yet"},
-                {name: "siiuuu", mana: 7, image: "Not here yet"},
-                {name: "Test", mana: 7, image: "Not here yet"}
-            ], activate: true
+        {name: "Test", numberOfCards: 8, deckID: "1", cards: cards, activate: true
         },
         {name: "gdrgrdg", numberOfCards: 8, deckID: "2", cards: [], activate: false
         },
@@ -59,13 +65,6 @@ export default function Decks() {
         }
     ];
 
-    let cards: CardType[] = [
-        {name: "Test", mana: 7, image: "Not here yet"},
-        {name: "awdawd", mana: 8, image: "Not here yet"},
-        {name: "siiuuu", mana: 7, image: "Not here yet"},
-        {name: "123", mana: 5, image: "Not here yet"},
-        {name: "hiiii", mana: 2, image: "Not here yet"}
-    ];
     const clickEvent = (deck: Deck) => {
         setClickedDeck(deck)
         setOpenDeckMenu(true)
@@ -190,8 +189,9 @@ export default function Decks() {
                         {clickedDeck.cards.map((card) => (
                             <div className={"specificCardInCreatDeckMenu"}>
                                 <h3>{card.name}</h3>
-                                <img src={card.image} alt={"card image"}/>
-                                <h3>In Deck: {cardsForNewDeck.filter(c => c.name === card.name).length+1}</h3>
+                                <img id="cardImages" src={card.image} alt={"card image"}/>
+                                <h5>{card.description}</h5>
+                                <h5>In Deck: {cardsForNewDeck.filter(c => c.name === card.name).length + 1}</h5>
                             </div>
                         ))}
                     </div>
@@ -211,7 +211,8 @@ export default function Decks() {
                         {cards.map((card) => (
                             <div className={"specificCardInCreatDeckMenu"}>
                                 <h3>{card.name}</h3>
-                                <img src={card.image} alt={"card image"}/>
+                                <img id="cardImages" src={card.image} alt={"card image"}/>
+                                <h5>{card.description}</h5>
                                 <Button onClick={() => addCardToDeck(card)} variant={"contained"}
                                         color={"secondary"} style={{marginTop: "20px"}}>Add to Deck</Button>
                             </div>
@@ -256,7 +257,11 @@ export default function Decks() {
                 <h2>Your Cards</h2>
                 <div className={"allCards"}>
                     {cards.map((card) => (
-                        <h3>{card.name}</h3>
+                        <div className={"individualCardOwned"}>
+                            <h3>{card.name}</h3>
+                            <img src={card.image} alt={"card image"}/>
+                            <h5>{card.description}</h5>
+                        </div>
                     ))}
                 </div>
             </div>

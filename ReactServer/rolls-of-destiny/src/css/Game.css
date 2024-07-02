@@ -34,9 +34,9 @@
 
 .playerInfo, .playerInfoOpp {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 60%;
+    justify-content: end;
+    width: 40%;
     margin-bottom: 5px;
     background-color: darkgray;
     border: 4px solid #000000;
@@ -168,3 +168,45 @@
     width: 20%;
     text-align: center;
 }
+
+.dividerAndPauseButton {
+    display:flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+
+.opponentCards, .playerOwnCards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.specificOpponentCard, .specificPlayerCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.specificOpponentCard img, .specificPlayerCard img {
+    height: 250px;
+    width: 150px;
+}
+
+.opponentAndCards, .playerAndCards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.playerInfoOpp, .playerInfo {
+    height: 60%;
+    width: 40%;
+}
+

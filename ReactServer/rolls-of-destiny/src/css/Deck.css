@@ -32,17 +32,34 @@
 
 .chooseCardsMenu, .specificDeckCards {
     display: grid;
-    grid-template-columns: repeat(3, 4fr);
+    grid-template-columns: repeat(4, 1fr);
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 5px;
     margin: 30px;
 }
 
-.specificCardInCreatDeckMenu {
+.specificCardInCreatDeckMenu, .individualCardOwned {
     padding: 10px;
     display: flex;
     flex-direction: column;
+}
+
+.individualCardOwned {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.individualCardOwned img {
+    height: 300px;
+    width: 200px;
+}
+
+.allCards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .deckMenuHeader {
@@ -80,4 +97,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#cardImages {
+    height: 200px;
+    width: 150px;
 }
