@@ -39,7 +39,7 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	var decks []Types.Deck
 	id := 0
 	for dbDecks.Next() {
-		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name); err != nil {
+		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name, &decks[id].Active); err != nil {
 			return []Types.Deck{}, err
 		}
 		id++
@@ -47,15 +47,15 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	return decks, nil
 }
 
-func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
-	dbCards, err := Database.Query("Select * from accountcards where deckid like %$1%", deckID)
+func GetCardsByDeckID(deckID string, name string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%' and name = $2", deckID, name)
 	if err != nil {
 		return []Types.Card{}, err
 	}
 	var cards []Types.Card
 	id := 0
 	for dbCards.Next() {
-		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count); err != nil {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost); err != nil {
 			return []Types.Card{}, err
 		}
 		id++
