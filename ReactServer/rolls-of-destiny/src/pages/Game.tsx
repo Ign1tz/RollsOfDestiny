@@ -11,6 +11,11 @@ import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import testImage from "../images/1.png";
 import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
+import VolumeSlider from "../components/VolumeSlider";
+import destroyColumnCard from "../cards/destroy_column.png"
+import doubleManaCard from "../cards/double_mana.png"
+import rollAgainCard from "../cards/roll_again.png"
+import rotateGridCard from "../cards/rotate_grid.png"
 
 
 export default function Game() {
@@ -35,6 +40,7 @@ export default function Game() {
     const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>(null)
     const [gameEnded, setGameEnded] = useState(false)
     const [endResults, setEndResults] = useState<endResults | null>()
+    const [volume, setVolume] = useState<number>(30);
 
 
     const togglePause = () => {
@@ -46,14 +52,6 @@ export default function Game() {
         window.location.href = "/";
     };
 
-
-    let volume = sessionStorage.getItem("volume");
-    let masterVolume = .30
-    if (volume) {
-        masterVolume = parseInt(volume) / 100
-    }
-
-
     const toggleSurrender = () => {
         setConfirmSurrender(!confirmSurrender)
     };
@@ -61,8 +59,9 @@ export default function Game() {
     const [player1, setPlayer1] = useState<profile>({
         username: "Lukas",
         rating: 3450913,
-        profilePicture: testImage
+        profilePicture: "testImage"
     })
+
     const [player2, setPlayer2] = useState<profile>({
         username: "default",
         rating: 0,
@@ -78,7 +77,16 @@ export default function Game() {
             setPlayer2(JSON.parse(user))
             setUserID(JSON.parse(user).userid)
         }
+
+        setVolume(Number(sessionStorage.getItem("volume")) || 30)
+
     }, []);
+
+
+    useEffect(() => {
+        console.log(volume)
+    }, [volume]);
+
 
     useEffect(() => {
         console.log(websocket)
@@ -216,13 +224,27 @@ export default function Game() {
         console.log(rolled)
     }, [rolled])
 
+    // testing purposes
+
+    type CardType = {
+        name: string,
+        mana: number,
+        image: string,
+        description: string
+    };
+
+    let cards: CardType[] = [
+        {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
+        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."}
+    ];
+
     return (
         <>
             <ReactAudioPlayer
                 src={background_music}
                 autoPlay={true}
                 loop={true}
-                volume={masterVolume}
+                volume={volume/100}
             />
             <div className="gameDivision" style={{
                 backgroundImage: `url(${background})`,
@@ -264,11 +286,9 @@ export default function Game() {
                     <Modal open={isPaused} onClose={togglePause}>
                         <div className="pauseMenu">
                             <h2>Pause Menu</h2>
+                            <VolumeSlider volume={volume} setVolume={setVolume}/>
                             <Button variant="contained" onClick={togglePause}>
                                 Continue playing
-                            </Button>
-                            <Button variant="contained" onClick={() => console.log("Go to Settings")}>
-                                Settings
                             </Button>
                             <Button variant="contained" onClick={() => {
                                 toggleSurrender();
@@ -278,7 +298,14 @@ export default function Game() {
                             </Button>
                         </div>
                     </Modal>
-                    <div className="playerSection">
+                    <div className={"opponentAndCards"}>
+                        <div className={"opponentCards"}>
+                            {cards.map((card) => (
+                                <div className={"specificOpponentCard"}>
+                                    <img src={card.image} alt={"card image"}/>
+                                </div>
+                            ))}
+                        </div>
                         <div className="playerInfoOpp">
                             <div className="score">
                                 <p>Score: <span id="player1Score">{player1Score}</span></p>
@@ -290,6 +317,9 @@ export default function Game() {
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
                         </div>
+                    </div>
+                    <div className="playerSection">
+
                         <div className="playerActions">
                             <div className="playerCards">
                                 <h3>Deck </h3>
@@ -305,7 +335,14 @@ export default function Game() {
                             </div>
                         </div>
                     </div>
-                    <div className="divider"></div>
+                    <div className={"dividerAndPauseButton"}>
+                        <div className="divider"></div>
+                        <Button variant="contained" color="secondary" onClick={togglePause}
+                                style={{marginLeft: "10px", marginRight: "10px"}}>
+                            Pause
+                        </Button>
+                        <div className="divider"></div>
+                    </div>
                     <div className="playerSection">
                         <div className="playerActions">
                             <div className="diceWrapper">
@@ -325,14 +362,23 @@ export default function Game() {
                                 <SimpleBox diceValue={null}/>
                             </div>
                         </div>
-                        <div className="playerInfo">
-                            <img src={player2.profilePicture} alt={player2.username}/>
-                            <div className="playerInfoUsernameRating">
-                                <h2>{player2.username + " (You)"}</h2>
-                                <p>Rating: {player2.rating}</p>
+                        <div className={"playerAndCards"}>
+                            <div className="playerInfo">
+                                <img src={player2.profilePicture} alt={player2.username}/>
+                                <div className="playerInfoUsernameRating">
+                                    <h2>{player2.username + " (You)"}</h2>
+                                    <p>Rating: {player2.rating}</p>
+                                </div>
+                                <div className="score">
+                                    <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
+                                </div>
                             </div>
-                            <div className="score">
-                                <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
+                            <div className={"playerOwnCards"}>
+                                {cards.map((card) => (
+                                    <div className={"specificPlayerCard"}>
+                                        <img src={card.image} alt={"card image"}/>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

@@ -13,16 +13,22 @@ import testImage from "./soundtracks/testImage.png"
 import Leaderboard from "./pages/Leaderboard";
 import Friendlist from "./pages/Friendlist";
 import {authFetch} from "./auth";
+import Decks from "./pages/Decks";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    const [loggedIn, setLoggedIn] = useState<boolean> ()
+    const [ingame, setIngame] = useState<boolean> (false)
+    const [gameInfo, setGameInfo] = useState<string> ("")
+    const [websocket, setWebsocket] = useState<WebSocket>()
     const [fetched, setFetched] = useState<boolean> (false)
-
     useEffect(() => {
-        if (localStorage.getItem("access_token")) {
+        const tempLoggedIn = sessionStorage.getItem("loggedIn")
+        if (localStorage.getItem("access_token") && tempLoggedIn !== "true") {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
+                sessionStorage.setItem("loggedIn", "true")
                 setFetched(true)
                 console.log("userInfo")
                 if (response.status === 200) {
@@ -35,12 +41,14 @@ function App() {
                     })
                 }
             })
+        } else {
+            setLoggedIn(tempLoggedIn === "true")
         }
     }, []);
 
     return (
     <>
-        {fetched && <BrowserRouter>
+        { (typeof loggedIn).toString() !== "undefined" && fetched && <BrowserRouter>
             <Routes>
                 <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
                 <Route path={"/profile"} element={<Profile user={p}/>}/>
@@ -51,6 +59,8 @@ function App() {
                 <Route path="/signup" element={<SignUp/>}/>
                 <Route path="/rules" element={<Rules/>}/>
                 <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
+                <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
+                <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
             </Routes>
         </BrowserRouter>}
     </>
