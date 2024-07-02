@@ -6,6 +6,6 @@ func DeleteAccount(userID string) error {
 }
 
 func DeleteFriend(userid string, friendid string) error {
-	_, err := Database.Exec("DELETE FROM accountfriends Where userid = $1 and friendid = $2", userid, userid)
+	_, err := Database.Exec("DELETE FROM accountfriends Where userid = $1 and friendid = $2", userid, friendid)
 	return err
 }

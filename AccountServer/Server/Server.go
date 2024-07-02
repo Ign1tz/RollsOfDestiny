@@ -310,7 +310,6 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
 		if valid {
@@ -338,8 +337,13 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
+			log.Println(userid, friend.UserID)
 
-			Database.DeleteFriend(userid, friend.UserID)
+			err = Database.DeleteFriend(userid, friend.UserID)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -352,13 +356,13 @@ func getAccounts(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	_, valid := checkToken(w, r)
+	userid, valid := checkToken(w, r)
 	if valid {
 		myUrl, _ := url.Parse(r.URL.String())
 		params, _ := url.ParseQuery(myUrl.RawQuery)
 		account := params.Get("username")
 
-		possibleAccounts, err := Database.GetAccountByPartUsername(account)
+		possibleAccounts, err := Database.GetAccountByPartUsername(account, userid)
 
 		if err != nil {
 			log.Println(err)
@@ -390,6 +394,7 @@ func setupRoutes() {
 	http.HandleFunc("/getFriends", getFriends)
 	http.HandleFunc("/getAccounts", getAccounts)
 	http.HandleFunc("/addFriend", newFriend)
+	http.HandleFunc("/removeFriend", deleteFriend)
 }
 
 func Server() {

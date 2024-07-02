@@ -86,8 +86,8 @@ func GetFriendsByUserID(userID string) ([]Types.Friend, error) {
 	return friends, nil
 }
 
-func GetAccountByPartUsername(usernamePart string) ([]Types.Account, error) {
-	dbAccount, err := Database.Query("Select * from accounts where username ilike '%' || $1 || '%' limit 10", usernamePart)
+func GetAccountByPartUsername(usernamePart string, userid string) ([]Types.Account, error) {
+	dbAccount, err := Database.Query("Select * from accounts where username ilike '%' || $1 || '%' and userid is distinct from $2 limit 10", usernamePart, userid)
 	if err != nil {
 		return []Types.Account{}, err
 	}
