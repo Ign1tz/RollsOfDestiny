@@ -29,7 +29,6 @@ import io.ktor.client.plugins.auth.providers.basic
 import io.ktor.client.plugins.auth.providers.bearer
 import okhttp3.Credentials.basic
 import kotlinx.coroutines.withContext
-import token
 
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 

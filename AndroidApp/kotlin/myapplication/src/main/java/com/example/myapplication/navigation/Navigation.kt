@@ -38,8 +38,13 @@ fun Navigation() {
         }
 
         composable(route = Screen.SettingScreen.route) {
-            SettingScreen(navController = navController, settingViewModel = settingViewModel)
 
+            settingViewModel.newPassword.value = ""
+            settingViewModel.oldPassword.value = ""
+            settingViewModel.confirmNewPassword.value = ""
+            settingViewModel.username.value = ""
+            SettingScreen(navController = navController, settingViewModel = settingViewModel)
+        }
         composable(route = Screen.GameScreen.route) {
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
