@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Card from '@mui/material/Card';
 import "../css/Deck.css"
 import {Modal, TextField} from "@mui/material";
@@ -8,30 +8,31 @@ import destroyColumnCard from "../cards/destroy_column.png"
 import doubleManaCard from "../cards/double_mana.png"
 import rollAgainCard from "../cards/roll_again.png"
 import rotateGridCard from "../cards/rotate_grid.png"
+import {authFetch} from "../auth";
 
 export default function Decks() {
 
     type Deck = {
         name: string,
-        numberOfCards: number,
-        deckID: string,
+        //numberOfCards: number,
+        deckid: string,
         cards: CardType[],
-        activate: boolean
+        active: boolean
     };
 
     type CardType = {
         name: string,
         mana: number,
         image: string,
-        description: string
+        count: number
     };
 
     const initialDeck: Deck = {
         name: "Sample Deck",
-        numberOfCards: 50,
-        deckID: "1",
+        //numberOfCards: 50,
+        deckid: "1",
         cards: [],
-        activate: false
+        active: false
     };
 
     const [createDeckButtonClicked, setCreateDeckButtonClicked] = useState(false)
@@ -43,27 +44,40 @@ export default function Decks() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isError, setIsError] = useState(false)
 
+    const [decks, setDecks] = useState<Deck[]>([])
+
     let cards: CardType[] = [
-        {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
-        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."},
-        {name: "Roll again", mana: 7, image: rollAgainCard, description: "Your throwed die is destroyed. Roll again."},
-        {name: "Rotate Grid", mana: 5, image: rotateGridCard, description: "Flip board by 90° clockwise."}
+        {
+            name: "Destroy Column",
+            mana: 7,
+            image: destroyColumnCard,
+            count: 0
+        },
+        {name: "Double Mana", mana: 8, image: doubleManaCard, count: 0},
+        {name: "Roll again", mana: 7, image: rollAgainCard, count: 0},
+        {name: "Rotate Grid", mana: 5, image: rotateGridCard, count: 0}
     ];
 
-    let decks: Deck[] = [
-        {name: "Test", numberOfCards: 8, deckID: "1", cards: cards, activate: true
+    /*let decks: Deck[] = [
+        {
+            name: "Test", /!*numberOfCards: 8,*!/ deckID: "1", cards: cards, active: true
         },
-        {name: "gdrgrdg", numberOfCards: 8, deckID: "2", cards: [], activate: false
+        {
+            name: "gdrgrdg", /!*numberOfCards: 8,*!/ deckID: "2", cards: [], active: false
         },
-        {name: "gdad3w", numberOfCards: 8, deckID: "3", cards: [] , activate: false
+        {
+            name: "gdad3w", /!*numberOfCards: 8,*!/ deckID: "3", cards: [], active: false
         },
-        {name: "maurits", numberOfCards: 8, deckID: "4", cards: [] , activate: false
+        {
+            name: "maurits", /!*numberOfCards: 8,*!/ deckID: "4", cards: [], active: false
         },
-        {name: "heyho", numberOfCards: 8, deckID: "5", cards: [] , activate: false
+        {
+            name: "heyho", /!*numberOfCards: 8,*!/ deckID: "5", cards: [], active: false
         },
-        {name: "siuuuu", numberOfCards: 8, deckID: "6", cards: [] , activate: false
+        {
+            name: "siuuuu", /!*numberOfCards: 8,*!/ deckID: "6", cards: [], active: false
         }
-    ];
+    ];*/
 
     const clickEvent = (deck: Deck) => {
         setClickedDeck(deck)
@@ -91,31 +105,39 @@ export default function Decks() {
         setErrorMessage("")
     }
 
+    useEffect(() => {
+        console.log(cards[0].image)
+        console.log(cards[1].image)
+        console.log(cards[2].image)
+        console.log(cards[3].image)
+        authFetch("http://localhost:9090/getDecks").then(response => {
+
+            return response.json()
+        }).then(r => {
+                console.log(r.decks[0].deckid)
+                setDecks(r.decks.reverse())
+            }
+        )
+    }, []);
 
 
-    function setPlayingDeck(deck: Deck) {
-
-        if (!deck.activate) {
-            fetch("http://localhost:9090/setPlayingDeck", {
+    function setActiveDeck(deck: Deck) {
+        console.log(deck.deckid)
+        if (!deck.active) {
+            authFetch("http://localhost:9090/setActiveDeck", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
-                body: JSON.stringify({username: "TODO USERNAME", deck: deck})
-            }).then(r => {
-                if (r.status === 200) {
-                    return r.json()
-                } else {
-                    // Error handling
-                }
+                body: JSON.stringify({name: deck.name, deckid: deck.deckid})
+            }).then( () => {
+                window.location.reload()
             })
         } else {
             setErrorMessage("This deck is already activated.")
             setIsError(true)
         }
-
-
     }
 
 
@@ -129,39 +151,30 @@ export default function Decks() {
         setNewDeckName("")
         setCreateDeckButtonClicked(false)
 
-        fetch("http://localhost:9090/createDeck", {
+        authFetch("http://localhost:9090/createDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({username: "TODO USERNAME", deck: deck, cards: cardsForNewDeck})
-        }).then(r => {
-            setCardsForNewDeck([])
-            if (r.status === 200) {
-                return r.json()
-            } else {
-                // Error handling
-            }
+            body: JSON.stringify({name: deck.name})
+        }).then( () => {
+            window.location.reload()
         })
     }
 
     function deleteDeck(deck: Deck) {
         console.log("delete deck clicked")
 
-        fetch("http://localhost:9090/deleteDeck", {
+        authFetch("http://localhost:9090/removeDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({username: "TODO USERNAME", deckID: deck.deckID})
-        }).then(r => {
-            if (r.status === 200) {
-                return r.json()
-            } else {
-                // Error handling
-            }
+            body: JSON.stringify({name: deck.name, deckid: deck.deckid})
+        }).then( () => {
+            window.location.reload()
         })
     }
 
@@ -190,7 +203,6 @@ export default function Decks() {
                             <div className={"specificCardInCreatDeckMenu"}>
                                 <h3>{card.name}</h3>
                                 <img id="cardImages" src={card.image} alt={"card image"}/>
-                                <h5>{card.description}</h5>
                                 <h5>In Deck: {cardsForNewDeck.filter(c => c.name === card.name).length + 1}</h5>
                             </div>
                         ))}
@@ -212,7 +224,6 @@ export default function Decks() {
                             <div className={"specificCardInCreatDeckMenu"}>
                                 <h3>{card.name}</h3>
                                 <img id="cardImages" src={card.image} alt={"card image"}/>
-                                <h5>{card.description}</h5>
                                 <Button onClick={() => addCardToDeck(card)} variant={"contained"}
                                         color={"secondary"} style={{marginTop: "20px"}}>Add to Deck</Button>
                             </div>
@@ -221,10 +232,9 @@ export default function Decks() {
                     <div className={"confirmButtonCreateDeckMenu"}>
                         <Button variant={"contained"} color={"success"} onClick={() => submitDeckCreation({
                             name: newDeckName,
-                            numberOfCards: cardsForNewDeck.length,
-                            deckID: "10",
+                            deckid: "10",
                             cards: cardsForNewDeck,
-                            activate: false
+                            active: false
                         })}>Create Deck</Button>
                     </div>
                 </div>
@@ -234,18 +244,18 @@ export default function Decks() {
                 <div className={"differentDecks"}>
                     {decks.map((deck, index) => (
                             <div className={"deckInstance"}>
-                                <Card style={{ backgroundColor: "lightgray"}}>
+                                <Card style={{backgroundColor: "lightgray"}}>
                                     <h4>{deck.name}</h4>
                                     <div className={"infosForDeck"}>
-                                        <h5>Size: {deck.numberOfCards}</h5>
-                                        <h5>DeckID: {deck.deckID}</h5>
+                                        <h5>Currently no Infos</h5>
                                     </div>
                                     <div className={"buttonForDeck"}>
                                         <Button variant="contained" color="secondary" onClick={() => clickEvent(deck)}>Edit
                                             Deck</Button>
                                         <Button variant="contained" color="error" onClick={() => deleteDeck(deck)}>Delete
                                             Deck</Button>
-                                        <Button variant={"contained"} color={ deck.activate ? "info":"success"} onClick={() => setPlayingDeck(deck)}> {deck.activate ? "Currently Using":"Activate"}</Button>
+                                        <Button variant={"contained"} color={deck.active ? "info" : "success"}
+                                                onClick={() => setActiveDeck(deck)}> {deck.active ? "Currently Using" : "Activate"}</Button>
                                     </div>
                                 </Card>
                             </div>
@@ -260,7 +270,6 @@ export default function Decks() {
                         <div className={"individualCardOwned"}>
                             <h3>{card.name}</h3>
                             <img src={card.image} alt={"card image"}/>
-                            <h5>{card.description}</h5>
                         </div>
                     ))}
                 </div>

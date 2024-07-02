@@ -17,15 +17,16 @@ func GetCardsOfDeckAsJsonString(deckid string, name string) string {
 		log.Println(err)
 		return ""
 	}
-	var cardString string
+	var cardString = ""
 	for cardIndex := range cards {
 		if cards[cardIndex].UserID != "" {
-			cardString = fmt.Sprintf(`%s, {"name": "%s", "count": "%s", "effect": "%s", "picture": "%s", "cost": "%s"}`, cards[cardIndex].Name, strconv.Itoa(cards[cardIndex].Count), cards[cardIndex].Effect, cards[cardIndex].Name, strconv.Itoa(cards[cardIndex].Cost))
+			cardString = fmt.Sprintf(`%s, {"name": "%s", "count": "%s", "image": "%s"}`, cards[cardIndex].Name, strconv.Itoa(cards[cardIndex].Count), cards[cardIndex].Effect, cards[cardIndex].Image)
 		}
 	}
 	if cardString != "" {
 		cardString = cardString[2:]
 	}
+	log.Println(cardString)
 	return cardString
 }
 
@@ -58,8 +59,8 @@ func RemoveCardFromDeck(cardInfos Types.AddCard, userid string) {
 	}
 }
 
-func ChangeActiveDeck(deckInfo Types.AddCard) {
-	err := Database.ChangeActiveDeck(deckInfo.Deckid)
+func ChangeActiveDeck(deckInfo Types.AddCard, userid string) {
+	err := Database.ChangeActiveDeck(deckInfo.Deckid, userid)
 	if err != nil {
 		return
 	}
@@ -68,6 +69,7 @@ func ChangeActiveDeck(deckInfo Types.AddCard) {
 func RemoveDeck(deckid string, userid string) {
 	err := Database.RemoveCardDeckIdByDeckId(userid, deckid)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 }

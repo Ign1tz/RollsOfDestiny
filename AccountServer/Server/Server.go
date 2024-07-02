@@ -453,10 +453,11 @@ func getDecks(w http.ResponseWriter, r *http.Request) {
 		}
 		var deckString string
 		var cardString string
+		//todo: check for empty
 		for deckIndex := range decks {
 			if decks[deckIndex].UserID != "" {
 				cardString = DeckLogic.GetCardsOfDeckAsJsonString(decks[deckIndex].DeckID, decks[deckIndex].Name)
-				deckString = fmt.Sprintf(`%s, {"name": "%s", "deckid": "%s", "active": "%s", "cards": [%s]}`, decks[deckIndex].Name, decks[deckIndex].DeckID, decks[deckIndex].Active, cardString)
+				deckString = fmt.Sprintf(`%s, {"name": "%s", "deckid": "%s", "active": %s, "cards": [%s]}`, deckString, decks[deckIndex].Name, decks[deckIndex].DeckID, strconv.FormatBool(decks[deckIndex].Active), cardString)
 			}
 		}
 		var array string
@@ -465,7 +466,7 @@ func getDecks(w http.ResponseWriter, r *http.Request) {
 		} else {
 			array = ""
 		}
-		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
+		friendInfo := fmt.Sprintf("{\"decks\": [%s]}", array)
 		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 	}
@@ -600,7 +601,7 @@ func setDeckActive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		_, valid := checkToken(w, r)
+		userid, valid := checkToken(w, r)
 		if valid {
 			// Read the raw body
 			body, err := ioutil.ReadAll(r.Body)
@@ -626,7 +627,7 @@ func setDeckActive(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			DeckLogic.ChangeActiveDeck(t)
+			DeckLogic.ChangeActiveDeck(t, userid)
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -690,7 +691,7 @@ func setupRoutes() {
 	http.HandleFunc("/createDeck", createDeck)
 	http.HandleFunc("/addCardToDeck", addCardToDeck)
 	http.HandleFunc("/removeCardFromDeck", removeCardFromDeck)
-	http.HandleFunc("/setDeckActive", setDeckActive)
+	http.HandleFunc("/setActiveDeck", setDeckActive)
 	http.HandleFunc("/removeDeck", removeDeck)
 }
 

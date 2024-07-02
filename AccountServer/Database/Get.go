@@ -36,7 +36,7 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	if err != nil {
 		return []Types.Deck{}, err
 	}
-	var decks []Types.Deck
+	var decks = make([]Types.Deck, 100)
 	id := 0
 	for dbDecks.Next() {
 		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name, &decks[id].Active); err != nil {
@@ -52,10 +52,10 @@ func GetCardsByDeckID(deckID string, name string) ([]Types.Card, error) {
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards []Types.Card
+	var cards = make([]Types.Card, 100)
 	id := 0
 	for dbCards.Next() {
-		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost); err != nil {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image); err != nil {
 			return []Types.Card{}, err
 		}
 		id++

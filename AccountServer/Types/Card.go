@@ -7,4 +7,5 @@ type Card struct {
 	DeckID string
 	Count  int
 	Cost   int
+	Image  string
 }

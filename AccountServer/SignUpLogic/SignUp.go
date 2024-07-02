@@ -49,6 +49,7 @@ func createDefaultCards(account Types.Account) []Types.Card {
 		DeckID: "",
 		Count:  0,
 		Cost:   3,
+		Image:  "/static/media/roll_again.21331c0ee525eb47281c.png",
 	}
 	doubleMana := Types.Card{
 		UserID: account.UserID,
@@ -57,6 +58,7 @@ func createDefaultCards(account Types.Account) []Types.Card {
 		DeckID: "",
 		Count:  0,
 		Cost:   2,
+		Image:  "/static/media/double_mana.7c47c6670f52b76c8fa6.png",
 	}
 	destroyColumn := Types.Card{
 		UserID: account.UserID,
@@ -65,6 +67,7 @@ func createDefaultCards(account Types.Account) []Types.Card {
 		DeckID: "",
 		Count:  0,
 		Cost:   5,
+		Image:  "/static/media/destroy_column.23caf4dcff16d50757e3.png",
 	}
 	flipClockwise := Types.Card{
 		UserID: account.UserID,
@@ -73,6 +76,7 @@ func createDefaultCards(account Types.Account) []Types.Card {
 		DeckID: "",
 		Count:  0,
 		Cost:   4,
+		Image:  "/static/media/rotate_grid.6a18f6243e59b2edf045.png",
 	}
 	cards := []Types.Card{rollAgain, doubleMana, destroyColumn, flipClockwise}
 	return cards

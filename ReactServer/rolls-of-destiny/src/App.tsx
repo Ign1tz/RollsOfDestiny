@@ -17,8 +17,8 @@ import Decks from "./pages/Decks";
 import LandingPage from "./pages/LandingPage";
 
 function App() {
-    let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> ()
+    let p: profile = {username: "Bernd", profilePicture: "testImage", rating:839}
+    const [loggedIn, setLoggedIn] = useState<boolean> (false)
     const [ingame, setIngame] = useState<boolean> (false)
     const [gameInfo, setGameInfo] = useState<string> ("")
     const [websocket, setWebsocket] = useState<WebSocket>()
@@ -43,6 +43,7 @@ function App() {
             })
         } else {
             setLoggedIn(tempLoggedIn === "true")
+            setFetched(true)
         }
     }, []);
 
@@ -57,7 +58,7 @@ function App() {
                 <Route path={"/game"} element={loggedIn ? <Game/> : <Login/>}/>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/signup" element={<SignUp/>}/>
-                <Route path="/rules" element={<Rules/>}/>
+                <Route path="/rules" element={<Rules loggedIn={loggedIn}/>}/>
                 <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
                 <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
                 <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
