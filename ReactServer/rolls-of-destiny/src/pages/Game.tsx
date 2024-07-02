@@ -253,11 +253,6 @@ export default function Game() {
                 height: '100%',
                 width: '100%'
             }}>
-                <div className="header">
-                    <Button variant="contained" onClick={togglePause}>
-                        Pause
-                    </Button>
-                </div>
                 <div className="content">
                     <Modal open={gameEnded}>
                         <div className="pauseMenu">
