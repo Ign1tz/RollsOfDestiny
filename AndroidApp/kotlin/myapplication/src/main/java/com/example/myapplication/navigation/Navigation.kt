@@ -34,10 +34,13 @@ fun Navigation() {
         }
 
         composable(route = Screen.GameScreen.route) {
+            gameViewModel.GameType.value = ""
+            gameViewModel.resetAllValues()
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
         composable(route = "game/bot") {
             gameViewModel.GameType.value = "bot"
+            gameViewModel.resetAllValues()
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
     }

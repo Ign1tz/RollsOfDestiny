@@ -51,6 +51,19 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
     private val IPADDRESS = "10.0.0.2"
 
+    fun resetAllValues () {
+        connected.value = false
+        WebSocketClient = null
+        WebsocketId.value = ""
+        gameInfo = null
+        endResults = null
+        isActive.value = false
+        hasRolled.value = false
+        pickedColumn.value = false
+        roll.value = false
+        started.value = false
+    }
+
 
     fun websocket(): WebSocketClient? {
         if (connected.value && started.value) {
