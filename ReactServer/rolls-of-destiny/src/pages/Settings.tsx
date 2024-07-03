@@ -127,7 +127,7 @@ export default function Settings({profile}: {profile:profile }) {
                     <div className="profilePicture">
                         <h2 id={"h2Text"}>Profile Picture</h2>
                         <h3 id={"h3Text"}>Your current Profile Picture:</h3>
-                        <img src={profile.profilePicture} alt={"profile picture current"}/>
+                        <img src={JSON.parse(sessionStorage.getItem("userInfo") || "").image} alt={"profile picture current"}/>
                         <h3 id={"h3Text"}>Upload a new picture</h3>
                         <h4>Coming soon...</h4>
                     </div>
@@ -139,7 +139,7 @@ export default function Settings({profile}: {profile:profile }) {
                     <div className="username">
                         <h2 id={"h2Text"}>Username</h2>
                         <h3 id={"h3Text"}>New Username</h3>
-                        <TextField id="filled-basic" label={profile.username} variant="filled"
+                        <TextField id="filled-basic" label={JSON.parse(sessionStorage.getItem("userInfo") || "").username} variant="filled"
                                    value={newUsername}
                                    onChange={(event) => setNewUsername(event.target.value)}/>
                         <br/>

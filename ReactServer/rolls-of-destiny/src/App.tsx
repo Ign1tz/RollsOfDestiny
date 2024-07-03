@@ -41,12 +41,12 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route index element={ loggedIn ? <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/> : <LandingPage loggedIn={loggedIn || false}/>}/>
-                    <Route path={"/profile"} element={<Profile user={p}/>}/>
+                    <Route path={"/profile"} element={<Profile/>}/>
                     <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn || false}/>}/>
                     <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn || false}/>}/>
                     <Route path={"/game" } element={loggedIn ? <Game/> : <Login/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/signup" element={<SignUp/>}/>
+                    <Route path="/login" element={!loggedIn ? <Login/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route path="/signup" element={!loggedIn ? <SignUp/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
                     <Route path="/rules" element={<Rules loggedIn={loggedIn || false}/>}/>
                     <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
                     <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
