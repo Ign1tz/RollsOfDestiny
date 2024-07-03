@@ -78,7 +78,7 @@ export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
 
     useEffect(() => {
         let username = sessionStorage.getItem("userInfo")
-        if (username != null) {
+        if (username != "" && username != null) {
             setUsername(JSON.parse(username).username || "")
 
         }
