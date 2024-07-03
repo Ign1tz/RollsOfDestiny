@@ -1,10 +1,10 @@
 package Types
 
 type NewDeckMessage struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type AddCard struct {
-	Name   string
-	Deckid string
+	Name   string `json:"name"`
+	Deckid string `json:"deckid"`
 }

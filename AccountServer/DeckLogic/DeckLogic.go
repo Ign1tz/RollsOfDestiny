@@ -45,7 +45,7 @@ func CreateNewDeck(name string, userid string) {
 
 func AddCardToDeck(cardInfos Types.AddCard, userid string) {
 
-	err := Database.UpdateCardDeckId(userid, cardInfos.Deckid)
+	err := Database.UpdateCardDeckId(cardInfos, userid)
 	if err != nil {
 		return
 	}

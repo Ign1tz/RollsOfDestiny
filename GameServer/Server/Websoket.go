@@ -1,7 +1,8 @@
 package Server
 
 import (
-	"RollsOfDestiny/GameServer/Database"
+	AccouuntDatabase "RollsOfDestiny/AccountServer/Database"
+	Database "RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/GameLogic"
 	"RollsOfDestiny/GameServer/Types"
 	"encoding/json"
@@ -129,7 +130,15 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 			log.Println(err)
 			return nil, nil
 		}
-		return handleGameEnded(playfield)
+		var surenderer Types.Player
+		if playfield.Host.WebsocketConnectionID == connectionId {
+			playfield.Host.Grid.Clear()
+			surenderer = playfield.Host
+		} else {
+			playfield.Guest.Grid.Clear()
+			surenderer = playfield.Guest
+		}
+		return handleGameEnded(playfield, true, surenderer)
 	case "playCard":
 		if position.CurrentStep == "afterRoll" || position.CurrentStep == "afterColumnPick" {
 			return GameLogic.HandleCards(message, position)
@@ -185,7 +194,7 @@ func handleEndTurn(message Types.WebsocketMessage) (map[string]string, map[strin
 	var guestMsg = make(map[string]string)
 	if gameEnded {
 		fmt.Println("game ended")
-		hostMsg, guestMsg = handleGameEnded(playfield)
+		hostMsg, guestMsg = handleGameEnded(playfield, false, Types.Player{})
 	} else {
 		hostMsg["id"] = playfield.Host.WebsocketConnectionID
 		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
@@ -256,27 +265,29 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 		}
 		playfield.Guest.Mana = min(max(playfield.Guest.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = false
-		handCards := 0
-		for cardIndex := range playfield.Guest.Deck.Cards {
-			if playfield.Guest.Deck.Cards[cardIndex].InHand {
-				handCards++
-			}
-		}
-		if handCards != 4 {
-			cards, err := Database.GetCardsByDeckID(playfield.Guest.Deck.DeckID)
-			if err != nil {
-				log.Println(err)
-				return nil, nil
-			}
-			cards = RandShuffle(cards)
-			for i := 0; i < 4-handCards; i++ {
-				if !cards[i].InHand {
-					cards[i].InHand = true
-				} else {
-					i--
+		if playfield.Guest.Deck.DeckID != "" {
+			handCards := 0
+			for cardIndex := range playfield.Guest.Deck.Cards {
+				if playfield.Guest.Deck.Cards[cardIndex].InHand {
+					handCards++
 				}
 			}
-			playfield.Guest.Deck.Cards = cards
+			if handCards != 4 {
+				cards, err := Database.GetCardsByDeckID(playfield.Guest.Deck.DeckID)
+				if err != nil {
+					log.Println(err)
+					return nil, nil
+				}
+				cards = RandShuffle(cards)
+				for i := 0; i < 4-handCards; i++ {
+					if !cards[i].InHand {
+						cards[i].InHand = true
+					} else {
+						i--
+					}
+				}
+				playfield.Guest.Deck.Cards = cards
+			}
 		}
 	} else {
 		log.Println("GUEST WAS ACTIVE")
@@ -291,27 +302,29 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 		}
 		playfield.Host.Mana = min(max(playfield.Host.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = true
-		handCards := 0
-		for cardIndex := range playfield.Host.Deck.Cards {
-			if playfield.Host.Deck.Cards[cardIndex].InHand {
-				handCards++
-			}
-		}
-		if handCards != 4 {
-			cards, err := Database.GetCardsByDeckID(playfield.Host.Deck.DeckID)
-			if err != nil {
-				log.Println(err)
-				return nil, nil
-			}
-			cards = RandShuffle(cards)
-			for i := 0; i < 4-handCards; i++ {
-				if !cards[i].InHand {
-					cards[i].InHand = true
-				} else {
-					i--
+		if playfield.Host.Deck.DeckID != "" {
+			handCards := 0
+			for cardIndex := range playfield.Host.Deck.Cards {
+				if playfield.Host.Deck.Cards[cardIndex].InHand {
+					handCards++
 				}
 			}
-			playfield.Host.Deck.Cards = cards
+			if handCards != 4 {
+				cards, err := Database.GetCardsByDeckID(playfield.Host.Deck.DeckID)
+				if err != nil {
+					log.Println(err)
+					return nil, nil
+				}
+				cards = RandShuffle(cards)
+				for i := 0; i < 4-handCards; i++ {
+					if !cards[i].InHand {
+						cards[i].InHand = true
+					} else {
+						i--
+					}
+				}
+				playfield.Host.Deck.Cards = cards
+			}
 		}
 
 	}
@@ -329,7 +342,7 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 	var guestMsg = make(map[string]string)
 	if gameEnded {
 		fmt.Println("game ended")
-		hostMsg, guestMsg = handleGameEnded(playfield)
+		hostMsg, guestMsg = handleGameEnded(playfield, false, Types.Player{})
 	} else {
 		hostMsg["id"] = playfield.Host.WebsocketConnectionID
 		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
@@ -344,13 +357,19 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 	return hostMsg, guestMsg
 }
 
-func handleGameEnded(playfield Types.Playfield) (map[string]string, map[string]string) {
+func handleGameEnded(playfield Types.Playfield, surrendered bool, surrenderer Types.Player) (map[string]string, map[string]string) {
 	var hostMsg = make(map[string]string)
 	var guestMsg = make(map[string]string)
 
 	hostWon := playfield.Host.Grid.Value() > playfield.Guest.Grid.Value()
 	guestWon := playfield.Host.Grid.Value() < playfield.Guest.Grid.Value()
 	tie := playfield.Host.Grid.Value() == playfield.Guest.Grid.Value()
+
+	if surrendered {
+		hostWon = surrenderer.UserID == playfield.Guest.UserID
+		guestWon = surrenderer.UserID == playfield.Host.UserID
+		tie = false
+	}
 
 	var hostWonMessage string
 	var guestWonMessage string
@@ -361,9 +380,13 @@ func handleGameEnded(playfield Types.Playfield) (map[string]string, map[string]s
 	} else if guestWon {
 		guestWonMessage = "You Won!"
 		hostWonMessage = "You Lost!"
+		AccouuntDatabase.UpdateRating(playfield.Host.UserID, -10)
+		AccouuntDatabase.UpdateRating(playfield.Guest.UserID, 10)
 	} else if hostWon {
 		hostWonMessage = "You Won!"
 		guestWonMessage = "You Lost!"
+		AccouuntDatabase.UpdateRating(playfield.Host.UserID, 10)
+		AccouuntDatabase.UpdateRating(playfield.Guest.UserID, -10)
 	}
 
 	hostMsg["id"] = playfield.Host.WebsocketConnectionID

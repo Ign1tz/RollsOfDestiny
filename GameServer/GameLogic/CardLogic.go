@@ -41,7 +41,7 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 			if playfield.ActivePlayer.Mana >= 4 {
 				playfield.LastRoll = playfield.ActivePlayer.Die.Throw()
 				Database.UpdateLastRollGames(playfield)
-				playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 3
+				playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 4
 			} else {
 				return nil, nil
 			}
@@ -56,7 +56,7 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 				position.GuestInfo = "doubleMana"
 			}
 			Database.UpdatePosition(position)
-			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 2
+			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 3
 		} else {
 			return nil, nil
 		}
@@ -73,7 +73,7 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 			Database.UpdateColumn(enemy.Grid.Left)
 			Database.UpdateColumn(enemy.Grid.Middle)
 			Database.UpdateColumn(enemy.Grid.Right)
-			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 4
+			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 6
 		} else {
 			return nil, nil
 		}
@@ -104,7 +104,7 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 					return nil, nil
 				}
 			}
-			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 5
+			playfield.ActivePlayer.Mana = playfield.ActivePlayer.Mana - 7
 		} else {
 			return nil, nil
 		}

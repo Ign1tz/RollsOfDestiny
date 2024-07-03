@@ -95,8 +95,7 @@ func InsertWholeGame(playfield Types.Playfield) error {
 		return err
 	}
 
-	log.Println(playfield.Host.Deck.DeckID)
-	log.Println(playfield.Guest.Deck.DeckID)
+	log.Println("deckId host", playfield.Host.Deck.DeckID)
 	if playfield.Host.Deck.DeckID != "" {
 		err = InsertDeck(playfield.Host.Deck)
 		if err != nil {
@@ -118,13 +117,16 @@ func InsertWholeGame(playfield Types.Playfield) error {
 		}
 		for cardIndex := range playfield.Guest.Deck.Cards {
 			if playfield.Guest.Deck.Cards[cardIndex].CardID != "" {
+				log.Println(playfield.Guest.Deck.Cards[cardIndex].DeckID)
 				err = InsertCard(playfield.Guest.Deck.Cards[cardIndex])
 				if err != nil {
+					log.Println("adsfaffasdfadfasfadsfdasssss", err)
 					return err
 				}
 			}
 		}
 	}
+	log.Println("deckId guest", playfield.Guest.Deck.DeckID)
 
 	game := Types.Game{
 		HostId:       playfield.Host.UserID,

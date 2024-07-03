@@ -109,13 +109,15 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			if err != nil {
 				log.Println("first Deck", err)
 			}
+			hostCards := []Types.Card{}
+			if hostDeckInfo.DeckID != "" {
+				hostCard, err := Database.GetCardsByDeckIDFromAccount(hostDeckInfo.DeckID)
+				if err != nil {
+					log.Println(err)
+				}
 
-			hostCardInfo, err := Database.GetCardsByDeckIDFromAccount(hostDeckInfo.DeckID)
-			if err != nil {
-				log.Println(err)
+				hostCards = createCards(hostCard, hostDeckInfo.DeckID)
 			}
-
-			hostCards := createCards(hostCardInfo, hostDeckInfo.DeckID)
 
 			hostDeck := Types.Deck{
 				DeckID: hostDeckInfo.DeckID,
@@ -130,12 +132,15 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 				log.Println("second Deck", err)
 			}
 
-			guestCardInfo, err := Database.GetCardsByDeckIDFromAccount(guestDeckInfo.DeckID)
-			if err != nil {
-				log.Println("secondCard", err)
-			}
+			guestCards := []Types.Card{}
+			if guestDeckInfo.DeckID != "" {
+				guestDeck, err := Database.GetCardsByDeckIDFromAccount(guestDeckInfo.DeckID)
+				if err != nil {
+					log.Println(err)
+				}
 
-			guestCards := createCards(guestCardInfo, guestDeckInfo.DeckID)
+				guestCards = createCards(guestDeck, guestDeckInfo.DeckID)
+			}
 
 			guestDeck := Types.Deck{
 				DeckID: guestDeckInfo.DeckID,
@@ -176,6 +181,9 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			}
 
 			err = Database.InsertWholeGame(playfield)
+			if err != nil {
+				log.Println(err)
+			}
 			position := Types.Position{
 				Gameid:      playfield.GameID,
 				CurrentStep: "started",
@@ -225,10 +233,11 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 		case "Roll Again":
 			for j := 0; j < 5; j++ {
 				cardCount += 1
+				log.Println("Card Count: ", cardCount)
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
-					Cost:    3,
+					Cost:    4,
 					Effect:  "rollAgain",
 					Picture: "/static/media/roll_again.21331c0ee525eb47281c.png",
 					DeckID:  deckid,
@@ -243,7 +252,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
-					Cost:    2,
+					Cost:    3,
 					Effect:  "doubleMana",
 					Picture: "/static/media/double_mana.7c47c6670f52b76c8fa6.png",
 					DeckID:  deckid,
@@ -257,7 +266,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
-					Cost:    5,
+					Cost:    7,
 					Effect:  "destroyColumn",
 					Picture: "/static/media/destroy_column.23caf4dcff16d50757e3.png",
 					DeckID:  deckid,
@@ -271,7 +280,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
-					Cost:    4,
+					Cost:    6,
 					Effect:  "flipClockwise",
 					Picture: "/static/media/rotate_grid.6a18f6243e59b2edf045.png",
 					DeckID:  deckid,

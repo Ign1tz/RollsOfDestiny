@@ -55,7 +55,7 @@ export default function Game() {
     };
 
     const [player1, setPlayer1] = useState<profile>({
-        username: "Lukas",
+        username: "",
         rating: 3450913,
         profilePicture: "testImage"
     })

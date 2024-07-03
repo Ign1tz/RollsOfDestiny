@@ -165,18 +165,18 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 
 	hostDeck, err := GetDeckByPlayerId(playfield.Host.UserID)
 	if err != nil {
-		return playfield, err
+		hostDeck = Types.Deck{}
 	}
 	playfield.Host.Deck = hostDeck
 
 	guestDeck, err := GetDeckByPlayerId(playfield.Guest.UserID)
 	if err != nil {
-		return playfield, err
+		guestDeck = Types.Deck{}
 	}
 	playfield.Guest.Deck = guestDeck
 	activeDeck, err := GetDeckByPlayerId(playfield.ActivePlayer.UserID)
 	if err != nil {
-		return playfield, err
+		activeDeck = Types.Deck{}
 	}
 	playfield.ActivePlayer.Deck = activeDeck
 

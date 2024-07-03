@@ -1,9 +1,17 @@
 package Database
 
-import "log"
+import (
+	"RollsOfDestiny/AccountServer/Types"
+	"log"
+)
 
 func UpdateUsername(username string, newUsername string) error {
 	_, err := Database.Exec("Update accounts set username = $1 where username = $2 ", newUsername, username)
+	return err
+}
+
+func UpdateRating(userid string, rating int) error {
+	_, err := Database.Exec("Update accounts set rating = rating + $1 where userid = $2 ", rating, userid)
 	return err
 }
 
@@ -12,8 +20,8 @@ func UpdatePassword(userid string, password string) error {
 	return err
 }
 
-func UpdateCardDeckId(userid string, deckid string) error {
-	_, err := Database.Exec("Update accountcards set deckids = concat(Select deckids from accountcards where userid = $1, ', ', $2) where userid = $1", userid, deckid)
+func UpdateCardDeckId(cardInfo Types.AddCard, userid string) error {
+	_, err := Database.Exec("Update accountcards set deckids = concat(Select deckids from accountcards where userid = $1 and name = $2, ', ', $3) where userid = $1 and name = $3", userid, cardInfo.Name, cardInfo.Deckid)
 	return err
 }
 
