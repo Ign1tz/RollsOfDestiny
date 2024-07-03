@@ -40,9 +40,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
         if (playOpened) {
             return (
                 <>
-                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
-                                           playOpened={playOpened}
-                                           />
+                    <HomeScreenButtonGroup/>
                 </>
             );
         } else {
@@ -69,7 +67,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
                         <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
                     </div>
                     <div className="homeButtons">
-                        {visibleButtons()}
+                        <HomeScreenButtonGroup/>
                     </div>
                 </div>
             </div>

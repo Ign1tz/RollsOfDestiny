@@ -96,8 +96,24 @@ export default function Decks() {
 
     const addCardToDeck = (card: CardType) => {
         cardsForNewDeck.push(card)
-        console.log(cardsForNewDeck)
         setCardsForNewDeck(cardsForNewDeck)
+
+        fetch("http://localhost:9090/addCardToDeck", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({name: card.name, deckId: clickedDeck.deckid})
+        }).then(r => {
+            if (r.status === 200) {
+                return r.json()
+            } else {
+                // Error handling
+            }
+        })
+
+
     }
 
     const handleError = () => {
@@ -138,7 +154,6 @@ export default function Decks() {
             setIsError(true)
         }
     }
-
 
     function submitDeckCreation(deck: Deck) {
         console.log("submit new deck clicked")
@@ -197,6 +212,19 @@ export default function Decks() {
                         <h3>{clickedDeck.name}</h3>
                         <Button variant={"contained"} color={"error"} onClick={closeDeckMenu}>Close</Button>
                     </div>
+
+                    <div className={"chooseCardsMenu"}>
+                        {cards.map((card) => (
+                            <div className={"specificCardInCreatDeckMenu"}>
+                                <h3>{card.name}</h3>
+                                <img id="cardImages" src={card.image} alt={"card image"}/>
+                                <Button onClick={() => addCardToDeck(card)} variant={"contained"}
+                                        color={"secondary"} style={{marginTop: "20px"}}>Add to Deck</Button>
+                            </div>
+                        ))}
+
+                    </div>
+                    {/*
                     <div className={"specificDeckCards"}>
                         {clickedDeck.cards.map((card) => (
                             <div className={"specificCardInCreatDeckMenu"}>
@@ -206,6 +234,8 @@ export default function Decks() {
                             </div>
                         ))}
                     </div>
+                     */}
+
                 </div>
             </Modal>
             <Modal open={createDeckButtonClicked} onClose={closeCreateDeckMenu}>
@@ -216,19 +246,6 @@ export default function Decks() {
                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                        setNewDeckName(event.target.value);
                                    }}/>
-                        <Button variant={"contained"} color={"error"} onClick={closeCreateDeckMenu}>Exit</Button>
-                    </div>
-                    <div className={"chooseCardsMenu"}>
-                        {cards.map((card) => (
-                            <div className={"specificCardInCreatDeckMenu"}>
-                                <h3>{card.name}</h3>
-                                <img id="cardImages" src={card.image} alt={"card image"}/>
-                                <Button onClick={() => addCardToDeck(card)} variant={"contained"}
-                                        color={"secondary"} style={{marginTop: "20px"}}>Add to Deck</Button>
-                            </div>
-                        ))}
-                    </div>
-                    <div className={"confirmButtonCreateDeckMenu"}>
                         <Button variant={"contained"} color={"success"} onClick={() => submitDeckCreation({
                             name: newDeckName,
                             deckid: "10",

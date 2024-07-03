@@ -362,7 +362,6 @@ export default function Game() {
                         <div className="playerActions">
                             <div className="diceWrapper">
                                 <Dice onRoll={(value) => {
-                                    websocket.send(JSON.stringify({type: "rolled", messageBody: "", gameId: gameId}))
                                     console.log(value);
                                     setRolled(true)
                                 }} defaultValue={6} size={100}

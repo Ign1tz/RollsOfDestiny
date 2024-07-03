@@ -66,6 +66,13 @@ export default function TopAppBar({loggedIn}: { loggedIn: boolean }) {
             case "Landing Page":
                 window.location.href = "/landingpage"
                 break;
+            case "Logout":
+                localStorage.setItem("access_token", "")
+                sessionStorage.setItem("userInfo", "")
+                sessionStorage.setItem("gameInfo", "")
+                sessionStorage.setItem("GameType", "")
+                sessionStorage.setItem("loggedIn", "false")
+                window.location.href = "/"
         }
     }
 

@@ -23,6 +23,7 @@ function App() {
     const [gameInfo, setGameInfo] = useState<string> ("")
     const [websocket, setWebsocket] = useState<WebSocket>()
     const [fetched, setFetched] = useState<boolean> (false)
+
     useEffect(() => {
         const tempLoggedIn = sessionStorage.getItem("loggedIn")
         if (localStorage.getItem("access_token") && tempLoggedIn !== "true") {
@@ -49,21 +50,23 @@ function App() {
 
     return (
     <>
-        { (typeof loggedIn).toString() !== "undefined" && fetched && <BrowserRouter>
-            <Routes>
-                <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
-                <Route path={"/profile"} element={<Profile user={p}/>}/>
-                <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>
-                <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn}/>}/>
-                <Route path={"/game"} element={loggedIn ? <Game/> : <Login/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/signup" element={<SignUp/>}/>
-                <Route path="/rules" element={<Rules loggedIn={loggedIn}/>}/>
-                <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
-                <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
-                <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
-            </Routes>
-        </BrowserRouter>}
+        { fetched && (typeof loggedIn).toString() !== "undefined" &&
+            <BrowserRouter>
+                <Routes>
+                    <Route index element={ loggedIn ? <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/> : <LandingPage loggedIn={loggedIn || false}/>}/>
+                    <Route path={"/profile"} element={<Profile/>}/>
+                    <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn || false}/>}/>
+                    <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn || false}/>}/>
+                    <Route path={"/game" } element={loggedIn ? <Game/> : <Login/>}/>
+                    <Route path="/login" element={!loggedIn ? <Login/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route path="/signup" element={!loggedIn ? <SignUp/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route path="/rules" element={<Rules loggedIn={loggedIn || false}/>}/>
+                    <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
+                    <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
+                    <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
+                </Routes>
+            </BrowserRouter>
+        }
     </>
   );
 }
