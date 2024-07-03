@@ -41,6 +41,7 @@ function App() {
             })
         } else {
             setLoggedIn(tempLoggedIn === "true")
+            setFetched(true)
         }
     }, []);
 

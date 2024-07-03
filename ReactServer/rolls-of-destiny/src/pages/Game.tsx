@@ -365,7 +365,7 @@ export default function Game() {
                                     <p>Rating: {player2.rating}</p>
                                 </div>
                                 <div className="score">
-                                    <p>Score: <span id="player2Score">{player2Score}</span></p>
+                                    <p>Score: <span id="player2Score">{yourInfo?.Score || 0}</span></p>
                                 </div>
                             </div>
                             <div className={"playerOwnCards"}>

@@ -231,9 +231,6 @@ export default function Decks() {
                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                        setNewDeckName(event.target.value);
                                    }}/>
-                        <Button variant={"contained"} color={"error"} onClick={closeCreateDeckMenu}>Exit</Button>
-                    </div>
-                    <div className={"confirmButtonCreateDeckMenu"}>
                         <Button variant={"contained"} color={"success"} onClick={() => submitDeckCreation({
                             name: newDeckName,
                             numberOfCards: 0,
