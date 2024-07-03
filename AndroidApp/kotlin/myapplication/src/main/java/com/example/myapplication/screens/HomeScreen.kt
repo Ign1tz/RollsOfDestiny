@@ -10,10 +10,13 @@ import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.widgets.UpButton
+import kotlin.math.log
 
 
 @Composable
