@@ -12,13 +12,16 @@ interface dao {
     @Insert
     fun Insert (user: User)
 
-    @Delete
-    fun Delete (user: User)
+    @Query("Delete from user")
+    fun Delete ()
 
     @Update
     fun Update (user: User)
 
     @Query("Select * from user")
     fun getUser (): User
+
+    @Query("SELECT (SELECT COUNT(*) FROM user) == 0")
+    fun isEmpty(): Boolean
 
 }
