@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -33,25 +35,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun HeaderTopBar (navController: NavController, icon: String) {
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
     Column {
         CenterAlignedTopAppBar(
             modifier = Modifier
                 .fillMaxWidth(),
             title = {},
-            navigationIcon = { TopButton(navController, icon) },
-            actions = {
-                if (navController.currentDestination?.route != "login") {
-                    IconButton(onClick = { scope.launch { drawerState.open()} }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Friendlist"
-                        )
-                    }
-                }
-            }
+            navigationIcon = { TopButton(navController, icon) }
         )
         TitleTopBar()
     }

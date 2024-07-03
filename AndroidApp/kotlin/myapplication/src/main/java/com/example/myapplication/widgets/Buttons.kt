@@ -33,24 +33,6 @@ fun LoginButton (viewModel: LoginViewModel) {
 
 
 @Composable
-fun RegisterButton () {
-    Button(
-        modifier = Modifier.size(130.dp,50.dp),
-        onClick = {  },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black
-        )
-    ) {
-        Text("Register",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Serif
-        )
-    }
-}
-
-
-@Composable
 fun TopButton (navController: NavController, icon: String) {
     Button(
         modifier = Modifier
@@ -61,26 +43,6 @@ fun TopButton (navController: NavController, icon: String) {
         onClick = { navController.popBackStack() }
     ) {
         Text(icon,
-            color = Color.White,
-            fontSize = 25.sp,
-            fontFamily = FontFamily.Serif,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
-    }
-}
-
-@Composable
-fun UpButton () {
-    Button(
-        modifier = Modifier
-            .size(50.dp,50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black),
-        shape = RoundedCornerShape(10.dp),
-        onClick = {}
-    ) {
-        Text("<",
             color = Color.White,
             fontSize = 25.sp,
             fontFamily = FontFamily.Serif,
