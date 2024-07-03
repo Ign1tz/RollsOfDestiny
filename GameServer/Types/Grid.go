@@ -39,7 +39,7 @@ func (g Grid) PrettyPrint() {
 }
 
 func (g *Grid) FlipClocwise() {
-	tempGrid := g
+	tempGrid := *g
 	g.Left.First = tempGrid.Left.Third
 	g.Left.Second = tempGrid.Middle.Third
 	g.Left.Third = tempGrid.Right.Third
@@ -48,4 +48,20 @@ func (g *Grid) FlipClocwise() {
 	g.Right.First = tempGrid.Left.First
 	g.Right.Second = tempGrid.Middle.First
 	g.Right.Third = tempGrid.Right.First
+	g.Left.shift()
+	g.Middle.shift()
+	g.Right.shift()
+}
+
+func (g *Grid) CheckGridForOverlap(grid Grid) Grid {
+	grid.Left.Remove(g.Left.First)
+	grid.Left.Remove(g.Left.Second)
+	grid.Left.Remove(g.Left.Third)
+	grid.Middle.Remove(g.Middle.First)
+	grid.Middle.Remove(g.Middle.Second)
+	grid.Middle.Remove(g.Middle.Third)
+	grid.Right.Remove(g.Right.First)
+	grid.Right.Remove(g.Right.Second)
+	grid.Right.Remove(g.Right.Third)
+	return grid
 }

@@ -9,13 +9,11 @@ import React, {useEffect, useState} from "react";
 import background_music from "../soundtracks/background_music.mp3";
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
-import testImage from "../images/1.png";
-import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
+import {activePlayer, card, endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 import VolumeSlider from "../components/VolumeSlider";
 import destroyColumnCard from "../cards/destroy_column.png"
 import doubleManaCard from "../cards/double_mana.png"
 import rollAgainCard from "../cards/roll_again.png"
-import rotateGridCard from "../cards/rotate_grid.png"
 
 
 export default function Game() {
@@ -48,7 +46,7 @@ export default function Game() {
     };
 
     const handleQuit = () => {
-        websocket.send(JSON.stringify({type:"surrender", message: {}, gameId: gameId}))
+        websocket.send(JSON.stringify({type: "surrender", message: {}, gameId: gameId}))
         window.location.href = "/";
     };
 
@@ -116,7 +114,7 @@ export default function Game() {
             if (message.info == "connected") {
                 console.log("connected")
                 setConnected(true)
-                websocket.send(JSON.stringify({type: "id"}))
+                websocket.send(JSON.stringify({type: "id", message: "", gameId: ""}))
             } else if (message.info == "id") {
                 console.log("id:", message.message.id)
                 setWebsocketId(message.message.id)
@@ -134,16 +132,24 @@ export default function Game() {
                 setGameInfo(message.message.gameInfo)
                 setGameEnded(true)
                 setEndResults(message.message.endResults)
+            } else if (message.info === "rollAgain") {
+                let newActivePlayer: activePlayer = {active: message.message.active, roll: message.message.roll}
+                setGameInfo(prev => ({...prev, ActivePlayer: newActivePlayer}))
+                setRolled(false)
             }
         }
     }
 
     const handleColumnClick = (key: number) => {
         console.log("handleColumnClicK", connected)
-        if (websocket && connected && gameInfo){
+        if (websocket && connected && gameInfo) {
             console.log(gameId)
             setPlaced(true)
-            websocket.send(JSON.stringify({type: sessionStorage.getItem("GameType") + "PickColumn", messageBody: key.toString(), gameId: gameId}))
+            websocket.send(JSON.stringify({
+                type: sessionStorage.getItem("GameType") + "PickColumn",
+                messageBody: key.toString(),
+                gameId: gameId
+            }))
         }
     };
 
@@ -158,7 +164,9 @@ export default function Game() {
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId, username: JSON.parse(userinfo).username
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username
                 })
             });
         } else {
@@ -235,9 +243,18 @@ export default function Game() {
     };
 
     let cards: CardType[] = [
-        {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
+        {
+            name: "Destroy Column",
+            mana: 7,
+            image: destroyColumnCard,
+            description: "Destroy a column from your opponent."
+        },
         {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."}
     ];
+
+    function playCard(card: card) {
+        websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId}))
+    }
 
     return (
         <>
@@ -245,7 +262,7 @@ export default function Game() {
                 src={background_music}
                 autoPlay={true}
                 loop={true}
-                volume={volume/100}
+                volume={volume / 100}
             />
             <div className="gameDivision" style={{
                 backgroundImage: `url(${background})`,
@@ -307,9 +324,10 @@ export default function Game() {
                         <div className="playerInfoOpp">
                             <div className="score">
                                 <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
+                                <h3>Mana : {enemyInfo?.mana || "0"}</h3>
                             </div>
                             <div className="playerInfoUsernameRating">
-                                <h2>{player1.username}</h2>
+                            <h2>{player1.username}</h2>
                                 <p>Rating: {player1.rating}</p>
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
@@ -344,6 +362,7 @@ export default function Game() {
                         <div className="playerActions">
                             <div className="diceWrapper">
                                 <Dice onRoll={(value) => {
+                                    websocket.send(JSON.stringify({type: "rolled", messageBody: "", gameId: gameId}))
                                     console.log(value);
                                     setRolled(true)
                                 }} defaultValue={6} size={100}
@@ -369,12 +388,17 @@ export default function Game() {
                                 <p>Rating: {player2.rating}</p>
                             </div>
                             <div className="score">
+                                <h3>Mana : {yourInfo?.mana || "0"}</h3>
                                 <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
                             </div>
                         </div>
                         <div className={"playerOwnCards"}>
                             {(typeof yourInfo).toString() != null && yourInfo?.deck.inHand.map((card) => (
-                                <div className={"specificPlayerCard"}>
+                                <div className={"specificPlayerCard"} onClick={() => {
+                                    if ((gameInfo.ActivePlayer ? gameInfo?.ActivePlayer.active : false)) {
+                                        playCard(card)
+                                    }
+                                }}>
                                     <img src={card.picture} alt={"card image"}/>
                                 </div>
                             ))}

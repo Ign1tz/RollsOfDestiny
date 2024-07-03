@@ -103,7 +103,6 @@ func InsertWholeGame(playfield Types.Playfield) error {
 			return err
 		}
 		for cardIndex := range playfield.Host.Deck.Cards {
-			log.Println("host", playfield.Host.Deck.Cards[cardIndex].CardID)
 			if playfield.Host.Deck.Cards[cardIndex].CardID != "" {
 				err = InsertCard(playfield.Host.Deck.Cards[cardIndex])
 				if err != nil {
@@ -118,7 +117,6 @@ func InsertWholeGame(playfield Types.Playfield) error {
 			return err
 		}
 		for cardIndex := range playfield.Guest.Deck.Cards {
-			log.Println("Guest", playfield.Guest.Deck.Cards[cardIndex].CardID)
 			if playfield.Guest.Deck.Cards[cardIndex].CardID != "" {
 				err = InsertCard(playfield.Guest.Deck.Cards[cardIndex])
 				if err != nil {
@@ -139,5 +137,11 @@ func InsertWholeGame(playfield Types.Playfield) error {
 	}
 
 	err = InsertGame(game)
+	return err
+}
+
+func InsertPosition(position Types.Position) error {
+	_, err := Database.Exec("INSERT INTO position VALUES ($1, $2, $3, $4)",
+		position.Gameid, position.CurrentStep, position.HostInfo, position.GuestInfo)
 	return err
 }

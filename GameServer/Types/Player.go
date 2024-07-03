@@ -44,7 +44,7 @@ func (p Player) ToJson(extraInfo bool) string {
 	} else {
 		extra = `, "deck": ` + handleDeckToStringEnemy(p.Deck)
 	}
-	message := `{ "WebsocketId": "` + p.WebsocketConnectionID + `", "Username": "` + p.Username + `", "Score": ` + strconv.Itoa(p.Grid.Value()) + `, "LeftColumn": { "First": "` + strconv.Itoa(p.Grid.Left.First) + `", "Second": "` + strconv.Itoa(p.Grid.Left.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Left.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Left.IsFull()) + `}, "MiddleColumn": { "First": "` + strconv.Itoa(p.Grid.Middle.First) + `", "Second": "` + strconv.Itoa(p.Grid.Middle.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Middle.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Middle.IsFull()) + `}, "RightColumn": { "First": "` + strconv.Itoa(p.Grid.Right.First) + `", "Second": "` + strconv.Itoa(p.Grid.Right.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Right.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Right.IsFull()) + `}` + extra + `}`
+	message := `{ "WebsocketId": "` + p.WebsocketConnectionID + `", "Username": "` + p.Username + `", "mana": "` + strconv.Itoa(p.Mana) + `", "Score": ` + strconv.Itoa(p.Grid.Value()) + `, "LeftColumn": { "First": "` + strconv.Itoa(p.Grid.Left.First) + `", "Second": "` + strconv.Itoa(p.Grid.Left.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Left.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Left.IsFull()) + `}, "MiddleColumn": { "First": "` + strconv.Itoa(p.Grid.Middle.First) + `", "Second": "` + strconv.Itoa(p.Grid.Middle.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Middle.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Middle.IsFull()) + `}, "RightColumn": { "First": "` + strconv.Itoa(p.Grid.Right.First) + `", "Second": "` + strconv.Itoa(p.Grid.Right.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Right.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Right.IsFull()) + `}` + extra + `}`
 	return message
 }
 
@@ -59,7 +59,7 @@ func handleDeckToString(deck Deck) string {
 				cardsLeft += 1
 			}
 			if deck.Cards[cardIndex].InHand {
-				cardsInHand = fmt.Sprintf(`%s, {"name": "%s", "cost": %s, "picture": "%s", "effect": "%s"}`, cardsInHand, deck.Cards[cardIndex].Name, strconv.Itoa(deck.Cards[cardIndex].Cost), deck.Cards[cardIndex].Picture, deck.Cards[cardIndex].Effect)
+				cardsInHand = fmt.Sprintf(`%s, {"name": "%s", "cost": %s, "picture": "%s", "effect": "%s", "cardid": "%s"}`, cardsInHand, deck.Cards[cardIndex].Name, strconv.Itoa(deck.Cards[cardIndex].Cost), deck.Cards[cardIndex].Picture, deck.Cards[cardIndex].Effect, deck.Cards[cardIndex].CardID)
 			}
 		}
 	}

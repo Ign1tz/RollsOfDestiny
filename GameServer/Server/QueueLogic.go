@@ -148,7 +148,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			host := Types.Player{
 				Username:              player.Username,
 				UserID:                player.UserId,
-				Mana:                  0,
+				Mana:                  2,
 				Deck:                  hostDeck,
 				Die:                   Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}},
 				WebsocketConnectionID: player.WebsocketConnectionId,
@@ -157,7 +157,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			guest := Types.Player{
 				Username:              queueEntry.Username,
 				UserID:                queueEntry.UserId,
-				Mana:                  0,
+				Mana:                  2,
 				Deck:                  guestDeck,
 				Die:                   Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}},
 				WebsocketConnectionID: queueEntry.WebsocketConnectionId,
@@ -176,6 +176,13 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			}
 
 			err = Database.InsertWholeGame(playfield)
+			position := Types.Position{
+				Gameid:      playfield.GameID,
+				CurrentStep: "started",
+				HostInfo:    "",
+				GuestInfo:   "",
+			}
+			err = Database.InsertPosition(position)
 			if err != nil {
 				Database.DeleteGame(hostGrid.GridId)
 				Database.DeleteGame(guestGrid.GridId)
@@ -275,7 +282,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 		}
 	}
 
-	cards = randShuffle(cards)
+	cards = RandShuffle(cards)
 
 	cards[0].InHand = true
 	cards[1].InHand = true
@@ -285,7 +292,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 	return cards
 }
 
-func randShuffle(a []Types.Card) []Types.Card {
+func RandShuffle(a []Types.Card) []Types.Card {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
 	return a

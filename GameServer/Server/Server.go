@@ -157,12 +157,16 @@ func Server() {
 			case newC := <-c:
 				somekindofstorrage[strings.Split(newC.RemoteAddr().String(), ":")[len(strings.Split(newC.RemoteAddr().String(), ":"))-1]] = newC
 			case msg := <-c2:
-				fmt.Println("s", msg["id"])
-				fmt.Println("s", msg["message"])
-				err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
-				if err != nil {
-					log.Println(err)
-
+				if msg != nil && somekindofstorrage[msg["id"]] != nil {
+					fmt.Println("s", msg["id"])
+					fmt.Println("s", msg["message"])
+					err := somekindofstorrage[msg["id"]].WriteMessage(1, []byte(msg["message"]))
+					if err != nil {
+						log.Println(err)
+						_ = err
+					}
+				} else {
+					log.Println("message or storrage is empty")
 				}
 			}
 		}

@@ -184,6 +184,8 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 }
 
 func GetPlayfieldByUserid(userid string) (Types.Playfield, error) {
+
+	log.Println("test", userid)
 	dbGame := Database.QueryRow("Select * from games where host = $1 or guest = $1", userid)
 	var game Types.Game
 	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
@@ -265,4 +267,40 @@ func GetCardsByDeckIDFromAccount(deckID string) ([]string, error) {
 		id++
 	}
 	return cardNames, err
+}
+
+func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from cards where deckid = $1 and played = 'false'", deckID)
+	if err != nil {
+		return []Types.Card{}, err
+	}
+	var cards = make([]Types.Card, 20)
+	id := 0
+	for dbCards.Next() {
+		if err := dbCards.Scan(&cards[id].Name, &cards[id].Cost, &cards[id].Effect, &cards[id].Picture, &cards[id].CardID, &cards[id].DeckID, &cards[id].Played, &cards[id].InHand); err != nil {
+			return []Types.Card{}, err
+		}
+		id++
+	}
+	return cards, err
+}
+
+func GetCardById(cardId string) (Types.Card, error) {
+	dbDeck := Database.QueryRow("Select * from cards where cardid = $1", cardId)
+	var tempCard Types.Card
+	if err := dbDeck.Scan(&tempCard.Name, &tempCard.Cost, &tempCard.Effect, &tempCard.Picture, &tempCard.CardID, &tempCard.DeckID, &tempCard.Played, &tempCard.InHand); err != nil {
+		return Types.Card{}, err
+	}
+
+	return tempCard, nil
+}
+
+func GetPosition(gameid string) (Types.Position, error) {
+	dbDeck := Database.QueryRow("Select * from position where gameid = $1", gameid)
+	var tempCard Types.Position
+	if err := dbDeck.Scan(&tempCard.Gameid, &tempCard.CurrentStep, &tempCard.HostInfo, &tempCard.GuestInfo); err != nil {
+		return Types.Position{}, err
+	}
+
+	return tempCard, nil
 }

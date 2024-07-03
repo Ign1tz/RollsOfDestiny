@@ -17,12 +17,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-type websocketMessage struct {
-	Type        string `json:"type"`
-	MessageBody string `json:"messageBody"`
-	GameId      string `json:"gameId"`
-}
-
 func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	conn.WriteMessage(1, []byte(`{"info": "connected", "message": {"connected": "true"}}`))
 	connectionID := strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]
@@ -37,19 +31,10 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 			log.Println(err)
 			return
 		}
-		/*
-			if string(p) == "id" {
-				log.Println(string(p))
-				conn.WriteMessage(1, []byte("id:"+strings.Split(conn.RemoteAddr().String(), ":")[len(strings.Split(conn.RemoteAddr().String(), ":"))-1]))
-			}
 
-			var msg = make(map[string]string)
-			msg["id"] = connectionID
-			msg["message"] = string(conn.RemoteAddr().String())*/
+		log.Println("incoming message", string(p))
 
-		log.Println(string(p))
-
-		var message websocketMessage
+		var message Types.WebsocketMessage
 
 		err = json.Unmarshal(p, &message)
 		if err != nil {
@@ -57,7 +42,7 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 			log.Println(string(p))
 			return
 		}
-		log.Println(message.Type)
+		log.Println(connectionID)
 		if message.Type == "botPickColumn" {
 			ended := GameLogic.BotTurn(
 				Types.Resp{Gameid: message.GameId, ColumnKey: message.MessageBody})
@@ -101,8 +86,9 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 				*c2 <- hostMsg
 			}
 		} else {
-
+			log.Println("before message Categorization")
 			msg, msg2 := categorizeMessage(message, connectionID)
+			log.Println(msg["id"])
 			*c2 <- msg
 			if msg2 != nil {
 				*c2 <- msg2
@@ -113,14 +99,30 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	}
 }
 
-func categorizeMessage(message websocketMessage, connectionId string) (map[string]string, map[string]string) {
+func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map[string]string, map[string]string) {
+
 	var msg = make(map[string]string)
-	switch message.Type {
-	case "id":
+	if message.Type == "id" {
 		msg["id"] = connectionId
 		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
+		log.Println("id: ", msg["id"], msg)
+		return msg, nil
+	}
+	position, err := Database.GetPosition(message.GameId)
+	if err != nil {
+		log.Println("position", err)
+		return nil, nil
+	}
+	log.Println("messageType", message.Type)
+	switch message.Type {
 	case "PickColumn":
-		return handlePickedColumn(message)
+		if position.CurrentStep == "afterRoll" {
+			msg1, msg2 := handlePickedColumn(message)
+			position.CurrentStep = "afterColumnPick"
+			return msg1, msg2
+		} else {
+			return nil, nil
+		}
 	case "surrender":
 		playfield, err := Database.GetPlayfield(message.GameId)
 		if err != nil {
@@ -128,25 +130,96 @@ func categorizeMessage(message websocketMessage, connectionId string) (map[strin
 			return nil, nil
 		}
 		return handleGameEnded(playfield)
+	case "playCard":
+		if position.CurrentStep == "afterRoll" || position.CurrentStep == "afterColumnPick" {
+			return GameLogic.HandleCards(message, position)
+		} else {
+			return nil, nil
+		}
+	case "endTurn":
+		if position.CurrentStep == "afterColumnPick" {
+			msg1, msg2 := handleEndTurn(message)
+			position.CurrentStep = "start"
+			return msg1, msg2
+
+		} else {
+			return nil, nil
+		}
+	case "rolled":
+		position.CurrentStep = "afterRoll"
+		log.Println("rolled")
+		err := Database.UpdatePosition(position)
+		if err != nil {
+			log.Println(err)
+			return nil, nil
+		}
+		return nil, nil
 	}
 	return msg, nil
 }
 
-func handlePickedColumn(message websocketMessage) (map[string]string, map[string]string) {
+func handleEndTurn(message Types.WebsocketMessage) (map[string]string, map[string]string) {
 	playfield, err := Database.GetPlayfield(message.GameId)
+	if err != nil {
+		panic(err)
+	}
+
+	var hostIsActive bool
+	if playfield.ActivePlayer.UserID == playfield.Host.UserID {
+		hostIsActive = false
+	} else {
+		hostIsActive = true
+	}
+
+	gameEnded := playfield.ActivePlayer.Grid.IsFull()
+	playfield.ActivePlayer = playfield.EnemyPlayer()
+
+	playfield.LastRoll = playfield.Host.Die.Throw()
+
+	Database.UpdateActivePlayerGames(playfield)
+	Database.UpdateLastRollGames(playfield)
+
+	fmt.Println(playfield.Host.Grid.Left.First)
+
+	var hostMsg = make(map[string]string)
+	var guestMsg = make(map[string]string)
+	if gameEnded {
+		fmt.Println("game ended")
+		hostMsg, guestMsg = handleGameEnded(playfield)
+	} else {
+		hostMsg["id"] = playfield.Host.WebsocketConnectionID
+		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+		infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+		hostMsg["message"] = infoMessage
+
+		guestMsg["id"] = playfield.Guest.WebsocketConnectionID
+		newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(!hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+		infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+		guestMsg["message"] = infoMessage
+	}
+	return hostMsg, guestMsg
+}
+
+func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[string]string) {
+	playfield, err := Database.GetPlayfield(message.GameId)
+	if err != nil {
+		panic(err)
+	}
+	position, err := Database.GetPosition(message.GameId)
 	if err != nil {
 		panic(err)
 	}
 
 	enemy := playfield.EnemyPlayer()
 	columnInt, _ := strconv.Atoi(playfield.LastRoll)
+	numberOfRemoved := 0
 	switch message.MessageBody {
 	case "0":
 		err := playfield.ActivePlayer.Grid.Left.Add(columnInt)
 		if err != nil {
 			panic(err)
 		}
-		enemy.Grid.Left.Remove(columnInt)
+		numberOfRemoved = enemy.Grid.Left.Remove(columnInt)
 		Database.UpdateColumn(playfield.ActivePlayer.Grid.Left)
 		Database.UpdateColumn(enemy.Grid.Left)
 	case "1":
@@ -154,7 +227,7 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 		if err != nil {
 			panic(err)
 		}
-		enemy.Grid.Middle.Remove(columnInt)
+		numberOfRemoved = enemy.Grid.Middle.Remove(columnInt)
 		fmt.Println("websocket placement", playfield.ActivePlayer.Grid.Middle.Placement)
 		Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
 		Database.UpdateColumn(enemy.Grid.Middle)
@@ -163,7 +236,7 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 		if err != nil {
 			panic(err)
 		}
-		enemy.Grid.Right.Remove(columnInt)
+		numberOfRemoved = enemy.Grid.Right.Remove(columnInt)
 		Database.UpdateColumn(playfield.ActivePlayer.Grid.Right)
 		Database.UpdateColumn(enemy.Grid.Right)
 	default:
@@ -174,18 +247,79 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 		log.Println("HOST WAS ACTIVE")
 		playfield.Host = playfield.ActivePlayer
 		playfield.Guest = enemy
+		addMana := 1
+		if position.GuestInfo == "doubleMana" {
+			addMana = 2
+			numberOfRemoved *= 2
+			position.GuestInfo = ""
+			Database.UpdatePosition(position)
+		}
+		playfield.Guest.Mana = min(max(playfield.Guest.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = false
+		handCards := 0
+		for cardIndex := range playfield.Guest.Deck.Cards {
+			if playfield.Guest.Deck.Cards[cardIndex].InHand {
+				handCards++
+			}
+		}
+		if handCards != 4 {
+			cards, err := Database.GetCardsByDeckID(playfield.Guest.Deck.DeckID)
+			if err != nil {
+				log.Println(err)
+				return nil, nil
+			}
+			cards = RandShuffle(cards)
+			for i := 0; i < 4-handCards; i++ {
+				if !cards[i].InHand {
+					cards[i].InHand = true
+				} else {
+					i--
+				}
+			}
+			playfield.Guest.Deck.Cards = cards
+		}
 	} else {
 		log.Println("GUEST WAS ACTIVE")
 		playfield.Guest = playfield.ActivePlayer
 		playfield.Host = enemy
+		addMana := 1
+		if position.HostInfo == "doubleMana" {
+			addMana = 2
+			numberOfRemoved *= 2
+			position.HostInfo = ""
+			Database.UpdatePosition(position)
+		}
+		playfield.Host.Mana = min(max(playfield.Host.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = true
+		handCards := 0
+		for cardIndex := range playfield.Host.Deck.Cards {
+			if playfield.Host.Deck.Cards[cardIndex].InHand {
+				handCards++
+			}
+		}
+		if handCards != 4 {
+			cards, err := Database.GetCardsByDeckID(playfield.Host.Deck.DeckID)
+			if err != nil {
+				log.Println(err)
+				return nil, nil
+			}
+			cards = RandShuffle(cards)
+			for i := 0; i < 4-handCards; i++ {
+				if !cards[i].InHand {
+					cards[i].InHand = true
+				} else {
+					i--
+				}
+			}
+			playfield.Host.Deck.Cards = cards
+		}
+
 	}
 	gameEnded := playfield.ActivePlayer.Grid.IsFull()
 	playfield.ActivePlayer = playfield.EnemyPlayer()
-
 	playfield.LastRoll = playfield.Host.Die.Throw()
 
+	Database.UpdatePlayerMana(playfield.ActivePlayer)
 	Database.UpdateActivePlayerGames(playfield)
 	Database.UpdateLastRollGames(playfield)
 
