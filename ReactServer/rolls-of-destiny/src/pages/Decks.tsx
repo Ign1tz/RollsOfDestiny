@@ -45,7 +45,7 @@ export default function Decks() {
 
     let cards: CardType[] = [
         {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
-        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."},
+        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana. For one round."},
         {name: "Roll again", mana: 7, image: rollAgainCard, description: "Your throwed die is destroyed. Roll again."},
         {name: "Rotate Grid", mana: 5, image: rotateGridCard, description: "Flip board by 90° clockwise."}
     ];
@@ -82,16 +82,25 @@ export default function Decks() {
 
     const addCardToDeck = (card: CardType) => {
         cardsForNewDeck.push(card)
-        console.log(cardsForNewDeck)
         setCardsForNewDeck(cardsForNewDeck)
+
+        fetch("http://localhost:9090/addCardToDeck", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({name: card.name, deckId: clickedDeck.deckID})
+        }).then(r => {
+            if (r.status === 200) {
+                return r.json()
+            } else {
+                // Error handling
+            }
+        })
+
+
     }
-
-
-    const pushChosenCardsToDeck = (deck: Deck) => {
-        deck.cards = cardsForNewDeck
-        setCardsForNewDeck([])
-    }
-
 
     const handleError = () => {
         setIsError(false)
@@ -99,9 +108,7 @@ export default function Decks() {
     }
 
 
-
     function setPlayingDeck(deck: Deck) {
-
         if (!deck.activate) {
             fetch("http://localhost:9090/setPlayingDeck", {
                 method: "POST",
@@ -121,10 +128,7 @@ export default function Decks() {
             setErrorMessage("This deck is already activated.")
             setIsError(true)
         }
-
-
     }
-
 
     function submitDeckCreation(deck: Deck) {
         console.log("submit new deck clicked")
@@ -142,7 +146,7 @@ export default function Decks() {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({username: "TODO USERNAME", deck: deck, cards: cardsForNewDeck})
+            body: JSON.stringify({name: deck.name})
         }).then(r => {
             setCardsForNewDeck([])
             if (r.status === 200) {
@@ -162,7 +166,7 @@ export default function Decks() {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({username: "TODO USERNAME", deckID: deck.deckID})
+            body: JSON.stringify({name: "", deckId: deck.deckID})
         }).then(r => {
             if (r.status === 200) {
                 return r.json()
@@ -205,7 +209,6 @@ export default function Decks() {
                         ))}
 
                     </div>
-                    <Button variant={"contained"} color={"success"} onClick={() => pushChosenCardsToDeck(clickedDeck)}>Submit</Button>
                     {/*
                     <div className={"specificDeckCards"}>
                         {clickedDeck.cards.map((card) => (
