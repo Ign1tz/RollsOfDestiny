@@ -148,8 +148,6 @@ func setupRoutes() {
 }
 
 func Server() {
-	Database.DeleteAllGames()
-	Database.DeleteQueue()
 	fmt.Println("starting")
 	setupRoutes()
 	go func() {

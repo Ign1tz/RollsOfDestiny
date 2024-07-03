@@ -203,6 +203,7 @@ export default function Game() {
     }
 
     useEffect(() => {
+        console.log(gameInfo)
         if (gameInfo.ActivePlayer) {
             console.log(gameInfo.ActivePlayer.active)
             if (gameInfo.ActivePlayer.active) {

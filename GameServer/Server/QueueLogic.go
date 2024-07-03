@@ -3,7 +3,6 @@ package Server
 import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 	"github.com/google/uuid"
 	"log"
 	"math/rand"
@@ -287,39 +286,4 @@ func randShuffle(a []Types.Card) []Types.Card {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
 	return a
-}
-
-func handleDeckToString(deck Types.Deck) string {
-	cardsLeft := 0
-	cardsLeft = 0
-	cardsInHand := ""
-	for cardIndex := range deck.Cards {
-		if !deck.Cards[cardIndex].Played && !deck.Cards[cardIndex].InHand {
-			cardsLeft += 1
-		}
-		if deck.Cards[cardIndex].InHand {
-			cardsInHand = fmt.Sprintf(`%s, {"name": "%s", "cost": "%s", "picture": %s, "effect": "%s"}`, cardsInHand, deck.Cards[cardIndex].Name, strconv.Itoa(deck.Cards[cardIndex].Cost), deck.Cards[cardIndex].Picture, deck.Cards[cardIndex].Effect)
-		}
-	}
-	if cardsInHand != "" {
-		cardsInHand = cardsInHand[2:]
-	}
-	infoMessage := `{"cardsLeft": "` + strconv.Itoa(cardsLeft) + `", "inHand": [` + cardsInHand + `]}`
-	return infoMessage
-}
-
-func handleDeckToStringEnemy(deck Types.Deck) string {
-	cardsLeft := 0
-	cardsInHand := 0
-	for cardIndex := range deck.Cards {
-		if !deck.Cards[cardIndex].Played && !deck.Cards[cardIndex].InHand {
-			cardsLeft += 1
-		}
-		if deck.Cards[cardIndex].InHand {
-			cardsInHand++
-		}
-	}
-
-	infoMessage := `{"cardsLeft": "` + strconv.Itoa(cardsLeft) + `", "inHand": "` + strconv.Itoa(cardsInHand) + `"}`
-	return infoMessage
 }

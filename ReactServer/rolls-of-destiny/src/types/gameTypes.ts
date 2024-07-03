@@ -17,7 +17,8 @@ type yourInfo = {
     LeftColumn: column,
     MiddleColumn: column,
     RightColumn: column,
-    Score: number
+    Score: number,
+    deck: deck
 }
 
 type column = {
@@ -33,13 +34,31 @@ type enemyInfo = {
     LeftColumn: column,
     MiddleColumn: column,
     RightColumn: column,
-    Score: number
+    Score: number,
+    deck: enemyDeck
 }
 
 type endResults = {
     yourScore: number,
     enemyScore: number,
     youWon: string
+}
+
+type card = {
+    name: string,
+    cost: number,
+    picture: string,
+    effect: string
+}
+
+type deck = {
+    cardsLeft: number,
+    inHand: card[]
+}
+
+type enemyDeck = {
+    cardsLeft: number,
+    inHand: number
 }
 
 export type {messageBody, column , yourInfo, enemyInfo, endResults }
