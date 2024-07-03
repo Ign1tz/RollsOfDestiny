@@ -14,6 +14,7 @@ type GridLogic interface {
 	Value()
 	IsFull()
 	PrettyPrint()
+	FlipClockwise()
 }
 
 func (g *Grid) Clear() {
@@ -35,4 +36,16 @@ func (g Grid) PrettyPrint() {
 	fmt.Println(g.Left.Second, g.Middle.Second, g.Right.Second)
 	fmt.Println(g.Left.Third, g.Middle.Third, g.Right.Third)
 	fmt.Println()
+}
+
+func (g *Grid) FlipClocwise() {
+	tempGrid := g
+	g.Left.First = tempGrid.Left.Third
+	g.Left.Second = tempGrid.Middle.Third
+	g.Left.Third = tempGrid.Right.Third
+	g.Middle.First = tempGrid.Left.Second
+	g.Middle.Third = tempGrid.Right.Second
+	g.Right.First = tempGrid.Left.First
+	g.Right.Second = tempGrid.Middle.First
+	g.Right.Third = tempGrid.Right.First
 }

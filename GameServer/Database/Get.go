@@ -201,3 +201,30 @@ func GetPlayfieldByUserid(userid string) (Types.Playfield, error) {
 	playfield.GuestGrid = guestGrid
 	return playfield, nil
 }
+
+func GetDeckByDeckIDFromAccount(userid string) (Types.Deck, error) {
+	dbDeck := Database.QueryRow("Select * from accountdecks where userid = $1 and active = 'true'", userid)
+	var tempDeck Types.Deck
+	var active bool
+	if err := dbDeck.Scan(&tempDeck.UserID, &tempDeck.DeckID, &tempDeck.Name, &active); err != nil {
+		return Types.Deck{}, err
+	}
+
+	return tempDeck, nil
+}
+
+func GetCardsByDeckIDFromAccount(deckID string) ([]string, error) {
+	dbCards, err := Database.Query("Select name from accountcards where deckids like '%' || $1 || '%'", deckID)
+	if err != nil {
+		return []string{}, err
+	}
+	var cardNames = make([]string, 100)
+	id := 0
+	for dbCards.Next() {
+		if err := dbCards.Scan(&cardNames[id]); err != nil {
+			return []string{}, err
+		}
+		id++
+	}
+	return cardNames, err
+}
