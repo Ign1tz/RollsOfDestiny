@@ -80,6 +80,7 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 				Database.DeleteGame(playfield.Host.Grid.GridId)
 				Database.DeleteGame(playfield.Guest.Grid.GridId)
 			} else {
+				log.Println(playfield.Host.WebsocketConnectionID)
 				hostMsg["id"] = playfield.Host.WebsocketConnectionID
 				newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(true) + `, "roll": "` + playfield.LastRoll + `"}}`
 				infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
