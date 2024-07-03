@@ -1,82 +1,78 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import TopAppBar from "../bars/TopAppBar";
-import { profile } from "../types/profileTypes";
+import {profile} from "../types/profileTypes";
 import '../css/Friendlist.css';
 import onlineImage from "../images/green.jpeg"
 import offlineImage from "../images/red.jpeg"
-import testImage from "../soundtracks/testImage.png";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
+import {authFetch} from "../auth";
 import Button from "@mui/material/Button";
-import {Modal} from "@mui/material";
+import {Modal, TextField} from "@mui/material";
+import Box from "@mui/material/Box";
+import testImage from "../soundtracks/testImage.png";
 
-export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
-
+export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     const [searchBar, setSearchBar] = useState("");
     const [searchResults, setSearchResults] = useState<profile[]>([]);
     const [resultsFound, setResultsFound] = useState(false);
     const [noResultsFound, setNoResultsFound] = useState(false);
 
-    const users: profile[] = [
-        { username: "Bernd", rating: 839, profilePicture: testImage},
-        { username: "Anna", rating: 902, profilePicture: testImage},
-        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
-        { username: "Diana", rating: 820, profilePicture: testImage},
-        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
-    ];
+    const [users, setUsers] = useState<profile[]>([
+    ])
 
     const online = true;
 
+
     function submitSearchBar() {
         // for connecting with backend
-        /* fetch("http://localhost:9090/users", {
+        authFetch("http://localhost:9090/getAccounts?username=" + searchBar).then(r => {
+            if (r.status === 200) {
+                r.json().then(r => {
+                    console.log(r)
+                    setSearchResults(r.friends);
+                    if (r.friends.length > 0) {
+                        setResultsFound(true);
+                        setNoResultsFound(false);
+                    } else {
+                        setResultsFound(false);
+                        setNoResultsFound(true);
+                    }
+                })
+            }
+        });
+    }
+
+    const addToFriendlist = (username: string) => {
+        authFetch("http://localhost:9090/addFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({searchText: searchBar})
-        }).then(r => {
-            if (r.status === 200) {
-                return r.json();
-            }
-        }); */
+            body: JSON.stringify({username: username})
+        })
+    };
 
-        // but now with dummy data
-        const results = users.filter(user => user.username.toLowerCase().includes(searchBar.toLowerCase()));
-        results.sort((a, b) => a.username.localeCompare(b.username));
-        setSearchResults(results);
-        if (results.length > 0) {
-            setResultsFound(true);
-            setNoResultsFound(false);
-        } else {
-            setResultsFound(false);
-            setNoResultsFound(true);
+    useEffect(() => {
+            console.log("test")
+            authFetch("http://localhost:9090/getFriends").then(response => {
+                console.log(response); return response.json()
+            }).then(response => {
+                console.log(response)
+                setUsers(response.friends)
+            })
         }
-    }
-
+        ,
+        []
+    )
     const handleCloseSearchModul = () => {
         setSearchBar("");
         setSearchResults([]);
         setResultsFound(false);
         setNoResultsFound(false)
+        window.location.reload();
     };
-
-    const addToFriendlist = (username: string) => {
-        fetch("http://localhost:9090/addToFriendlist", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({username: username})
-        }).then(r => {
-            return r.json()
-        })
-    };
-
     const removeFromFriendlist = (username: string) => {
-        fetch("http://localhost:909/removeFromFriendList", {
+        authFetch("http://localhost:9090/removeFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -84,13 +80,13 @@ export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
             },
             body: JSON.stringify({username: username})
         }).then(r => {
-            return r.json()
+            window.location.reload();
         })
     };
 
     return (
         <>
-            <TopAppBar loggedIn={loggedIn} />
+            <TopAppBar loggedIn={loggedIn}/>
             <Box id="searchBox">
                 <TextField id="filled-basic" label="Search for a player" variant="filled"
                            value={searchBar}
@@ -141,7 +137,8 @@ export default function Friendlist({ loggedIn }: { loggedIn: boolean }) {
                             <div className={"onlineStatusAndRemoveButton"}>
                                 <img src={online ? onlineImage : offlineImage} className="online-status"
                                      alt={"online/offline status"}/>
-                                <Button variant={"contained"} color={"error"} onClick={() => removeFromFriendlist(user.username)}>Remove</Button>
+                                <Button variant={"contained"} color={"error"}
+                                        onClick={() => removeFromFriendlist(user.username)}>Remove</Button>
                             </div>
                         </li>
                     ))}

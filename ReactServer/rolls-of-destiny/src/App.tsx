@@ -18,10 +18,8 @@ import LandingPage from "./pages/LandingPage";
 
 function App() {
     let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
-    const [loggedIn, setLoggedIn] = useState<boolean> ()
-    const [ingame, setIngame] = useState<boolean> (false)
-    const [gameInfo, setGameInfo] = useState<string> ("")
-    const [websocket, setWebsocket] = useState<WebSocket>()
+    const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    const [fetched, setFetched] = useState<boolean> (false)
 
     useEffect(() => {
         const tempLoggedIn = sessionStorage.getItem("loggedIn")
@@ -29,6 +27,17 @@ function App() {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
                 sessionStorage.setItem("loggedIn", "true")
+                setFetched(true)
+                console.log("userInfo")
+                if (response.status === 200) {
+                    authFetch("http://localhost:9090/userInfo").then(r => {
+
+                        return r.json()
+                    }).then(response => {
+                        sessionStorage.setItem("userInfo", JSON.stringify(response))
+
+                    })
+                }
             })
         } else {
             setLoggedIn(tempLoggedIn === "true")
@@ -37,7 +46,7 @@ function App() {
 
     return (
     <>
-        { (typeof loggedIn).toString() !== "undefined" &&
+        { fetched && (typeof loggedIn).toString() !== "undefined" &&
             <BrowserRouter>
                 <Routes>
                     <Route index element={ loggedIn ? <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/> : <LandingPage loggedIn={loggedIn || false}/>}/>
