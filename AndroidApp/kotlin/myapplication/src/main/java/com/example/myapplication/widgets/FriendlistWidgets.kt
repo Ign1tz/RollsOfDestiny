@@ -22,10 +22,9 @@ import androidx.navigation.NavController
 @Composable
 fun FriendlistDrawer (navController: NavController) {
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
 
     ModalNavigationDrawer (
-        drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet (
                 content = {
@@ -37,7 +36,7 @@ fun FriendlistDrawer (navController: NavController) {
             )
         },
         content = {
-            HeaderTopBar(navController, icon = "<")
+
         }
         )
 }

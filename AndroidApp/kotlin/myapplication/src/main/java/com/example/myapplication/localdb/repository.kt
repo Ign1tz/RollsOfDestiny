@@ -16,4 +16,5 @@ class Repository (private val dao: dao) {
     fun returnUpdate (user:User) = dao.Update(user)
     fun returnDelete (user:User) = dao.Delete(user)
     fun getUser (): User = dao.getUser()
+    fun isEmpty(): Boolean = dao.isEmpty()
 }

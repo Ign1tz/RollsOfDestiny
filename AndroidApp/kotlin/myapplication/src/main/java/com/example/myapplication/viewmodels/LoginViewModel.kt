@@ -2,8 +2,6 @@ package com.example.myapplication.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
 import com.example.myapplication.types.token
@@ -14,17 +12,11 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.request
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.InternalAPI
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
@@ -32,7 +24,7 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     private val IPADDRESS = "192.168.0.181"
 
 
-    suspend private fun testHttp(userName: String, password: String): Boolean {
+    suspend private fun loginRequest(userName: String, password: String): Boolean {
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -82,18 +74,20 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     fun login(userName: String, password: String): Boolean {
         var worked = false
 
-        runBlocking { worked = testHttp(userName, password) }
+        runBlocking { worked = loginRequest(userName, password) }
         Log.d("HttpTest", worked.toString())
 
         return worked
     }
 
-    fun alreadyLoggedIn(): Boolean {
+    fun checkAlreadyLoggedIn(): Boolean {
         var worked = false
         runBlocking {
-            var newUser = repository.getUser()
-            worked = testHttp(newUser.userName, newUser.password)
-
+            val isEmpty = repository.isEmpty()
+            if (!isEmpty) {
+                val newUser = repository.getUser()
+                worked = loginRequest(newUser.userName, newUser.password)
+            }
         }
 
         return worked
