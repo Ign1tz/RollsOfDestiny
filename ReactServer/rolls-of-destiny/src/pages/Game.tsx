@@ -251,7 +251,7 @@ export default function Game() {
                 backgroundImage: `url(${background})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                height: '100%',
+                height: '100vh',
                 width: '100%'
             }}>
                 <div className="content">
@@ -296,20 +296,21 @@ export default function Game() {
                     </Modal>
                     <div className={"opponentAndCards"}>
                         <div className={"opponentCards"}>
-                            {cards.map((card) => (
-                                <div className={"specificOpponentCard"}>
-                                    <img src={card.image} alt={"card image"}/>
-                                </div>
-                            ))}
+                            {(typeof enemyInfo).toString() != null &&
+                                Array.from({length: enemyInfo?.deck.inHand || 0}, (_, k) => (
+                                    <div className={"specificOpponentCard"}>
+                                        <img src={rollAgainCard} alt={"card image"}/>
+                                    </div>
+                                ))
+                            }
                         </div>
                         <div className="playerInfoOpp">
                             <div className="score">
-                                <p>Score: <span id="player1Score">{player1Score}</span></p>
+                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                             </div>
                             <div className="playerInfoUsernameRating">
-                                <h2>{player1.username + " (Opponent)"}</h2>
+                                <h2>{player1.username}</h2>
                                 <p>Rating: {player1.rating}</p>
-                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
                         </div>
@@ -358,24 +359,25 @@ export default function Game() {
                                 <SimpleBox diceValue={null}/>
                             </div>
                         </div>
-                        <div className={"playerAndCards"}>
-                            <div className="playerInfo">
-                                <img src={player2.profilePicture} alt={player2.username}/>
-                                <div className="playerInfoUsernameRating">
-                                    <h2>{player2.username + " (You)"}</h2>
-                                    <p>Rating: {player2.rating}</p>
-                                </div>
-                                <div className="score">
-                                    <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
-                                </div>
+
+                    </div>
+                    <div className={"playerAndCards"}>
+                        <div className="playerInfo">
+                            <img src={player2.profilePicture} alt={player2.username}/>
+                            <div className="playerInfoUsernameRating">
+                                <h2>{player2.username}</h2>
+                                <p>Rating: {player2.rating}</p>
                             </div>
-                            <div className={"playerOwnCards"}>
-                                {cards.map((card) => (
-                                    <div className={"specificPlayerCard"}>
-                                        <img src={card.image} alt={"card image"}/>
-                                    </div>
-                                ))}
+                            <div className="score">
+                                <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
                             </div>
+                        </div>
+                        <div className={"playerOwnCards"}>
+                            {(typeof yourInfo).toString() != null && yourInfo?.deck.inHand.map((card) => (
+                                <div className={"specificPlayerCard"}>
+                                    <img src={card.picture} alt={"card image"}/>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ package Types
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 )
 
@@ -37,16 +38,18 @@ func (p *Player) RemoveMana(spent int) error {
 
 func (p Player) ToJson(extraInfo bool) string {
 	var extra string
+
 	if extraInfo {
 		extra = `, "userId": "` + p.UserID + `", "deck": ` + handleDeckToString(p.Deck)
 	} else {
-		extra = `, "enemyDeck": ` + handleDeckToStringEnemy(p.Deck)
+		extra = `, "deck": ` + handleDeckToStringEnemy(p.Deck)
 	}
 	message := `{ "WebsocketId": "` + p.WebsocketConnectionID + `", "Username": "` + p.Username + `", "Score": ` + strconv.Itoa(p.Grid.Value()) + `, "LeftColumn": { "First": "` + strconv.Itoa(p.Grid.Left.First) + `", "Second": "` + strconv.Itoa(p.Grid.Left.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Left.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Left.IsFull()) + `}, "MiddleColumn": { "First": "` + strconv.Itoa(p.Grid.Middle.First) + `", "Second": "` + strconv.Itoa(p.Grid.Middle.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Middle.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Middle.IsFull()) + `}, "RightColumn": { "First": "` + strconv.Itoa(p.Grid.Right.First) + `", "Second": "` + strconv.Itoa(p.Grid.Right.Second) + `", "Third": "` + strconv.Itoa(p.Grid.Right.Third) + `", "IsFull": ` + strconv.FormatBool(p.Grid.Right.IsFull()) + `}` + extra + `}`
 	return message
 }
 
 func handleDeckToString(deck Deck) string {
+	log.Println(deck.DeckID)
 	cardsLeft := 0
 	cardsLeft = 0
 	cardsInHand := ""

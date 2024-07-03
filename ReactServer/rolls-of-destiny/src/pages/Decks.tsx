@@ -114,7 +114,6 @@ export default function Decks() {
 
             return response.json()
         }).then(r => {
-                console.log(r.decks[0].deckid)
                 setDecks(r.decks.reverse())
             }
         )

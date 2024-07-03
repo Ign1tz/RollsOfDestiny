@@ -18,7 +18,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			return
 		}
 		playfield, err := Database.GetPlayfieldByUserid(queueEntry.UserId)
-
+		log.Println("deckid", playfield.Host.Deck.DeckID)
 		if playfield.Host.UserID == queueEntry.UserId {
 			active := playfield.ActivePlayer.UserID == playfield.Host.UserID
 			var msg = make(map[string]string)
@@ -26,7 +26,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(active) + `, "roll": "` + playfield.LastRoll + `"}}`
 			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg["message"] = infoMessage
-
+			log.Println(infoMessage)
 			*c2 <- msg
 		} else {
 			active := playfield.ActivePlayer.UserID == playfield.Guest.UserID
@@ -35,6 +35,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(active) + `, "roll": "` + playfield.LastRoll + `"}}`
 			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg2["message"] = infoMessage
+			log.Println(infoMessage)
 
 			*c2 <- msg2
 		}
@@ -187,7 +188,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
 			infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg["message"] = infoMessage
-
+			log.Println(infoMessage)
 			*c2 <- msg
 
 			var msg2 = make(map[string]string)
@@ -195,6 +196,7 @@ func AddToQueue(queueEntry Types.QueueInfo, c2 *chan map[string]string) {
 			newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": false, "roll": "` + playfield.LastRoll + `"}}`
 			infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}, "gameId": "` + playfield.GameID + `"}`
 			msg2["message"] = infoMessage
+			log.Println(infoMessage)
 
 			*c2 <- msg2
 		}
@@ -209,6 +211,7 @@ func alreadyInGame(userID string) bool {
 
 func createCards(stringCards []string, deckid string) []Types.Card {
 	var cards = make([]Types.Card, 20)
+	log.Println(stringCards)
 	cardCount := -1
 	for index := range stringCards {
 		switch stringCards[index] {
@@ -229,6 +232,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 		case "Double Mana":
 			for j := 0; j < 5; j++ {
 				cardCount += 1
+				log.Println("Card Count: ", cardCount)
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
@@ -257,7 +261,6 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 		case "Flip Clockwise":
 			for j := 0; j < 5; j++ {
 				cardCount += 1
-				log.Println(cardCount)
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],

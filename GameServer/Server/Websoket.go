@@ -137,6 +137,7 @@ func handlePickedColumn(message websocketMessage) (map[string]string, map[string
 	if err != nil {
 		panic(err)
 	}
+
 	enemy := playfield.EnemyPlayer()
 	columnInt, _ := strconv.Atoi(playfield.LastRoll)
 	switch message.MessageBody {

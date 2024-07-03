@@ -3,6 +3,7 @@ package Database
 import (
 	"RollsOfDestiny/GameServer/Types"
 	"fmt"
+	"log"
 )
 
 func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTING IF ALREADY IN GAME
@@ -55,6 +56,7 @@ func GetGrid(gridId string) (Types.Grid, error) {
 }
 
 func GetDeckByDeckId(deckId string) (Types.Deck, error) {
+	log.Println("Error querying cards", deckId)
 	dbDeck := Database.QueryRow("Select * from decks where deckid = $1", deckId)
 	var deck Types.Deck
 	if err := dbDeck.Scan(&deck.DeckID, &deck.UserID); err != nil {
@@ -83,6 +85,7 @@ func GetDeckByPlayerId(playerId string) (Types.Deck, error) {
 	if err := dbDeck.Scan(&deck.DeckID, &deck.UserID); err != nil {
 		return Types.Deck{}, err
 	}
+
 	dbCards, err := Database.Query("select * from cards where deckid = $1", deck.DeckID)
 	if err != nil {
 		return deck, err
@@ -159,6 +162,24 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 		return playfield, err
 	}
 	playfield.GuestGrid = guestGrid
+
+	hostDeck, err := GetDeckByPlayerId(playfield.Host.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Host.Deck = hostDeck
+
+	guestDeck, err := GetDeckByPlayerId(playfield.Guest.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Guest.Deck = guestDeck
+	activeDeck, err := GetDeckByPlayerId(playfield.ActivePlayer.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.ActivePlayer.Deck = activeDeck
+
 	return playfield, nil
 }
 
@@ -199,6 +220,23 @@ func GetPlayfieldByUserid(userid string) (Types.Playfield, error) {
 		return playfield, err
 	}
 	playfield.GuestGrid = guestGrid
+
+	hostDeck, err := GetDeckByPlayerId(playfield.Host.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Host.Deck = hostDeck
+
+	guestDeck, err := GetDeckByPlayerId(playfield.Guest.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.Guest.Deck = guestDeck
+	activeDeck, err := GetDeckByPlayerId(playfield.ActivePlayer.UserID)
+	if err != nil {
+		return playfield, err
+	}
+	playfield.ActivePlayer.Deck = activeDeck
 	return playfield, nil
 }
 
