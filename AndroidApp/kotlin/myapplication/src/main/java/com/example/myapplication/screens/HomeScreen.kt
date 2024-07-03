@@ -11,6 +11,7 @@ import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
 import com.example.myapplication.viewmodels.HomeViewModel
+import com.example.myapplication.widgets.FriendlistDrawer
 import com.example.myapplication.widgets.UpButton
 
 
@@ -18,7 +19,7 @@ import com.example.myapplication.widgets.UpButton
 fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
     Scaffold (
         topBar = {
-            HeaderTopBar(navController, "<")
+            FriendlistDrawer(navController = navController)
         },
         bottomBar = {
             BottomBar()
