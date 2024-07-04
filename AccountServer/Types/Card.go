@@ -6,4 +6,6 @@ type Card struct {
 	Effect string
 	DeckID string
 	Count  int
+	Cost   int
+	Image  string
 }

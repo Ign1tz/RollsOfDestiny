@@ -3,10 +3,12 @@ package Server
 import (
 	"RollsOfDestiny/AccountServer/AccountLogic"
 	"RollsOfDestiny/AccountServer/Database"
+	"RollsOfDestiny/AccountServer/DeckLogic"
 	"RollsOfDestiny/AccountServer/SignUpLogic"
 	"RollsOfDestiny/AccountServer/Types"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -38,7 +40,13 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer r.Body.Close()
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}(r.Body)
 
 		fmt.Printf("Raw body: %s\n", body)
 
@@ -69,7 +77,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer r.Body.Close()
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}(r.Body)
 
 		fmt.Printf("Raw body: %s\n", body)
 
@@ -155,7 +169,13 @@ func changeUsername(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			defer r.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
 
 			fmt.Printf("Raw body: %s\n", body)
 
@@ -197,7 +217,13 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			defer r.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
 
 			fmt.Printf("Raw body: %s\n", body)
 
@@ -209,6 +235,51 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			AccountLogic.ChangePasswprd(t, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func changeProfilePicture(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			var t AccountLogic.NewProfilePicture
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				log.Println(err)
+				return
+			}
+			log.Println("before update")
+			err = Database.UpdateProfilePicture(userid, t.ProfilePicture)
+			log.Println(err)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -228,7 +299,10 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
 		if valid {
-			Database.DeleteAccount(userid)
+			err := Database.DeleteAccount(userid)
+			if err != nil {
+				return
+			}
 		}
 	}
 }
@@ -262,7 +336,6 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 			array = ""
 		}
 		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
-		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 		return
 	}
@@ -286,7 +359,13 @@ func newFriend(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			defer r.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
 
 			fmt.Printf("Raw body: %s\n", body)
 
@@ -321,13 +400,21 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
 		if valid {
+			log.Println("DeleteFriend")
 			// Read the raw body
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				log.Println(err)
 				return
 			}
-			defer r.Body.Close()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
 
 			fmt.Printf("Raw body: %s\n", body)
 
@@ -395,6 +482,279 @@ func getAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getDecks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	userid, valid := checkToken(w, r)
+	if valid {
+
+		decks, err := Database.GetDecksByUserID(userid)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var deckString string
+		var cardString string
+		//todo: check for empty
+		for deckIndex := range decks {
+			if decks[deckIndex].UserID != "" {
+				cardString = DeckLogic.GetCardsOfDeckAsJsonString(decks[deckIndex].DeckID, decks[deckIndex].Name)
+				deckString = fmt.Sprintf(`%s, {"name": "%s", "deckid": "%s", "active": %s, "cards": [%s]}`, deckString, decks[deckIndex].Name, decks[deckIndex].DeckID, strconv.FormatBool(decks[deckIndex].Active), cardString)
+			}
+		}
+		var array string
+		if len(deckString) > 2 {
+			array = deckString[2:]
+		} else {
+			array = ""
+		}
+		friendInfo := fmt.Sprintf("{\"decks\": [%s]}", array)
+		log.Println(friendInfo)
+		fmt.Fprint(w, friendInfo)
+	}
+}
+
+func createDeck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.NewDeckMessage
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			DeckLogic.CreateNewDeck(t.Name, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func addCardToDeck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.AddCard
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			DeckLogic.AddCardToDeck(t, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func removeCardFromDeck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.AddCard
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			DeckLogic.RemoveCardFromDeck(t, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func setDeckActive(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.AddCard
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			DeckLogic.ChangeActiveDeck(t, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func removeDeck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.AddCard
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			DeckLogic.RemoveDeck(t.Deckid, userid)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func getTopTen(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	_, valid := checkToken(w, r)
+	if valid {
+
+		topTenPlayers, err := Database.GetTopTenPlayers()
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var deckString string
+		for deckIndex := range topTenPlayers {
+			if topTenPlayers[deckIndex].UserID != "" {
+				deckString = fmt.Sprintf(`%s, {"username": "%s", "rating": %s, "profilePicture": "%s"}`, deckString, topTenPlayers[deckIndex].Username, strconv.Itoa(topTenPlayers[deckIndex].Rating), topTenPlayers[deckIndex].ProfilePicture)
+			}
+		}
+		var array string
+		if len(deckString) > 2 {
+			array = deckString[2:]
+		} else {
+			array = ""
+		}
+		friendInfo := fmt.Sprintf("{\"topTenPlayers\": [%s]}", array)
+		fmt.Fprint(w, friendInfo)
+	}
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
@@ -409,6 +769,14 @@ func setupRoutes() {
 	http.HandleFunc("/getAccounts", getAccounts)
 	http.HandleFunc("/addFriend", newFriend)
 	http.HandleFunc("/removeFriend", deleteFriend)
+	http.HandleFunc("/getDecks", getDecks)
+	http.HandleFunc("/createDeck", createDeck)
+	http.HandleFunc("/addCardToDeck", addCardToDeck)
+	http.HandleFunc("/removeCardFromDeck", removeCardFromDeck)
+	http.HandleFunc("/setActiveDeck", setDeckActive)
+	http.HandleFunc("/removeDeck", removeDeck)
+	http.HandleFunc("/getTopTen", getTopTen)
+	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
 }
 
 func Server() {

@@ -160,7 +160,7 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 		Mana:                  0,
 		Deck:                  Types.Deck{},
 		Die:                   Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}},
-		WebsocketConnectionID: "",
+		WebsocketConnectionID: uuid.New().String(),
 		Grid:                  guestGrid,
 	}
 

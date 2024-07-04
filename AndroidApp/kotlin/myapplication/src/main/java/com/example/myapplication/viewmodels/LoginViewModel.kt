@@ -28,6 +28,7 @@ import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.basic
 import io.ktor.client.plugins.auth.providers.bearer
 import okhttp3.Credentials.basic
+import kotlinx.coroutines.withContext
 
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
@@ -36,7 +37,7 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
     suspend private fun loginRequest(userName: String, password: String): Boolean {
-        var client = HttpClient(CIO) {
+        val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
@@ -120,5 +121,4 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         }
         return worked
     }
-
 }

@@ -13,13 +13,13 @@ func InsertAccount(account Types.Account) error {
 }
 
 func InsertDeck(deck Types.Deck) error {
-	_, err := Database.Exec("INSERT INTO accountdecks (userid, deckid, name) Values ($1, $2, $3)", deck.UserID, deck.DeckID, deck.Name)
+	_, err := Database.Exec("INSERT INTO accountdecks (userid, deckid, name, active) Values ($1, $2, $3, $4)", deck.UserID, deck.DeckID, deck.Name, deck.Active)
 	return err
 }
 
 func InsertCard(card Types.Card) error {
-	_, err := Database.Exec("INSERT INTO accountcards (userid, name, effect, deckids, count) Values ($1, $2, $3, $4, $5)",
-		card.UserID, card.Name, card.Effect, card.DeckID, card.Count)
+	_, err := Database.Exec("INSERT INTO accountcards (userid, name, effect, deckids, count, cost, image) Values ($1, $2, $3, $4, $5, $6, $7)",
+		card.UserID, card.Name, card.Effect, card.DeckID, card.Count, card.Cost, card.Image)
 	return err
 }
 

@@ -1,9 +1,134 @@
 package com.example.myapplication.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
+import com.example.myapplication.types.friends
+import com.example.myapplication.types.friendsWraper
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 
 class HomeViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
 
+    private val IPADDRESS = "10.0.0.2"
+    private val user = repository.getUser()
+    var friends = mutableStateOf<List<friends>?>(null)
+    var addFriend = mutableStateOf("")
 
+
+    suspend private fun requestGetFriends() {
+        Log.d("friends", "test")
+
+        val newClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(user.jwtToken, user.jwtToken)
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
+
+        }
+        val response: HttpResponse = newClient.get("http://$IPADDRESS:9090/getFriends") {
+        }
+        Log.d("userinfo", response.status.value.toString())
+        if (response.status.value == 200) {
+            val userInfo: friendsWraper = Json.decodeFromString(response.body())
+            friends.value = userInfo.friends
+
+            newClient.close()
+        }
+    }
+
+    suspend private fun requestRemoveFriend(username: String){
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(user.jwtToken, user.jwtToken)
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
+        }
+
+        val responseText: HttpResponse = client.post("http://$IPADDRESS:9090/removeFriend") {
+            contentType(ContentType.Application.Json)
+            setBody("{\"username\":\"$username\"}")
+        }
+    }
+
+    suspend private fun requestAddNewFriend(){
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(user.jwtToken, user.jwtToken)
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
+        }
+
+        val responseText: HttpResponse = client.post("http://$IPADDRESS:9090/addFriend") {
+            contentType(ContentType.Application.Json)
+            setBody("{\"username\":\"${addFriend.value}\"}")
+        }
+    }
+
+    fun getFriends(){
+        runBlocking {requestGetFriends() }
+    }
+
+    fun removeFriend(username: String){
+        runBlocking { requestRemoveFriend(username) }
+        runBlocking {requestGetFriends() }
+    }
+
+    fun addNewFriend(){
+
+        runBlocking { requestAddNewFriend() }
+        runBlocking {requestGetFriends() }
+        addFriend.value = ""
+    }
 }

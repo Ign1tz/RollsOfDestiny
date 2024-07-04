@@ -18,6 +18,10 @@ type NewPasswordMessage struct {
 	ConfirmNewPassword string `json:"confirmNewPassword"`
 }
 
+type NewProfilePicture struct {
+	ProfilePicture string `json:"profilePicture"`
+}
+
 func ChangeUsername(message NewUsernameMessage) {
 	if len(message.NewUsername) < 3 || len(message.NewUsername) > 20 {
 		return

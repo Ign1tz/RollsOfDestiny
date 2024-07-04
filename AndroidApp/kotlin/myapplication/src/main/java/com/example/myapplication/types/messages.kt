@@ -81,3 +81,15 @@ data class userInfoMessage(
     val rating: String,
     val userid: String
 )
+
+@Serializable
+data class friendsWraper(
+    val friends: List<friends>
+)
+
+@Serializable
+data class friends(
+    val username: String,
+    val rating: String,
+    val profilePicture: String
+)

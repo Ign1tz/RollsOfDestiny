@@ -36,10 +36,10 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	if err != nil {
 		return []Types.Deck{}, err
 	}
-	var decks []Types.Deck
+	var decks = make([]Types.Deck, 100)
 	id := 0
 	for dbDecks.Next() {
-		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name); err != nil {
+		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name, &decks[id].Active); err != nil {
 			return []Types.Deck{}, err
 		}
 		id++
@@ -47,15 +47,15 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	return decks, nil
 }
 
-func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
-	dbCards, err := Database.Query("Select * from accountcards where deckid like %$1%", deckID)
+func GetCardsByDeckID(deckID string, name string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%' and name = $2", deckID, name)
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards []Types.Card
+	var cards = make([]Types.Card, 100)
 	id := 0
 	for dbCards.Next() {
-		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count); err != nil {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image); err != nil {
 			return []Types.Card{}, err
 		}
 		id++
@@ -88,6 +88,25 @@ func GetFriendsByUserID(userID string) ([]Types.Friend, error) {
 
 func GetAccountByPartUsername(usernamePart string, userid string) ([]Types.Account, error) {
 	dbAccount, err := Database.Query("Select * from accounts where username ilike '%' || $1 || '%' and userid is distinct from $2 limit 10", usernamePart, userid)
+	if err != nil {
+		return []Types.Account{}, err
+	}
+	var accounts = make([]Types.Account, 10)
+	id := 0
+	for dbAccount.Next() {
+		var account Types.Account
+		if err := dbAccount.Scan(&account.UserID, &account.Username, &account.Password, &account.Email, &account.ProfilePicture, &account.Rating); err != nil {
+			return []Types.Account{}, err
+		}
+		accounts[id] = account
+		id++
+	}
+
+	return accounts, nil
+}
+
+func GetTopTenPlayers() ([]Types.Account, error) {
+	dbAccount, err := Database.Query("Select * from accounts order by rating desc limit 10")
 	if err != nil {
 		return []Types.Account{}, err
 	}
