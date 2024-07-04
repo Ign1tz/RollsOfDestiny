@@ -483,9 +483,10 @@ func getAccounts(w http.ResponseWriter, r *http.Request) {
 
 func getDecks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "OPTIONS" {
-		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
-		w.Header().Set("Access-Control-Allow-Methods", "*")
+
 		return
 	}
 	userid, valid := checkToken(w, r)
