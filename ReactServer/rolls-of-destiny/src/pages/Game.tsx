@@ -7,6 +7,7 @@ import {profile} from "../types/profileTypes";
 import "../css/Game.css";
 import React, {useEffect, useState} from "react";
 import background_music from "../soundtracks/background_music.mp3";
+import diceSound from "../soundtracks/dice-95077.mp3"
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
 import {activePlayer, card, endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
@@ -294,6 +295,11 @@ export default function Game() {
         }
     }
 
+    function playSoundEffect() {
+        var snd = new Audio(diceSound); // buffers automatically when created
+        snd.play();
+    }
+
     return (
         <>
             <ReactAudioPlayer
@@ -399,7 +405,7 @@ export default function Game() {
                     <div className="playerSection">
                         <div className="playerActions">
                             <div className="diceWrapper">
-                                <Dice onRoll={(value) => {
+                                <Dice sound={diceSound} onRoll={(value) => {
                                     console.log(value);
                                     setRolled(true)
                                     websocket.send(JSON.stringify({type: "rolled", message: "", gameId: gameId}))
