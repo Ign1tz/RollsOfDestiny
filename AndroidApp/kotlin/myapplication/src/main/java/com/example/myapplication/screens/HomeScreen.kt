@@ -86,7 +86,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                 }
             ){ innerPadding ->
                 Column (modifier = Modifier.padding(innerPadding)) {
-                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel, scoreboardViewModel)
+                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel, scoreboardViewModel, homeViewModel)
                 }
             }
         })

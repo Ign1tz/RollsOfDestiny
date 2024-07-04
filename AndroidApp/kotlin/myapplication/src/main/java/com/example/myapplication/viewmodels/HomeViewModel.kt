@@ -1,9 +1,14 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
+import com.example.myapplication.localdb.User
 import com.example.myapplication.types.friends
 import com.example.myapplication.types.friendsWraper
 import io.ktor.client.HttpClient
@@ -25,15 +30,54 @@ import kotlinx.serialization.json.Json
 
 class HomeViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
 
-    private val IPADDRESS = "10.0.0.2"
+    private val IPADDRESS = "192.168.2.109"
     private val user = repository.getUser()
     var friends = mutableStateOf<List<friends>?>(null)
     var addFriend = mutableStateOf("")
 
+    var isFriendPlayClicked by mutableStateOf(false)
+        private set
+    fun toggleFriendClick() {
+        isFriendPlayClicked = !isFriendPlayClicked
+        isHostButtonClicked = false
+        isJoinButtonClicked = false
+    }
+
+    var isHostButtonClicked by mutableStateOf(false)
+    fun toggleHostButtonClicked() {
+        isHostButtonClicked = !isHostButtonClicked
+        isJoinButtonClicked = false
+        isFriendPlayClicked = false
+    }
+
+    var isJoinButtonClicked by mutableStateOf(false)
+
+    fun toggleJoinButtonClicked() {
+        isJoinButtonClicked = !isJoinButtonClicked
+        isHostButtonClicked = false
+        isFriendPlayClicked = false
+    }
+
+    fun getUser(): User? {
+        val user = repository.getUser()
+        try {
+            user.userName
+            return user
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+
 
     suspend private fun requestGetFriends() {
         Log.d("friends", "test")
-
+        val user = repository.getUser()
+        try {
+            user.userName
+        }catch (e : Exception){
+            return
+        }
         val newClient = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {

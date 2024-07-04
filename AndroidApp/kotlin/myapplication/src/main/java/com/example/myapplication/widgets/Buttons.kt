@@ -2,12 +2,19 @@ package com.example.myapplication.widgets
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,10 +25,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.navigation.Screen
 import com.example.myapplication.viewmodels.GameViewModel
+import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.SettingViewModel
 import com.example.myapplication.viewmodels.ScoreboardViewModel
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -119,10 +133,16 @@ fun QuickPlayButton(navController: NavController, gameViewModel: GameViewModel) 
 }
 
 @Composable
-fun FriendPlayButton() {
+fun FriendPlayButton(homeViewModel: HomeViewModel) {
+
+    val isFriendPlayClicked by homeViewModel::isFriendPlayClicked
+    val isHostButtonClicked by homeViewModel::isHostButtonClicked
+    val isJoinButtonClicked by homeViewModel::isJoinButtonClicked
+
+
     Button(
         modifier = Modifier.size(300.dp, 50.dp),
-        onClick = {},
+        onClick = { homeViewModel.toggleFriendClick() },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -134,7 +154,103 @@ fun FriendPlayButton() {
             fontFamily = FontFamily.Serif
         )
     }
+    // extra buttons when Play vs Friend is clicked
+    if (isFriendPlayClicked) {
+        Button(
+            modifier = Modifier.size(300.dp, 50.dp),
+            onClick = {homeViewModel.toggleHostButtonClicked()},
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Gray
+            )
+        ) {
+            Text(
+                "Host",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Serif
+            )
+        }
+        Button(
+            modifier = Modifier.size(300.dp, 50.dp),
+            onClick = {homeViewModel.toggleJoinButtonClicked()},
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Gray
+            )
+        ) {
+            Text(
+                "Join",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Serif
+            )
+        }
+    }
+    if (isJoinButtonClicked) {
+
+        var nameState by remember { mutableStateOf("") }
+
+        TextField(value = nameState,
+            onValueChange = { newName ->
+                nameState = newName },
+            label = {Text("Enter User ID")},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp))
+            Button(
+                modifier = Modifier.size(130.dp,50.dp),
+                onClick = { /* TODO JOIN GAME */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black
+                )
+            ) {
+                Text("Play",
+                    color = Color.Green,
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+    }
+    if (isHostButtonClicked) {
+        UserIDTextWithCopyClickboard(homeViewModel)
+        Button(
+            modifier = Modifier.size(130.dp,50.dp),
+            onClick = { /* TODO JOIN GAME */ },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black
+            )
+        ) {
+            Text("Play",
+                color = Color.Green,
+                fontSize = 25.sp,
+                fontFamily = FontFamily.Serif
+            )
+        }
+    }
 }
+
+@Composable
+fun UserIDTextWithCopyClickboard(homeViewModel: HomeViewModel) {
+    val context = LocalContext.current
+    homeViewModel.getUser()?.userid?.let { userId ->
+        Text(
+            text = userId,
+            color = Color.Black,
+            fontSize = 14.sp,
+            fontFamily = FontFamily.Serif,
+            modifier = Modifier.clickable {
+                copyToClipboard(context, userId)
+                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+}
+
+fun copyToClipboard(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("UserId", text)
+    clipboard.setPrimaryClip(clip)
+}
+
 
 @Composable
 fun RankedPlayButton(navController: NavController, gameViewModel: GameViewModel) {
@@ -156,10 +272,10 @@ fun RankedPlayButton(navController: NavController, gameViewModel: GameViewModel)
 }
 
 @Composable
-fun ScoreboardButton (navController: NavController, scoreboardViewModel: ScoreboardViewModel) {
+fun ScoreboardButton(navController: NavController, scoreboardViewModel: ScoreboardViewModel) {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
-        onClick = {navController.navigate(route = "scoreboard")},
+        modifier = Modifier.size(300.dp, 50.dp),
+        onClick = { navController.navigate(route = "scoreboard") },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
