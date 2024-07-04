@@ -43,6 +43,10 @@ export default function Decks() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isError, setIsError] = useState(false)
 
+    const [hasMessage, setHasMessage] = useState(true)
+    const [showNewCard, setShowNewCard] = useState(false)
+    const [newCard, setNewCard] = useState<CardType>()
+
     let cards: CardType[] = [
         {name: "Destroy Column", mana: 7, image: destroyColumnCard, description: "Destroy a column from your opponent."},
         {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana. For one round."},
@@ -80,6 +84,19 @@ export default function Decks() {
         setNewDeckName("")
     }
 
+    const openNewCardModal = () => {
+        setShowNewCard(true)
+        setNewCard(cards[0])
+        // fetch logic for getting new card
+    }
+
+    const closeNewCardModal = () => {
+        setShowNewCard(false)
+        setNewCard(cards[0])
+    }
+
+
+
     const addCardToDeck = (card: CardType) => {
         cardsForNewDeck.push(card)
         setCardsForNewDeck(cardsForNewDeck)
@@ -98,8 +115,6 @@ export default function Decks() {
                 // Error handling
             }
         })
-
-
     }
 
     const handleError = () => {
@@ -241,8 +256,32 @@ export default function Decks() {
                     </div>
                 </div>
             </Modal>
+
+            <Modal open={showNewCard} onClose={closeNewCardModal}>
+                <div className="errorMenu">
+                    <h2>You collected a new card! </h2>
+                    <div className="errorText">
+                        <div className={"individualCardOwned"}>
+                            <h3>{newCard?.name}</h3>
+                            <img src={newCard?.image} alt={"card image"}/>
+                            <h5>{newCard?.description}</h5>
+                        </div>
+                        <Button variant={"contained"} color={"success"} onClick={closeNewCardModal} >WOW THIS IS THE BEST THING EVER</Button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Button onClick={() => setHasMessage(!hasMessage)}>here</Button>
             <div className={"titleWithDecksAndCards"}>
-                <h2 style={{textAlign: "center"}}>Your Decks</h2>
+                <div className={"deckScreenHeader"} style={hasMessage ? {width: "1200px"}: {width:"135px"}}>
+                    <h2>Your Decks</h2>
+                    {hasMessage && (
+                        <Button className="blinking-button" variant={"contained"} color={"warning"} onClick={openNewCardModal}>New
+                            Message</Button>
+                    )}
+
+                </div>
+
                 <div className={"differentDecks"}>
                     {decks.map((deck, index) => (
                             <div className={"deckInstance"}>
