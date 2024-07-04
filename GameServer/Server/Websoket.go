@@ -103,6 +103,28 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 
 func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map[string]string, map[string]string) {
 
+	if message.Type == "surrender" {
+		log.Println("surrender")
+		playfield, err := Database.GetPlayfield(message.GameId)
+		if err != nil {
+			log.Println(err)
+			return nil, nil
+		}
+		if strings.Contains(playfield.GameID, "bot: ") {
+			Database.DeleteGame(playfield.Host.Grid.GridId)
+			Database.DeleteGame(playfield.Guest.Grid.GridId)
+			return nil, nil
+		}
+		var surenderer Types.Player
+		if playfield.Host.WebsocketConnectionID == connectionId {
+			playfield.Host.Grid.Clear()
+			surenderer = playfield.Host
+		} else {
+			playfield.Guest.Grid.Clear()
+			surenderer = playfield.Guest
+		}
+		return handleGameEnded(playfield, true, surenderer)
+	}
 	var msg = make(map[string]string)
 	if message.Type == "id" {
 		msg["id"] = connectionId
@@ -125,21 +147,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		} else {
 			return nil, nil
 		}
-	case "surrender":
-		playfield, err := Database.GetPlayfield(message.GameId)
-		if err != nil {
-			log.Println(err)
-			return nil, nil
-		}
-		var surenderer Types.Player
-		if playfield.Host.WebsocketConnectionID == connectionId {
-			playfield.Host.Grid.Clear()
-			surenderer = playfield.Host
-		} else {
-			playfield.Guest.Grid.Clear()
-			surenderer = playfield.Guest
-		}
-		return handleGameEnded(playfield, true, surenderer)
+
 	case "playCard":
 		if position.CurrentStep == "afterRoll" || position.CurrentStep == "afterColumnPick" {
 			return GameLogic.HandleCards(message, position)

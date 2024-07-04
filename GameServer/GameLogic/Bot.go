@@ -77,12 +77,17 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 	_, err := Database.GetPlayer(queueEntry.Userid)
 
 	if err == nil {
+		log.Println("relog")
 		playfield, err := Database.GetPlayfieldByUserid(queueEntry.Userid)
 		if err != nil {
-			log.Println(err)
+			log.Println("noPlayfield", err)
 			return
 		}
-		Database.UpdatePlayerWebsocketID(queueEntry.Userid, queueEntry.WebsocketConnectionId)
+		err = Database.UpdatePlayerWebsocketID(queueEntry.Userid, queueEntry.WebsocketConnectionId)
+		if err != nil {
+			log.Println("websocketUpdate", err)
+			return
+		}
 		var msg = make(map[string]string)
 		msg["id"] = queueEntry.WebsocketConnectionId
 		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
