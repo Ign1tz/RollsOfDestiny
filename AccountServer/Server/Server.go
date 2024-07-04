@@ -91,6 +91,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.WriteHeader(http.StatusOK)
+			fmt.Println("logged in")
 			test := `{"token": "` + tokenString + `"}`
 			fmt.Fprint(w, test)
 			return
@@ -114,6 +115,7 @@ func isLoggedIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func accountInfo(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("test")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
 		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed

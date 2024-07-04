@@ -29,9 +29,12 @@ import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
+import com.example.myapplication.viewmodels.GameViewModel
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.viewmodels.HomeViewModel
+import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.widgets.UpButton
 import com.example.myapplication.widgets.FriendList
 import com.example.myapplication.widgets.TitleTopBar
 import com.example.myapplication.widgets.TopButton
@@ -83,4 +86,3 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
             }
         })
 }
-

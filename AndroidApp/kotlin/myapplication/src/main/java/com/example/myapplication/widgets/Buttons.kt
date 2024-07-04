@@ -33,6 +33,24 @@ fun LoginButton (viewModel: LoginViewModel) {
 
 
 @Composable
+fun RegisterButton (viewModel: LoginViewModel) {
+    Button(
+        modifier = Modifier.size(130.dp,50.dp),
+        onClick = {  },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text("Register",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+
+@Composable
 fun TopButton (navController: NavController, icon: String) {
     Button(
         modifier = Modifier
@@ -53,10 +71,11 @@ fun TopButton (navController: NavController, icon: String) {
 }
 
 @Composable
-fun QuickPlayButton (navController: NavController) {
+fun QuickPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+    gameViewModel.GameType.value = "bot"
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {navController.navigate(route = "game")},
+        onClick = {navController.navigate(route = "game/bot")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -87,10 +106,11 @@ fun FriendPlayButton () {
 }
 
 @Composable
-fun RankedPlayButton () {
+fun RankedPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+    gameViewModel.GameType.value = ""
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {},
+        onClick = {navController.navigate(route = "game")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -130,6 +150,23 @@ fun SettingsButton () {
         )
     ) {
         Text("Settings",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun LogOut (viewModel: LoginViewModel, navController: NavController) {
+    Button(
+        modifier = Modifier.size(300.dp,50.dp),
+        onClick = {viewModel.repository.returnDelete(); navController.navigate("login")},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text("LogOut",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif

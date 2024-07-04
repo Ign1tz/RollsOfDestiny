@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import com.android.volley.Request
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.viewmodels.LoginViewModel
 import org.json.JSONObject
+import java.net.URI
 
 @Composable
 fun LoginBox (navController: NavController, viewModel: LoginViewModel) {
@@ -71,7 +73,20 @@ fun LoginBox (navController: NavController, viewModel: LoginViewModel) {
             )
         }
         Spacer(Modifier.padding(padding))
-        LoginButton(viewModel)
+        val uriHandler = LocalUriHandler.current
+        Button(
+                modifier = Modifier.size(150.dp,50.dp),
+        onClick = { uriHandler.openUri("http://${viewModel.IPADDRESS}:3000/signup")},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+        ) {
+        Text("SignUp",
+            color = Color.White,
+            fontSize = 25.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
     }
 }
 

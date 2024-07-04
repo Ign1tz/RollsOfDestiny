@@ -81,4 +81,3 @@ data class userInfoMessage(
     val rating: String,
     val userid: String
 )
-
