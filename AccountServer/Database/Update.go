@@ -26,34 +26,41 @@ func UpdatePassword(userid string, password string) error {
 }
 
 func UpdateCardDeckId(cardInfo Types.AddCard, userid string) error {
-	_, err := Database.Exec("Update accountcards set deckids = concat(Select deckids from accountcards where userid = $1 and name = $2, ', ', $3) where userid = $1 and name = $3", userid, cardInfo.Name, cardInfo.Deckid)
+	_, err := Database.Exec(`
+    UPDATE accountcards 
+    SET deckids = 
+        CASE 
+            WHEN deckids IS NULL THEN $3 
+            ELSE deckids || ', ' || $3 
+        END
+    WHERE userid = $1 
+      AND name = $2`,
+		userid, cardInfo.Name, cardInfo.Deckid)
 	return err
 }
 
-func RemoveCardDeckId(userid string, deckid string) error {
-	_, err := Database.Exec("Update accountcards set deckids = replace(Select deckids from accountcards where userid = $1 and name = 'Roll Again', $2, '') where userid = $1 and name = 'Roll Again'", userid, deckid)
+func RemoveCardDeckId(userid string, cardInfo Types.AddCard) error {
+	_, err := Database.Exec(`UPDATE accountcards
+	SET deckids = 
+	REPLACE(
+		deckids,
+		$2,
+		''
+	)
+	WHERE userid = $1 AND name = $3`, userid, ", "+cardInfo.Deckid, cardInfo.Name)
 	if err != nil {
 		return err
 	}
-	_, err = Database.Exec("Update accountcards set deckids = replace(Select deckids from accountcards where userid = $1 and name = 'Double Mana', $2, '') where userid = $1 and name = 'Double Mana'", userid, deckid)
-	if err != nil {
-		return err
-	}
-	_, err = Database.Exec("Update accountcards set deckids = replace(Select deckids from accountcards where userid = $1 and name = 'Destroy Column', $2, '') where userid = $1 and name = 'Destroy Column'", userid, deckid)
-	if err != nil {
-		return err
-	}
-	_, err = Database.Exec("Update accountcards set deckids = replace(Select deckids from accountcards where userid = $1 and name = 'Flip Clockwise', $2, '') where userid = $1 and name = 'Flip Clockwise'", userid, deckid)
 	return err
 }
 
 func ChangeActiveDeck(deckid string, userid string) error {
-	_, err := Database.Exec("Update accountdecks set active = 'false' where userid = $1 and active = 'true' ", userid)
+	_, err := Database.Exec("Update accountdecks set active = case when deckid = $1 then not active else 'false' end where userid = $2", deckid, userid)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	_, err = Database.Exec("Update accountdecks set active = 'true' where deckid = $1 ", deckid)
+	/*_, err = Database.Exec("Update accountdecks set active = 'true' where deckid = $1 ", deckid)*/
 	return err
 }
 
@@ -70,13 +77,18 @@ func getCardByUseridAndName(userid, name string) (string, error) {
 
 func RemoveCardDeckIdByDeckId(userid string, deckid string) error {
 
-	deckIds, err := getCardByUseridAndName(userid, "Roll Again")
+	_, err := Database.Exec("Update accountcards set deckids = replace(deckids, $2, '') where userid = $1", userid, ", "+deckid)
+	if err != nil {
+		return err
+	}
+
+	/*deckIds, err := getCardByUseridAndName(userid, "Roll Again")
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Roll Again'", userid, deckid, deckIds)
+	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Roll Again'", userid, ", " + deckid, deckIds)
 	if err != nil {
 		return err
 	}
@@ -87,7 +99,7 @@ func RemoveCardDeckIdByDeckId(userid string, deckid string) error {
 		return err
 	}
 
-	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Double Mana'", userid, deckid, deckIds)
+	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Double Mana'", userid, ", " + deckid, deckIds)
 	if err != nil {
 		return err
 	}
@@ -98,10 +110,6 @@ func RemoveCardDeckIdByDeckId(userid string, deckid string) error {
 		return err
 	}
 
-	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Destroy Column'", userid, deckid, deckIds)
-	if err != nil {
-		return err
-	}
 
 	deckIds, err = getCardByUseridAndName(userid, "Flip Clockwise")
 	if err != nil {
@@ -109,11 +117,17 @@ func RemoveCardDeckIdByDeckId(userid string, deckid string) error {
 		return err
 	}
 
-	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Flip Clockwise'", userid, deckid, deckIds)
+	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Flip Clockwise'", userid, ", " + deckid, deckIds)
 	if err != nil {
 		return err
 	}
 
+
+	_, err = Database.Exec("Update accountcards set deckids = replace($3, $2, '') where userid = $1 and name = 'Flip Clockwise'", userid, ", " + deckid, deckIds)
+	if err != nil {
+		return err
+	}
+	*/
 	_, err = Database.Exec("DELETE FROM accountdecks Where deckid = $1", deckid)
 	return err
 }

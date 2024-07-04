@@ -54,8 +54,8 @@ export default function Decks() {
             count: 0
         },
         {name: "Double Mana", mana: 8, image: doubleManaCard, count: 0},
-        {name: "Roll again", mana: 7, image: rollAgainCard, count: 0},
-        {name: "Rotate Grid", mana: 5, image: rotateGridCard, count: 0}
+        {name: "Roll Again", mana: 7, image: rollAgainCard, count: 0},
+        {name: "Flip Clockwise", mana: 5, image: rotateGridCard, count: 0}
     ];
 
     /*let decks: Deck[] = [
@@ -98,22 +98,32 @@ export default function Decks() {
         cardsForNewDeck.push(card)
         setCardsForNewDeck(cardsForNewDeck)
 
-        fetch("http://localhost:9090/addCardToDeck", {
+        authFetch("http://localhost:9090/addCardToDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({name: card.name, deckId: clickedDeck.deckid})
-        }).then(r => {
-            if (r.status === 200) {
-                return r.json()
-            } else {
-                // Error handling
-            }
-        })
+        }).then(() =>
+            window.location.reload())
 
 
+    }
+
+    const removeCardFromDeck = (card: CardType) => {
+        cardsForNewDeck.push(card)
+        setCardsForNewDeck(cardsForNewDeck)
+
+        authFetch("http://localhost:9090/removeCardFromDeck", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({name: card.name, deckId: clickedDeck.deckid})
+        }).then(() =>
+            window.location.reload())
     }
 
     const handleError = () => {
@@ -138,21 +148,17 @@ export default function Decks() {
 
     function setActiveDeck(deck: Deck) {
         console.log(deck.deckid)
-        if (!deck.active) {
-            authFetch("http://localhost:9090/setActiveDeck", {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json, text/plain',
-                    'Content-Type': 'application/json;charset=UTF-8'
-                },
-                body: JSON.stringify({name: deck.name, deckid: deck.deckid})
-            }).then( () => {
-                window.location.reload()
-            })
-        } else {
-            setErrorMessage("This deck is already activated.")
-            setIsError(true)
-        }
+        authFetch("http://localhost:9090/setActiveDeck", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({name: deck.name, deckid: deck.deckid})
+        }).then(() => {
+            window.location.reload()
+        })
+
     }
 
     function submitDeckCreation(deck: Deck) {
@@ -172,7 +178,7 @@ export default function Decks() {
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({name: deck.name})
-        }).then( () => {
+        }).then(() => {
             window.location.reload()
         })
     }
@@ -187,7 +193,7 @@ export default function Decks() {
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({name: deck.name, deckid: deck.deckid})
-        }).then( () => {
+        }).then(() => {
             window.location.reload()
         })
     }
@@ -218,8 +224,11 @@ export default function Decks() {
                             <div className={"specificCardInCreatDeckMenu"}>
                                 <h3>{card.name}</h3>
                                 <img id="cardImages" src={card.image} alt={"card image"}/>
-                                <Button onClick={() => addCardToDeck(card)} variant={"contained"}
-                                        color={"secondary"} style={{marginTop: "20px"}}>Add to Deck</Button>
+                                <Button onClick={() => {
+                                    !clickedDeck.cards.find(e => e.name === card.name) ? addCardToDeck(card) : removeCardFromDeck(card)
+                                }} variant={"contained"}
+                                        color={"secondary"}
+                                        style={{marginTop: "20px"}}>{clickedDeck.cards.find(e => e.name === card.name) ? "Delete" : "Add to Deck"}</Button>
                             </div>
                         ))}
 
@@ -270,8 +279,8 @@ export default function Decks() {
                                             Deck</Button>
                                         <Button variant="contained" color="error" onClick={() => deleteDeck(deck)}>Delete
                                             Deck</Button>
-                                        <Button variant={"contained"} color={deck.active ? "info" : "success"}
-                                                onClick={() => setActiveDeck(deck)}> {deck.active ? "Currently Using" : "Activate"}</Button>
+                                        <Button variant={"contained"} color={!deck.active ? "info" : "success"}
+                                                onClick={() => setActiveDeck(deck)}> {!deck.active ? "Activate" : "Active"}</Button>
                                     </div>
                                 </Card>
                             </div>

@@ -48,7 +48,7 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 }
 
 func GetCardsByDeckID(deckID string, name string) ([]Types.Card, error) {
-	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%' and name = $2", deckID, name)
+	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%'", deckID)
 	if err != nil {
 		return []Types.Card{}, err
 	}

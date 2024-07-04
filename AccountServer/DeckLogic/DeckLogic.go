@@ -17,10 +17,11 @@ func GetCardsOfDeckAsJsonString(deckid string, name string) string {
 		log.Println(err)
 		return ""
 	}
+	log.Println(cards[0].DeckID)
 	var cardString = ""
 	for cardIndex := range cards {
 		if cards[cardIndex].UserID != "" {
-			cardString = fmt.Sprintf(`%s, {"name": "%s", "count": "%s", "image": "%s"}`, cards[cardIndex].Name, strconv.Itoa(cards[cardIndex].Count), cards[cardIndex].Effect, cards[cardIndex].Image)
+			cardString = fmt.Sprintf(`%s, {"name": "%s", "count": "%s", "image": "%s"}`, cardString, cards[cardIndex].Name, strconv.Itoa(cards[cardIndex].Count), cards[cardIndex].Image)
 		}
 	}
 	if cardString != "" {
@@ -44,7 +45,7 @@ func CreateNewDeck(name string, userid string) {
 }
 
 func AddCardToDeck(cardInfos Types.AddCard, userid string) {
-
+	log.Println(cardInfos.Deckid, cardInfos.Name, userid)
 	err := Database.UpdateCardDeckId(cardInfos, userid)
 	if err != nil {
 		return
@@ -53,7 +54,7 @@ func AddCardToDeck(cardInfos Types.AddCard, userid string) {
 }
 
 func RemoveCardFromDeck(cardInfos Types.AddCard, userid string) {
-	err := Database.RemoveCardDeckId(userid, cardInfos.Deckid)
+	err := Database.RemoveCardDeckId(userid, cardInfos)
 	if err != nil {
 		return
 	}

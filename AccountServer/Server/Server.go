@@ -596,7 +596,9 @@ func addCardToDeck(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
+			log.Println(t.Deckid, t.Name, userid)
 			DeckLogic.AddCardToDeck(t, userid)
+			log.Println("add")
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -637,6 +639,7 @@ func removeCardFromDeck(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			DeckLogic.RemoveCardFromDeck(t, userid)
+			log.Println("remove")
 			w.WriteHeader(http.StatusOK)
 		}
 	}
