@@ -14,6 +14,7 @@ import VolumeSlider from "../components/VolumeSlider";
 import destroyColumnCard from "../cards/destroy_column.png"
 import doubleManaCard from "../cards/double_mana.png"
 import rollAgainCard from "../cards/roll_again.png"
+import flipClockwiseCard from "../cards/rotate_grid.png"
 
 
 export default function Game() {
@@ -30,7 +31,7 @@ export default function Game() {
     const [gameId, setGameId] = useState("")
     const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
     const [rolled, setRolled] = useState(false)
-    const [placed, setPlaced] = useState(false)
+    const [placed, setPlaced] = useState(true)
     const [player1Score, setPlayer1Score] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
@@ -240,8 +241,7 @@ export default function Game() {
         if (gameInfo.ActivePlayer) {
             console.log(gameInfo.ActivePlayer.active)
             if (gameInfo.ActivePlayer.active) {
-                console.log("setFalse")
-                setRolled(false)
+                setRolled(!placed)
                 setPlaced(false)
             } else {
                 setRolled(true)
@@ -279,6 +279,19 @@ export default function Game() {
 
     function playCard(card: card) {
         websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId}))
+    }
+
+    function getCardPicture(card: card) {
+        switch (card.name) {
+            case "Roll Again":
+                return rollAgainCard
+            case "Double Mana":
+                return  doubleManaCard
+            case "Destroy Column":
+                return  destroyColumnCard
+            case "Flip Clockwise":
+                return flipClockwiseCard
+        }
     }
 
     return (
@@ -352,7 +365,7 @@ export default function Game() {
                                 <h3>Mana : {enemyInfo?.mana || "0"}</h3>
                             </div>
                             <div className="playerInfoUsernameRating">
-                            <h2>{player1.username}</h2>
+                                <h2>{player1.username}</h2>
                                 <p>Rating: {player1.rating}</p>
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
@@ -407,7 +420,8 @@ export default function Game() {
                     </div>
                     <div className={"playerAndCards"}>
                         <div className="playerInfo">
-                            <img src={"data:image/jpeg;base64," + sessionStorage.getItem("profilePicture")} alt={player2.username}/>
+                            <img src={"data:image/jpeg;base64," + sessionStorage.getItem("profilePicture")}
+                                 alt={player2.username}/>
                             <div className="playerInfoUsernameRating">
                                 <h2>{player2.username}</h2>
                                 <p>Rating: {player2.rating}</p>
@@ -424,7 +438,7 @@ export default function Game() {
                                         playCard(card)
                                     }
                                 }}>
-                                    <img src={card.picture} alt={"card image"}/>
+                                    <img src={getCardPicture(card)} alt={"card image"}/>
                                 </div>
                             ))}
                         </div>
