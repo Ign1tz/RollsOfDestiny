@@ -11,6 +11,7 @@ class Factory (private val repository: Repository):ViewModelProvider.Factory{
         HomeViewModel::class.java -> HomeViewModel(repository = repository)
         GameViewModel::class.java -> GameViewModel(repository = repository)
         DeckViewModel::class.java -> DeckViewModel(repository = repository)
+        CardViewModel::class.java -> CardViewModel(repository = repository)
         else -> throw IllegalArgumentException("Oh oh!")
     } as T
 }

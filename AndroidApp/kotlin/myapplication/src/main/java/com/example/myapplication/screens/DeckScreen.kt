@@ -17,7 +17,7 @@ fun DeckScreen (deckViewModel: DeckViewModel, navController: NavController) {
         topBar = { ScreenTopBar(navController = navController, "Your Decks") },
 
     ){innerPadding ->
-        DeckList(modifier = Modifier.padding(innerPadding), deckViewModel, deck = deckViewModel.getDeckList())
+        DeckList(modifier = Modifier.padding(innerPadding), deckViewModel, deck = deckViewModel.getDeckList(), navController)
     }
 
 }

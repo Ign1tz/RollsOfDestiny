@@ -6,11 +6,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.screens.CardScreen
 import com.example.myapplication.screens.DeckScreen
 import com.example.myapplication.screens.GameScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
-import com.example.myapplication.viewmodels.Deck
+import com.example.myapplication.viewmodels.CardViewModel
 import com.example.myapplication.viewmodels.DeckViewModel
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.HomeViewModel
@@ -25,6 +26,7 @@ fun Navigation() {
     val homeViewModel: HomeViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val gameViewModel: GameViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val deckViewModel: DeckViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val cardViewModel: CardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
 
 
     NavHost(navController = navController,
@@ -50,6 +52,9 @@ fun Navigation() {
 
         composable(route = "decks") {
             DeckScreen(navController = navController,deckViewModel = deckViewModel)
+        }
+        composable (route = "cards") {
+            CardScreen(navController = navController, cardViewModel = cardViewModel)
         }
     }
 }
