@@ -1,6 +1,6 @@
 import TopAppBar from "../bars/TopAppBar";
 import {Modal, TextField} from "@mui/material";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
 import "../css/Settings.css"
 import {profile} from "../types/profileTypes";
@@ -16,6 +16,35 @@ export default function Settings({profile}: {profile:profile }) {
     const [isUsernameError, setIsUsernameError] = useState(false);
     const [isPasswordError, setIsPasswordError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [volume, setVolume] = useState<number>(30)
+    const [imageString, setImageString] = useState("")
+    const [image, setImage] = useState(<img alt={""}/>)
+    const [username, setUsername] = useState("")
+
+    useEffect(() => {
+        authFetch("http://localhost:9090/userInfo").then(r => {
+
+            return r.json()
+        }).then(response => {
+            sessionStorage.setItem("userInfo", JSON.stringify(response))
+            sessionStorage.setItem("profilePicture", response.profilePicture)
+        })
+        setVolume(Number(sessionStorage.getItem("volume")) || 30)
+
+        let imageString = sessionStorage.getItem("userInfo")
+        if (imageString) {
+            imageString = JSON.parse(imageString).profilePicture
+            setImage(<img className={"img"} src={"data:image/jpeg;base64," + imageString}
+                                                                                 alt={"Something went wrong"}/>)
+        }
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            let username = JSON.parse(userinfo).username
+            setUsername(username)
+        }
+    }, []);
+
+
 
     function checkPasswordChange() {
         // return false if oldPassword is incorrect
@@ -105,6 +134,39 @@ export default function Settings({profile}: {profile:profile }) {
         }
     }
 
+    function submitProfilePicture() {
+        if (imageString != "") {
+            authFetch("http://localhost:9090/changeProfilePicture", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({profilePicture: imageString})
+            }).then(r => {
+                if (r.status === 200) {
+                }
+                setErrorMessage("Something went wrong while trying to save your password. Please try again.");
+            });
+        }
+    }
+
+    function handleImage(e: any) {
+        let reader = new FileReader()
+        reader.onloadend = function () {
+            if (typeof reader.result === "string") {
+                let convertedImg = reader.result.split(',')[1]
+                setImageString(convertedImg)
+                let image = <img className={"img"} src={"data:image/jpeg;base64," + convertedImg}
+                                 alt={"Something went wrong"}></img>
+                setImage(image)
+
+            }
+        }
+        reader.readAsDataURL(e.target.files[0])
+
+    }
+
     return (
         <>
             <TopAppBar loggedIn={true}></TopAppBar>
@@ -125,19 +187,21 @@ export default function Settings({profile}: {profile:profile }) {
                     <div className="profilePicture">
                         <h2 id={"h2Text"}>Profile Picture</h2>
                         <h3 id={"h3Text"}>Your current Profile Picture:</h3>
-                        <img src={profile.profilePicture} alt={"profile picture current"}/>
-                        <h3 id={"h3Text"}>Upload a new picture</h3>
-                        <h4>Coming soon...</h4>
+                        {image}
+                        <input className={"profile_input"} type={"file"} accept={"image/png, image/gif, image/jpeg"}
+                               name={"file"}
+                               onChange={handleImage}/>
+                        <Button variant={"contained"} color = "secondary" onClick={submitProfilePicture}>Submit Profile Picture</Button>
                     </div>
                     <div className="volume">
                         <h2 id={"h2Text"}>Volume</h2>
-                        <VolumeSlider/>
+                        <VolumeSlider volume={volume} setVolume={setVolume}/>
                         <h5>Attention: it is required to "slide" the bar, not click it.</h5>
                     </div>
                     <div className="username">
                         <h2 id={"h2Text"}>Username</h2>
                         <h3 id={"h3Text"}>New Username</h3>
-                        <TextField id="filled-basic" label={profile.username} variant="filled"
+                        <TextField id="filled-basic" label={username} variant="filled"
                                    value={newUsername}
                                    onChange={(event) => setNewUsername(event.target.value)}/>
                         <br/>

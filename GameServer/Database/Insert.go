@@ -3,6 +3,7 @@ package Database
 import (
 	"RollsOfDestiny/GameServer/Types"
 	"fmt"
+	"log"
 )
 
 func InsertPlayer(player Types.Player) error {
@@ -94,6 +95,39 @@ func InsertWholeGame(playfield Types.Playfield) error {
 		return err
 	}
 
+	log.Println("deckId host", playfield.Host.Deck.DeckID)
+	if playfield.Host.Deck.DeckID != "" {
+		err = InsertDeck(playfield.Host.Deck)
+		if err != nil {
+			return err
+		}
+		for cardIndex := range playfield.Host.Deck.Cards {
+			if playfield.Host.Deck.Cards[cardIndex].CardID != "" {
+				err = InsertCard(playfield.Host.Deck.Cards[cardIndex])
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if playfield.Guest.Deck.DeckID != "" {
+		err = InsertDeck(playfield.Guest.Deck)
+		if err != nil {
+			return err
+		}
+		for cardIndex := range playfield.Guest.Deck.Cards {
+			if playfield.Guest.Deck.Cards[cardIndex].CardID != "" {
+				log.Println(playfield.Guest.Deck.Cards[cardIndex].DeckID)
+				err = InsertCard(playfield.Guest.Deck.Cards[cardIndex])
+				if err != nil {
+					log.Println("adsfaffasdfadfasfadsfdasssss", err)
+					return err
+				}
+			}
+		}
+	}
+	log.Println("deckId guest", playfield.Guest.Deck.DeckID)
+
 	game := Types.Game{
 		HostId:       playfield.Host.UserID,
 		GuestId:      playfield.Guest.UserID,
@@ -105,5 +139,11 @@ func InsertWholeGame(playfield Types.Playfield) error {
 	}
 
 	err = InsertGame(game)
+	return err
+}
+
+func InsertPosition(position Types.Position) error {
+	_, err := Database.Exec("INSERT INTO position VALUES ($1, $2, $3, $4)",
+		position.Gameid, position.CurrentStep, position.HostInfo, position.GuestInfo)
 	return err
 }

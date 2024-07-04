@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.SettingViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -27,21 +28,22 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginButton (viewModel: LoginViewModel) {
+fun LoginButton(viewModel: LoginViewModel) {
 
 }
 
 
 @Composable
-fun RegisterButton (viewModel: LoginViewModel) {
+fun RegisterButton() {
     Button(
-        modifier = Modifier.size(130.dp,50.dp),
-        onClick = {  },
+        modifier = Modifier.size(130.dp, 50.dp),
+        onClick = { },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Register",
+        Text(
+            "Register",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -51,16 +53,18 @@ fun RegisterButton (viewModel: LoginViewModel) {
 
 
 @Composable
-fun TopButton (navController: NavController, icon: String) {
+fun TopButton(navController: NavController, icon: String) {
     Button(
         modifier = Modifier
-            .size(50.dp,50.dp),
+            .size(50.dp, 50.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black),
+            containerColor = Color.Black
+        ),
         shape = RoundedCornerShape(10.dp),
         onClick = { navController.popBackStack() }
     ) {
-        Text(icon,
+        Text(
+            icon,
             color = Color.White,
             fontSize = 25.sp,
             fontFamily = FontFamily.Serif,
@@ -71,16 +75,39 @@ fun TopButton (navController: NavController, icon: String) {
 }
 
 @Composable
-fun QuickPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+fun UpButton() {
+    Button(
+        modifier = Modifier
+            .size(50.dp, 50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        ),
+        shape = RoundedCornerShape(10.dp),
+        onClick = {}
+    ) {
+        Text(
+            "<",
+            color = Color.White,
+            fontSize = 25.sp,
+            fontFamily = FontFamily.Serif,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+    }
+}
+
+@Composable
+fun QuickPlayButton(navController: NavController, gameViewModel: GameViewModel) {
     gameViewModel.GameType.value = "bot"
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
-        onClick = {navController.navigate(route = "game/bot")},
+        modifier = Modifier.size(300.dp, 50.dp),
+        onClick = { navController.navigate(route = "game/bot") },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Quickplay",
+        Text(
+            "Quickplay",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -89,15 +116,16 @@ fun QuickPlayButton (navController: NavController, gameViewModel: GameViewModel)
 }
 
 @Composable
-fun FriendPlayButton () {
+fun FriendPlayButton() {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
+        modifier = Modifier.size(300.dp, 50.dp),
         onClick = {},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Play vs Friend",
+        Text(
+            "Play vs Friend",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -106,16 +134,17 @@ fun FriendPlayButton () {
 }
 
 @Composable
-fun RankedPlayButton (navController: NavController, gameViewModel: GameViewModel) {
+fun RankedPlayButton(navController: NavController, gameViewModel: GameViewModel) {
     gameViewModel.GameType.value = ""
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
-        onClick = {navController.navigate(route = "game")},
+        modifier = Modifier.size(300.dp, 50.dp),
+        onClick = { navController.navigate(route = "game") },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Ranked",
+        Text(
+            "Ranked",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -124,15 +153,16 @@ fun RankedPlayButton (navController: NavController, gameViewModel: GameViewModel
 }
 
 @Composable
-fun ScoreboardButton () {
+fun ScoreboardButton() {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
+        modifier = Modifier.size(300.dp, 50.dp),
         onClick = {},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Scoreboard",
+        Text(
+            "Scoreboard",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -141,15 +171,16 @@ fun ScoreboardButton () {
 }
 
 @Composable
-fun SettingsButton () {
+fun SettingsButton(navController: NavController) {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
-        onClick = {},
+        modifier = Modifier.size(300.dp, 50.dp),
+        onClick = { navController.navigate(route = "setting") },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("Settings",
+        Text(
+            "Settings",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif
@@ -158,17 +189,68 @@ fun SettingsButton () {
 }
 
 @Composable
-fun LogOut (viewModel: LoginViewModel, navController: NavController) {
+fun LogOut(viewModel: LoginViewModel, navController: NavController) {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
-        onClick = {viewModel.repository.returnDelete(); navController.navigate("login")},
+        modifier = Modifier.size(300.dp, 50.dp),
+        onClick = { viewModel.repository.returnDelete(); navController.navigate("login") },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
-        Text("LogOut",
+        Text(
+            "LogOut",
             color = Color.White,
             fontSize = 20.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun PasswordConfirmation(navController: NavController, settingViewModel: SettingViewModel) {
+    Button(
+        modifier = Modifier.size(230.dp, 40.dp),
+        onClick = {
+            if (settingViewModel.changePassword()) {
+                navController.navigate(route = "home")
+            } else {
+                settingViewModel.oldPassword.value = ""
+                settingViewModel.newPassword.value = ""
+                settingViewModel.confirmNewPassword.value = ""
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text(
+            "Confirm Password",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun UsernameConfirmation(navController: NavController, settingViewModel: SettingViewModel) {
+    Button(
+        modifier = Modifier.size(230.dp, 40.dp),
+        onClick = {
+            if (settingViewModel.changeUsername()) {
+                navController.navigate(route = "home")
+            } else {
+                settingViewModel.username.value = ""
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text(
+            "Confirm Username",
+            color = Color.White,
+            fontSize = 18.sp,
             fontFamily = FontFamily.Serif
         )
     }

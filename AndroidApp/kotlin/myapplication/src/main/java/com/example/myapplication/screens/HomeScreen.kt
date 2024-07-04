@@ -29,6 +29,8 @@ import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodels.GameViewModel
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
@@ -39,6 +41,7 @@ import com.example.myapplication.widgets.FriendList
 import com.example.myapplication.widgets.TitleTopBar
 import com.example.myapplication.widgets.TopButton
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 
 @OptIn(ExperimentalMaterial3Api::class)
