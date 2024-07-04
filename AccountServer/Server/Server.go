@@ -799,9 +799,9 @@ func getYourCards(w http.ResponseWriter, r *http.Request) {
 
 func getNewCards(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "OPTIONS" {
-		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
-		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
 	userid, valid := checkToken(w, r)
@@ -813,7 +813,6 @@ func getNewCards(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
 		var oldCardString string
 		for cardIndex := range oldCards {
 			if oldCards[cardIndex].UserID != "" {
@@ -848,6 +847,46 @@ func getNewCards(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func aknowledgeCard(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			fmt.Printf("Raw body: %s\n", body)
+
+			var t Types.AknowledgeCard
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			Database.UpdateCardCount(userid, t.Name)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
@@ -870,8 +909,9 @@ func setupRoutes() {
 	http.HandleFunc("/removeDeck", removeDeck)
 	http.HandleFunc("/getTopTen", getTopTen)
 	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
-	http.HandleFunc("/getYourCards", changeProfilePicture)
-	http.HandleFunc("/getNewCard", getNewCards)
+	http.HandleFunc("/getYourCards", getYourCards)
+	http.HandleFunc("/getNewCards", getNewCards)
+	http.HandleFunc("/aknowledgeNewCard", aknowledgeCard)
 }
 
 func Server() {

@@ -25,6 +25,11 @@ func UpdatePassword(userid string, password string) error {
 	return err
 }
 
+func UpdateCardCount(userid string, name string) error {
+	_, err := Database.Exec("Update accountcards set count = 1 where userid = $1 and name = $2 ", userid, name)
+	return err
+}
+
 func UpdateCardDeckId(cardInfo Types.AddCard, userid string) error {
 	_, err := Database.Exec(`
     UPDATE accountcards 

@@ -8,6 +8,7 @@ import destroyColumnCard from "../cards/destroy_column.png"
 import doubleManaCard from "../cards/double_mana.png"
 import rollAgainCard from "../cards/roll_again.png"
 import rotateGridCard from "../cards/rotate_grid.png"
+import flipClockwiseCard from "../cards/rotate_grid.png"
 import {authFetch} from "../auth";
 
 export default function Decks() {
@@ -44,11 +45,12 @@ export default function Decks() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isError, setIsError] = useState(false)
 
-    const [hasMessage, setHasMessage] = useState(true)
+    const [hasMessage, setHasMessage] = useState(false)
     const [showNewCard, setShowNewCard] = useState(false)
-    const [newCard, setNewCard] = useState<CardType>()
 
     const [decks, setDecks] = useState<Deck[]>([])
+    const [oldCards, setOldCards] = useState<string[]>([])
+    const [newCards, setNewCards] = useState<string[]>([])
 
     let cards: CardType[] = [
         {
@@ -61,27 +63,6 @@ export default function Decks() {
         {name: "Roll Again", mana: 7, image: rollAgainCard, count: 0},
         {name: "Flip Clockwise", mana: 5, image: rotateGridCard, count: 0}
     ];
-
-    /*let decks: Deck[] = [
-        {
-            name: "Test", /!*numberOfCards: 8,*!/ deckID: "1", cards: cards, active: true
-        },
-        {
-            name: "gdrgrdg", /!*numberOfCards: 8,*!/ deckID: "2", cards: [], active: false
-        },
-        {
-            name: "gdad3w", /!*numberOfCards: 8,*!/ deckID: "3", cards: [], active: false
-        },
-        {
-            name: "maurits", /!*numberOfCards: 8,*!/ deckID: "4", cards: [], active: false
-        },
-        {
-            name: "heyho", /!*numberOfCards: 8,*!/ deckID: "5", cards: [], active: false
-        },
-        {
-            name: "siuuuu", /!*numberOfCards: 8,*!/ deckID: "6", cards: [], active: false
-        }
-    ];*/
 
     const clickEvent = (deck: Deck) => {
         setClickedDeck(deck)
@@ -100,36 +81,42 @@ export default function Decks() {
 
     const openNewCardModal = () => {
         setShowNewCard(true)
-        setNewCard(cards[0])
         // fetch logic for getting new card
     }
 
     const closeNewCardModal = () => {
-        setShowNewCard(false)
-        setNewCard(cards[0])
-    }
-
-
-
-    const addCardToDeck = (card: CardType) => {
-        cardsForNewDeck.push(card)
-        setCardsForNewDeck(cardsForNewDeck)
-
-        fetch("http://localhost:9090/addCardToDeck", {
+        authFetch("http://localhost:9090/aknowledgeNewCard", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({name: card.name, deckId: clickedDeck.deckid})
+            body: JSON.stringify({name: newCards[0]})
         }).then(() =>
-            window.location.reload())
+            window.location.reload()
+        )
+        setShowNewCard(false)
+    }
+
+
+    const addCardToDeck = (name: string) => {
+        setCardsForNewDeck(cardsForNewDeck)
+
+        authFetch("http://localhost:9090/addCardToDeck", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({name: name, deckId: clickedDeck.deckid})
+        }).then(() =>
+            window.location.reload()
+        )
 
 
     }
 
-    const removeCardFromDeck = (card: CardType) => {
-        cardsForNewDeck.push(card)
+    const removeCardFromDeck = (cardname: string) => {
         setCardsForNewDeck(cardsForNewDeck)
 
         authFetch("http://localhost:9090/removeCardFromDeck", {
@@ -138,7 +125,7 @@ export default function Decks() {
                 'Accept': 'application/json, text/plain',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: JSON.stringify({name: card.name, deckId: clickedDeck.deckid})
+            body: JSON.stringify({name: cardname, deckId: clickedDeck.deckid})
         }).then(() =>
             window.location.reload())
     }
@@ -149,10 +136,6 @@ export default function Decks() {
     }
 
     useEffect(() => {
-        console.log(cards[0].image)
-        console.log(cards[1].image)
-        console.log(cards[2].image)
-        console.log(cards[3].image)
         authFetch("http://localhost:9090/getDecks").then(response => {
 
             return response.json()
@@ -160,6 +143,15 @@ export default function Decks() {
                 setDecks(r.decks.reverse())
             }
         )
+
+        authFetch("http://localhost:9090/getNewCards").then(response => {
+            return response.json()
+        }).then(r => {
+            setOldCards(r.oldCards)
+            setHasMessage(r.newCards.length > 0)
+            setNewCards(r.newCards)
+            console.log(r)
+        })
     }, []);
 
 
@@ -215,6 +207,19 @@ export default function Decks() {
         })
     }
 
+    function getCardPicture(card: string) {
+        switch (card) {
+            case "Roll Again":
+                return rollAgainCard
+            case "Double Mana":
+                return doubleManaCard
+            case "Destroy Column":
+                return destroyColumnCard
+            case "Flip Clockwise":
+                return flipClockwiseCard
+        }
+    }
+
     return (
         <div className={"deckPage"}>
             <TopAppBar loggedIn={true}/>
@@ -235,33 +240,19 @@ export default function Decks() {
                         <h3>{clickedDeck.name}</h3>
                         <Button variant={"contained"} color={"error"} onClick={closeDeckMenu}>Close</Button>
                     </div>
-
                     <div className={"chooseCardsMenu"}>
-                        {cards.map((card) => (
+                        {oldCards.map((cardName) => (
                             <div className={"specificCardInCreatDeckMenu"}>
-                                <h3>{card.name}</h3>
-                                <img id="cardImages" src={card.image} alt={"card image"}/>
+                                <h3>{cardName}</h3>
+                                <img id="cardImages" src={getCardPicture(cardName)} alt={"card image"}/>
                                 <Button onClick={() => {
-                                    !clickedDeck.cards.find(e => e.name === card.name) ? addCardToDeck(card) : removeCardFromDeck(card)
+                                    !clickedDeck.cards.find(e => e.name === cardName) ? addCardToDeck(cardName) : removeCardFromDeck(cardName)
                                 }} variant={"contained"}
                                         color={"secondary"}
-                                        style={{marginTop: "20px"}}>{clickedDeck.cards.find(e => e.name === card.name) ? "Delete" : "Add to Deck"}</Button>
-                            </div>
-                        ))}
-
-                    </div>
-                    {/*
-                    <div className={"specificDeckCards"}>
-                        {clickedDeck.cards.map((card) => (
-                            <div className={"specificCardInCreatDeckMenu"}>
-                                <h3>{card.name}</h3>
-                                <img id="cardImages" src={card.image} alt={"card image"}/>
-                                <h5>In Deck: {cardsForNewDeck.filter(c => c.name === card.name).length + 1}</h5>
+                                        style={{marginTop: "20px"}}>{clickedDeck.cards.find(e => e.name === cardName) ? "Delete" : "Add to Deck"}</Button>
                             </div>
                         ))}
                     </div>
-                     */}
-
                 </div>
             </Modal>
             <Modal open={createDeckButtonClicked} onClose={closeCreateDeckMenu}>
@@ -287,20 +278,20 @@ export default function Decks() {
                     <h2>You collected a new card! </h2>
                     <div className="errorText">
                         <div className={"individualCardOwned"}>
-                            <h3>{newCard?.name}</h3>
-                            <img src={newCard?.image} alt={"card image"}/>
+                            <h3>{newCards[0]}</h3>
+                            <img src={getCardPicture(newCards[0])} alt={"card image"}/>
                         </div>
-                        <Button variant={"contained"} color={"success"} onClick={closeNewCardModal} >WOW THIS IS THE BEST THING EVER</Button>
+                        <Button variant={"contained"} color={"success"} onClick={closeNewCardModal}>WOW THIS IS THE BEST
+                            THING EVER</Button>
                     </div>
                 </div>
             </Modal>
-
-            <Button onClick={() => setHasMessage(!hasMessage)}>here</Button>
             <div className={"titleWithDecksAndCards"}>
-                <div className={"deckScreenHeader"} style={hasMessage ? {width: "1200px"}: {width:"135px"}}>
+                <div className={"deckScreenHeader"} style={hasMessage ? {width: "1200px"} : {width: "135px"}}>
                     <h2>Your Decks</h2>
                     {hasMessage && (
-                        <Button className="blinking-button" variant={"contained"} color={"warning"} onClick={openNewCardModal}>New
+                        <Button className="blinking-button" variant={"contained"} color={"warning"}
+                                onClick={openNewCardModal}>New
                             Message</Button>
                     )}
 
@@ -331,10 +322,10 @@ export default function Decks() {
                 </div>
                 <h2>Your Cards</h2>
                 <div className={"allCards"}>
-                    {cards.map((card) => (
+                    {oldCards.map((cardname) => (
                         <div className={"individualCardOwned"}>
-                            <h3>{card.name}</h3>
-                            <img src={card.image} alt={"card image"}/>
+                            <h3>{cardname}</h3>
+                            <img src={getCardPicture(cardname)} alt={"card image"}/>
                         </div>
                     ))}
                 </div>

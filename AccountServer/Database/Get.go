@@ -2,6 +2,8 @@ package Database
 
 import (
 	"RollsOfDestiny/AccountServer/Types"
+	"os"
+	"strconv"
 )
 
 func GetAccountByUserID(userID string) (Types.Account, error) {
@@ -52,7 +54,8 @@ func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards = make([]Types.Card, 100)
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
 	id := 0
 	for dbCards.Next() {
 		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {
@@ -68,7 +71,8 @@ func GetCardsByUserId(userid string) ([]Types.Card, error) {
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards = make([]Types.Card, 100)
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
 	id := 0
 	for dbCards.Next() {
 		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {
@@ -84,7 +88,8 @@ func GetAllCardsByUserId(userid string) ([]Types.Card, error) {
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards = make([]Types.Card, 100)
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
 	id := 0
 	for dbCards.Next() {
 		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {

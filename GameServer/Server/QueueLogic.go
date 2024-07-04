@@ -228,6 +228,7 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 	var cards = make([]Types.Card, 20)
 	log.Println(stringCards)
 	cardCount := -1
+
 	for index := range stringCards {
 		switch stringCards[index] {
 		case "Roll Again":
