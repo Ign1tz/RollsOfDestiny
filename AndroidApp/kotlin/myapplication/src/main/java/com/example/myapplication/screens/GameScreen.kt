@@ -92,9 +92,9 @@ fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
     }else{
         Scaffold (
 
-            topBar = { ProfileRow(profileImage = R.drawable.caught, username = gameViewModel.gameInfo?.EnemyInfo?.Username ?: "", score = gameViewModel.gameInfo?.EnemyInfo?.Score ?: 0)},
+            topBar = { ProfileRow(profileImage = R.drawable.caught, username = gameViewModel.gameInfo?.EnemyInfo?.Username ?: "", score = gameViewModel.gameInfo?.EnemyInfo?.Score ?: 0, mana = gameViewModel.gameInfo?.EnemyInfo?.mana?: "0")},
 
-            bottomBar = { ProfileRow(profileImage = R.drawable.xdd, username = gameViewModel.user.userName, score =  gameViewModel.gameInfo?.YourInfo?.Score ?: 0) }
+            bottomBar = { ProfileRow(profileImage = R.drawable.xdd, username = gameViewModel.user.userName, score =  gameViewModel.gameInfo?.YourInfo?.Score ?: 0, mana = gameViewModel.gameInfo?.YourInfo?.mana?: "0") }
 
 
 

@@ -1,12 +1,20 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.types.ActivePlayer
@@ -18,6 +26,7 @@ import com.example.myapplication.types.gameInfo
 import com.example.myapplication.types.gameMessageBody
 import com.example.myapplication.types.idMessageBody
 import com.example.myapplication.types.message
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -49,7 +58,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
 
-    private val IPADDRESS = "10.0.0.2"
+    private val IPADDRESS = "192.168.0.181"
 
     fun resetAllValues () {
         connected.value = false
@@ -197,4 +206,20 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
             hasRolled.value = true
         }
     }
+
+    fun getCardList(): List<Card> {
+        val cards = listOf("Destroy Column", "Double Mana", "Roll Again", "Flip Clockwise")
+        return cards.map { name -> Card(name, getCardImageById(name)) }
+    }
+
+    private fun getCardImageById (cardName: String): Int {
+        return when (cardName) {
+            "Destroy Column" -> R.drawable.destroy_column_app
+            "Double Mana" -> R.drawable.double_mana_app
+            "Roll Again" -> R.drawable.roll_again_app
+            "Flip Clockwise" -> R.drawable.rotate_grid_app
+            else -> R.drawable.double_mana_app
+        }
+    }
 }
+data class Card (val cardName: String, val cardImageId: Int)
