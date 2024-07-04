@@ -41,6 +41,11 @@ func UpdateQueueEntry(userId string, websocketId string) error {
 	return err
 }
 
+func UpdateFriendQueueEntry(userId string, websocketId string) error {
+	_, err := Database.Exec("Update friendqueue set websocketconnectionid = $1 where userid = $2", websocketId, userId)
+	return err
+}
+
 func UpdatePosition(position Types.Position) error {
 	_, err := Database.Exec("Update position set currentstep = $1, hostinfo = $2, guestinfo = $3 where gameid = $4", position.CurrentStep, position.HostInfo, position.GuestInfo, position.Gameid)
 	return err

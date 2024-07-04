@@ -99,6 +99,8 @@ export default function Game() {
             console.log("queuing websocket")
             if (sessionStorage.getItem("GameType") === "bot") {
                 startBot()
+            } else if (sessionStorage.getItem("GameType") === "Friend") {
+                queueForGameWithFriend()
             } else {
                 queueForGame()
             }
@@ -167,6 +169,29 @@ export default function Game() {
                     userid: JSON.parse(userinfo).userid,
                     websocketconnectionid: websocketId,
                     username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+    }
+
+    async function queueForGameWithFriend() {
+        let userinfo = sessionStorage.getItem("userInfo")
+        console.log(JSON.parse(userinfo || ""))
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://localhost:8080/queueFroGameWithFriend", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username,
+                    FriendId: sessionStorage.getItem("FriendId") || ""
                 })
             });
         } else {
@@ -364,6 +389,7 @@ export default function Game() {
                                 <Dice onRoll={(value) => {
                                     console.log(value);
                                     setRolled(true)
+                                    websocket.send(JSON.stringify({type: "rolled", message: "", gameId: gameId}))
                                 }} defaultValue={6} size={100}
                                       cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
                                       disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>

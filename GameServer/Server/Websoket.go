@@ -147,7 +147,14 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		} else {
 			return nil, nil
 		}
-
+	case "FriendPickColumn":
+		if position.CurrentStep == "afterRoll" {
+			msg1, msg2 := handlePickedColumn(message)
+			position.CurrentStep = "afterColumnPick"
+			return msg1, msg2
+		} else {
+			return nil, nil
+		}
 	case "playCard":
 		if position.CurrentStep == "afterRoll" || position.CurrentStep == "afterColumnPick" {
 			return GameLogic.HandleCards(message, position)
@@ -165,7 +172,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		}
 	case "rolled":
 		position.CurrentStep = "afterRoll"
-		log.Println("rolled")
+		log.Println("rolled", position.CurrentStep)
 		err := Database.UpdatePosition(position)
 		if err != nil {
 			log.Println(err)
@@ -219,6 +226,7 @@ func handleEndTurn(message Types.WebsocketMessage) (map[string]string, map[strin
 }
 
 func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[string]string) {
+	log.Println("friendly")
 	playfield, err := Database.GetPlayfield(message.GameId)
 	if err != nil {
 		panic(err)

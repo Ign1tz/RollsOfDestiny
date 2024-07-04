@@ -13,6 +13,13 @@ export default function HomeScreenButtonGroup() {
     const [join, setJoin] = useState(false);
     const [id, setId] = useState("");
 
+    function handleHosting(){
+        sessionStorage.setItem("GameType", "Friend")
+        sessionStorage.setItem("FriendId", "")
+        navigator.clipboard.writeText(JSON.parse(sessionStorage.getItem("userInfo") || "").userid)
+        window.location.href = "/game"
+    }
+
     return (
         <>
             <Button className="buttonInHomeScreenGroup" color="secondary" variant="contained"
@@ -49,18 +56,24 @@ export default function HomeScreenButtonGroup() {
                     <div className={"hostAndJoinModal"}>
                     {host &&
                         <>
-                            <h4 style={{color: "white"}}>Test</h4>
-                            <Button variant={"contained"} color={"success"}>Play</Button>
+                            <h4 style={{color: "white"}}>{JSON.parse(sessionStorage.getItem("userInfo") || "").userid}</h4>
+                            <Button onClick={handleHosting} variant={"contained"} color={"success"}>Play</Button>
                         </>
                     }
                     {join &&
                         <>
-                            <TextField required id="filled-basic" label="Username" variant="filled"
+                            <TextField required id="filled-basic" label="Userid" variant="filled"
                                        value={id}
                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                            setId(event.target.value);
                                        }}/>
-                            <Button style={{marginTop: "10px"}} variant={"contained"} color={"success"}>Play</Button>
+                            <Button onClick={() => {
+                                if (id != ""){
+                                    sessionStorage.setItem("GameType", "Friend")
+                                    sessionStorage.setItem("FriendId", id)
+                                    window.location.href = "/game"
+                                }
+                            }} style={{marginTop: "10px"}} variant={"contained"} color={"success"}>Play</Button>
                         </>
                     }
                     </div>
