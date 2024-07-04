@@ -98,5 +98,6 @@ fun CenterSettings (viewModel: SettingViewModel, navController: NavController) {
         )
 
         PasswordConfirmation(navController = navController, settingViewModel = viewModel)
+        DeleteAccount(navController = navController, settingViewModel = viewModel)
     }
 }

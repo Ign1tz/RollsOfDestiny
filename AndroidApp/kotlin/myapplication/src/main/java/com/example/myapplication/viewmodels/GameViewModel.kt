@@ -44,7 +44,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import java.net.URI
 
-class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
+class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewModel(), BasicViewModel {
 
     var connected = mutableStateOf(false)
     var WebSocketClient: WebSocketClient? = null
@@ -59,7 +59,6 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
 
-    private val IPADDRESS = "10.0.0.2"
 
     fun resetAllValues () {
         connected.value = false

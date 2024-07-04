@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
+import com.example.myapplication.localdb.User
 import com.example.myapplication.types.friends
 import com.example.myapplication.types.friendsWraper
 import io.ktor.client.HttpClient
@@ -23,17 +24,28 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
-class HomeViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
+class HomeViewModel (val repository: Repository, val IPADDRESS: String) : ViewModel(), BasicViewModel {
 
-    private val IPADDRESS = "10.0.0.2"
-    private val user = repository.getUser()
     var friends = mutableStateOf<List<friends>?>(null)
     var addFriend = mutableStateOf("")
 
+    fun getUsername(): String {
+        val user = repository.getUser()
+        try {
+            return user.userName
+        }catch (e : Exception){
+            return ""
+        }
+    }
+
 
     suspend private fun requestGetFriends() {
-        Log.d("friends", "test")
-
+        val user = repository.getUser()
+        try {
+            user.userName
+        }catch (e : Exception){
+            return
+        }
         val newClient = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -65,6 +77,7 @@ class HomeViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
     }
 
     suspend private fun requestRemoveFriend(username: String){
+        val user = repository.getUser()
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -91,6 +104,7 @@ class HomeViewModel (val repository: Repository) : ViewModel(), BasicViewModel {
     }
 
     suspend private fun requestAddNewFriend(){
+        val user = repository.getUser()
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {

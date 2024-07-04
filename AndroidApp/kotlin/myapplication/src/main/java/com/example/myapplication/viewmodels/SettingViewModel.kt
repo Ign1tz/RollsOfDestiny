@@ -1,7 +1,9 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
@@ -24,15 +26,14 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
-class SettingViewModel (val repository: Repository): ViewModel(), BasicViewModel  {
+class SettingViewModel (val repository: Repository, val IPADDRESS: String): ViewModel(), BasicViewModel  {
 
 
     var username = mutableStateOf("")
     var oldPassword = mutableStateOf("")
     var newPassword = mutableStateOf("")
     var confirmNewPassword = mutableStateOf("")
-
-    val IPADDRESS = "10.0.0.2"
+    var user by mutableStateOf(repository.getUser())
 
 
     suspend private fun changeUsernameRequest(): Boolean {
@@ -131,5 +132,44 @@ class SettingViewModel (val repository: Repository): ViewModel(), BasicViewModel
         confirmNewPassword.value = ""
         Log.d("test", worked.toString())
         return worked
+    }
+
+    fun deleteAccount(){
+        runBlocking { requestDeleteAccount() }
+        runBlocking {
+            repository.returnDelete() }
+    }
+
+    suspend private fun requestDeleteAccount(){
+        val user = repository.getUser()
+        try {
+            user.userName
+        }catch (e : Exception){
+            return
+        }
+        val newClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(user.jwtToken, user.jwtToken)
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
+
+        }
+        var password = newPassword.value
+        val response: HttpResponse = newClient.post("http://$IPADDRESS:9090/deleteAccount") {
+            contentType(ContentType.Application.Json)
+            }
+
     }
 }

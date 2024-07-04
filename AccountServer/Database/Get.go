@@ -47,8 +47,24 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	return decks, nil
 }
 
-func GetCardsByDeckID(deckID string, name string) ([]Types.Card, error) {
+func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
 	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%'", deckID)
+	if err != nil {
+		return []Types.Card{}, err
+	}
+	var cards = make([]Types.Card, 100)
+	id := 0
+	for dbCards.Next() {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image); err != nil {
+			return []Types.Card{}, err
+		}
+		id++
+	}
+	return cards, err
+}
+
+func GetCardsByUserId(userid string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from accountcards where userid = $1 and not cost = 0", userid)
 	if err != nil {
 		return []Types.Card{}, err
 	}

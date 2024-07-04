@@ -1,5 +1,6 @@
 package com.example.myapplication.screens
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,26 +40,30 @@ import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun DisplayPlayer(player: scoreboardPlayer, place: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp, vertical = 5.dp)
-            .background(color = Color(0xFFF9F9F9), shape = RoundedCornerShape(5.dp))
+            .background(color = Color(0xFFb5b5b5), shape = RoundedCornerShape(5.dp))
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            painter = rememberAsyncImagePainter(player.profilePicture),
+            bitmap = BitmapFactory.decodeByteArray(Base64.decode(player.profilePicture, 0), 0, Base64.decode(player.profilePicture, 0).size).asImageBitmap(),
             contentDescription = player.username,
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
+
         Spacer(modifier = Modifier.width(10.dp))
         Column(
             modifier = Modifier.weight(1f)

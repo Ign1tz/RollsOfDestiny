@@ -196,7 +196,7 @@ fun SettingsButton(navController: NavController) {
 fun LogOut(viewModel: LoginViewModel, navController: NavController) {
     Button(
         modifier = Modifier.size(300.dp,50.dp),
-        onClick = {viewModel.repository.returnDelete(); navController.navigate("login")},
+        onClick = { navController.navigate("login"); viewModel.repository.returnDelete()},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -229,6 +229,28 @@ fun PasswordConfirmation(navController: NavController, settingViewModel: Setting
     ) {
         Text(
             "Confirm Password",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun DeleteAccount(navController: NavController, settingViewModel: SettingViewModel) {
+    Button(
+        modifier = Modifier.size(230.dp, 40.dp),
+        onClick = {
+            settingViewModel.deleteAccount()
+            navController.navigate("login")
+
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Red
+        )
+    ) {
+        Text(
+            "Delete Account",
             color = Color.White,
             fontSize = 18.sp,
             fontFamily = FontFamily.Serif

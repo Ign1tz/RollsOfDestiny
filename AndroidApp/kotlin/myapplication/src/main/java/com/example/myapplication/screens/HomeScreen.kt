@@ -47,7 +47,7 @@ import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, loginViewModel: LoginViewModel, gameViewModel: GameViewModel) {
+fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, loginViewModel: LoginViewModel, gameViewModel: GameViewModel, scoreboardViewModel: ScoreboardViewModel) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -86,7 +86,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                 }
             ){ innerPadding ->
                 Column (modifier = Modifier.padding(innerPadding)) {
-                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel)
+                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel, scoreboardViewModel)
                 }
             }
         })

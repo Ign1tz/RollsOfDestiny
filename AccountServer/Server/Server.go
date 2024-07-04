@@ -506,7 +506,7 @@ func getDecks(w http.ResponseWriter, r *http.Request) {
 		//todo: check for empty
 		for deckIndex := range decks {
 			if decks[deckIndex].UserID != "" {
-				cardString = DeckLogic.GetCardsOfDeckAsJsonString(decks[deckIndex].DeckID, decks[deckIndex].Name)
+				cardString = DeckLogic.GetCardsOfDeckAsJsonString(decks[deckIndex].DeckID)
 				deckString = fmt.Sprintf(`%s, {"name": "%s", "deckid": "%s", "active": %s, "cards": [%s]}`, deckString, decks[deckIndex].Name, decks[deckIndex].DeckID, strconv.FormatBool(decks[deckIndex].Active), cardString)
 			}
 		}

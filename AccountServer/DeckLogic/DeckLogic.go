@@ -9,9 +9,9 @@ import (
 	"strconv"
 )
 
-func GetCardsOfDeckAsJsonString(deckid string, name string) string {
+func GetCardsOfDeckAsJsonString(deckid string) string {
 
-	cards, err := Database.GetCardsByDeckID(deckid, name)
+	cards, err := Database.GetCardsByDeckID(deckid)
 
 	if err != nil {
 		log.Println(err)
