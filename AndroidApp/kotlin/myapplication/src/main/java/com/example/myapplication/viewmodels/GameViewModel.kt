@@ -49,7 +49,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
 
-    private val IPADDRESS = "10.0.0.2"
+    private val IPADDRESS = "192.168.0.181"
 
     fun resetAllValues () {
         connected.value = false

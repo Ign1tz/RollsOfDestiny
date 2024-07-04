@@ -28,32 +28,32 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
+//@Composable
+//fun LoginButton (viewModel: LoginViewModel) {
+//
+//}
+
+
+//@Composable
+//fun RegisterButton (viewModel: LoginViewModel) {
+//    Button(
+//        modifier = Modifier.size(130.dp,50.dp),
+//        onClick = {  },
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = Color.Black
+//        )
+//    ) {
+//        Text("Register",
+//            color = Color.White,
+//            fontSize = 20.sp,
+//            fontFamily = FontFamily.Serif
+//        )
+//    }
+//}
+
+
 @Composable
-fun LoginButton (viewModel: LoginViewModel) {
-
-}
-
-
-@Composable
-fun RegisterButton (viewModel: LoginViewModel) {
-    Button(
-        modifier = Modifier.size(130.dp,50.dp),
-        onClick = {  },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black
-        )
-    ) {
-        Text("Register",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Serif
-        )
-    }
-}
-
-
-@Composable
-fun TopButton (navController: NavController, icon: String) {
+fun TopButton (navController: NavController) {
     Button(
         modifier = Modifier
             .size(50.dp,50.dp),
@@ -61,26 +61,6 @@ fun TopButton (navController: NavController, icon: String) {
             containerColor = Color.Black),
         shape = RoundedCornerShape(10.dp),
         onClick = { navController.popBackStack() }
-    ) {
-        Text(icon,
-            color = Color.White,
-            fontSize = 25.sp,
-            fontFamily = FontFamily.Serif,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
-    }
-}
-
-@Composable
-fun UpButton () {
-    Button(
-        modifier = Modifier
-            .size(50.dp,50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black),
-        shape = RoundedCornerShape(10.dp),
-        onClick = {}
     ) {
         Text("<",
             color = Color.White,
@@ -91,6 +71,26 @@ fun UpButton () {
         )
     }
 }
+
+//@Composable
+//fun UpButton () {
+//    Button(
+//        modifier = Modifier
+//            .size(50.dp,50.dp),
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = Color.Black),
+//        shape = RoundedCornerShape(10.dp),
+//        onClick = {}
+//    ) {
+//        Text("<",
+//            color = Color.White,
+//            fontSize = 25.sp,
+//            fontFamily = FontFamily.Serif,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier.align(Alignment.CenterVertically)
+//        )
+//    }
+//}
 
 @Composable
 fun QuickPlayButton (navController: NavController, gameViewModel: GameViewModel) {
@@ -182,13 +182,30 @@ fun SettingsButton () {
 @Composable
 fun LogOut (viewModel: LoginViewModel, navController: NavController) {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
+        modifier = Modifier.size(100.dp,50.dp),
         onClick = {viewModel.repository.returnDelete(); navController.navigate("login")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
     ) {
         Text("LogOut",
+            color = Color.White,
+            fontSize = 15.sp,
+            fontFamily = FontFamily.Serif
+        )
+    }
+}
+
+@Composable
+fun DecksButton (navController: NavController) {
+    Button(
+        modifier = Modifier.size(300.dp,50.dp),
+        onClick = {navController.navigate(route = "decks")},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        )
+    ) {
+        Text("Card Decks",
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif

@@ -30,6 +30,6 @@ fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewMo
         Spacer(Modifier.padding(padding))
         SettingsButton()
         Spacer(Modifier.padding(padding))
-        LogOut(viewModel = loginViewModel, navController)
+        DecksButton(navController = navController)
     }
 }
