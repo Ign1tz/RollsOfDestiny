@@ -39,30 +39,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.myapplication.viewmodels.HomeViewModel
 
 
 @Composable
-fun FriendList(modifier: Modifier) {
+fun FriendList(modifier: Modifier, homeViewModel: HomeViewModel) {
     Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxHeight(0.9f)) {
 
-        var friendState by remember { mutableStateOf("") }
 
 
         Text("Search for a Friend:", style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Serif)
-        TextField(value = friendState,
+        TextField(value = homeViewModel.addFriend.value,
             onValueChange = { searchedFriend ->
-                friendState = searchedFriend },
+                homeViewModel.addFriend.value = searchedFriend },
             label = {Text("username", fontFamily = FontFamily.Serif)},
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxWidth(0.6f))
         Button(
             modifier = Modifier.size(90.dp,30.dp),
-            onClick = { },
+            onClick = { homeViewModel.addNewFriend() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black
             )
@@ -78,16 +77,15 @@ fun FriendList(modifier: Modifier) {
         HorizontalDivider(modifier = Modifier
             .fillMaxWidth(0.6f))
         Spacer(modifier = Modifier.height(8.dp))
-        val friends = listOf("Alice", "Bob", "Charlie", "David")
 
-        if (friends.isEmpty()) {
+        if (homeViewModel.friends.value == null || homeViewModel.friends.value!!.isEmpty()) {
             Column {
                 Text(text = "No friends yet. :(")
             }
         } else {
             LazyColumn (modifier = modifier){
-                items(friends) { friend ->
-                    FriendField(friend)
+                items(homeViewModel.friends.value!!) { friend ->
+                    FriendField(friend.username, homeViewModel)
                 }
             }
         }
@@ -102,12 +100,12 @@ fun FriendList(modifier: Modifier) {
 
 @Composable
 fun FriendField (
-    friend: String) {
+    friend: String, homeViewModel: HomeViewModel) {
     Card (modifier = Modifier.fillMaxWidth(0.6f)) {
         Row (horizontalArrangement = Arrangement.End){
             Text(text = friend, fontFamily = FontFamily.Serif, modifier = Modifier.padding(8.dp))
-            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Challange Friend", modifier = Modifier.clickable {  }.padding(8.dp))
-            Icon(modifier = Modifier.clickable {  }.padding(8.dp),
+            Spacer(Modifier.weight(1f))
+            Icon(modifier = Modifier.clickable { homeViewModel.removeFriend(friend) }.padding(8.dp),
                 imageVector = Icons.Filled.Delete,
                 contentDescription = "Delete from friendlist")
         }

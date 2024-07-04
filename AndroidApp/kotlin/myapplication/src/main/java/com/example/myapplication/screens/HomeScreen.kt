@@ -46,17 +46,18 @@ import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
+fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, loginViewModel: LoginViewModel, gameViewModel: GameViewModel) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    homeViewModel.getFriends()
     ModalNavigationDrawer(
 
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                FriendList(modifier = Modifier)
+                FriendList(modifier = Modifier, homeViewModel)
             }
         },
         content = {
@@ -84,7 +85,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
                 }
             ){ innerPadding ->
                 Column (modifier = Modifier.padding(innerPadding)) {
-                    HomeScreenButtons(navController = navController)
+                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel)
                 }
             }
         })

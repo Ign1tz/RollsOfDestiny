@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.SettingViewModel
 import io.ktor.client.HttpClient

@@ -336,7 +336,6 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 			array = ""
 		}
 		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
-		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 		return
 	}
@@ -401,10 +400,12 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
 		if valid {
+			log.Println("DeleteFriend")
 			// Read the raw body
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				log.Println(err)
 				return
 			}
 			defer func(Body io.ReadCloser) {
