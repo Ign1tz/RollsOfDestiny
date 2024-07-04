@@ -43,22 +43,24 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 
 func createDefaultCards(account Types.Account) []Types.Card {
 	rollAgain := Types.Card{
-		UserID: account.UserID,
-		Name:   "Roll Again",
-		Effect: "rollAgain",
-		DeckID: "",
-		Count:  1,
-		Cost:   4,
-		Image:  "/static/media/roll_again.21331c0ee525eb47281c.png",
+		UserID:    account.UserID,
+		Name:      "Roll Again",
+		Effect:    "rollAgain",
+		DeckID:    "",
+		Count:     1,
+		Cost:      4,
+		Image:     "/static/media/roll_again.21331c0ee525eb47281c.png",
+		Threshold: 1000,
 	}
 	doubleMana := Types.Card{
-		UserID: account.UserID,
-		Name:   "Double Mana",
-		Effect: "doubleMana",
-		DeckID: "",
-		Count:  1,
-		Cost:   3,
-		Image:  "/static/media/double_mana.7c47c6670f52b76c8fa6.png",
+		UserID:    account.UserID,
+		Name:      "Double Mana",
+		Effect:    "doubleMana",
+		DeckID:    "",
+		Count:     1,
+		Cost:      3,
+		Image:     "/static/media/double_mana.7c47c6670f52b76c8fa6.png",
+		Threshold: 1000,
 	}
 	destroyColumn := Types.Card{
 		UserID:    account.UserID,
