@@ -104,3 +104,22 @@ func GetAccountByPartUsername(usernamePart string, userid string) ([]Types.Accou
 
 	return accounts, nil
 }
+
+func GetTopTenPlayers() ([]Types.Account, error) {
+	dbAccount, err := Database.Query("Select * from accounts order by rating desc limit 10")
+	if err != nil {
+		return []Types.Account{}, err
+	}
+	var accounts = make([]Types.Account, 10)
+	id := 0
+	for dbAccount.Next() {
+		var account Types.Account
+		if err := dbAccount.Scan(&account.UserID, &account.Username, &account.Password, &account.Email, &account.ProfilePicture, &account.Rating); err != nil {
+			return []Types.Account{}, err
+		}
+		accounts[id] = account
+		id++
+	}
+
+	return accounts, nil
+}

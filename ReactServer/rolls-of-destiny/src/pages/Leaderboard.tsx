@@ -1,20 +1,23 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import TopAppBar from "../bars/TopAppBar";
 import { profile } from "../types/profileTypes";
 import '../css/Leaderboard.css';
 import testImage from "../soundtracks/testImage.png";
+import {authFetch} from "../auth";
 
 export default function Leaderboard({ loggedIn }: { loggedIn: boolean }) {
 
-    let users: profile[] = [
-        { username: "Bernd", rating: 839, profilePicture: testImage},
-        { username: "Anna", rating: 902, profilePicture: testImage},
-        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
-        { username: "Diana", rating: 820, profilePicture: testImage},
-        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
-    ];
+    const [users, setUsers] = useState<profile[]>([])
 
-    users = users.sort((a, b) => b.rating - a.rating);
+
+
+
+    useEffect(() => {
+        authFetch("http://localhost:9090/getTopTen").then((response) => response.json()).then(r =>
+            setUsers(r.topTenPlayers.sort((a:profile, b:profile) => b.rating - a.rating))
+        )
+    }, []);
+
 
 
     return (
@@ -26,7 +29,7 @@ export default function Leaderboard({ loggedIn }: { loggedIn: boolean }) {
                     {users.map((user, index) => (
                         <li key={index} className="leaderboard-item">
                                 <div className={"someItemsFromLeaderbord"}>
-                                    <img src={user.profilePicture} alt={user.username} className="leaderboard-picture" />
+                                    <img src={"data:image/jpeg;base64," + user.profilePicture} alt={user.username} className="leaderboard-picture" />
                                     <div className="leaderboard-info">
                                         <h2 className="leaderboard-username">{user.username}</h2>
                                         <p className="leaderboard-rating">Rating: {user.rating}</p>

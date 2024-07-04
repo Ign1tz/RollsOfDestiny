@@ -32,6 +32,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
                 return r.json()
             }).then(response => {
                 sessionStorage.setItem("userInfo", JSON.stringify(response))
+                sessionStorage.setItem("profilePicture", response.profilePicture)
             })
         }
     }, []);

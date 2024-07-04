@@ -10,6 +10,11 @@ func UpdateUsername(username string, newUsername string) error {
 	return err
 }
 
+func UpdateProfilePicture(userid string, profilePicture string) error {
+	_, err := Database.Exec("Update accounts set profilepicture = $1 where userid = $2 ", profilePicture, userid)
+	return err
+}
+
 func UpdateRating(userid string, rating int) error {
 	_, err := Database.Exec("Update accounts set rating = rating + $1 where userid = $2 ", rating, userid)
 	return err

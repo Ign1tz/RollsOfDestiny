@@ -381,7 +381,7 @@ export default function Game() {
                     </div>
                     <div className={"playerAndCards"}>
                         <div className="playerInfo">
-                            <img src={player2.profilePicture} alt={player2.username}/>
+                            <img src={"data:image/jpeg;base64," + sessionStorage.getItem("profilePicture")} alt={player2.username}/>
                             <div className="playerInfoUsernameRating">
                                 <h2>{player2.username}</h2>
                                 <p>Rating: {player2.rating}</p>

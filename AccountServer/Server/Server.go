@@ -240,6 +240,51 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func changeProfilePicture(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+
+	if r.Method == "POST" {
+		userid, valid := checkToken(w, r)
+		if valid {
+			// Read the raw body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}(r.Body)
+
+			var t AccountLogic.NewProfilePicture
+
+			err = json.Unmarshal(body, &t)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				log.Println(err)
+				return
+			}
+			log.Println("before update")
+			err = Database.UpdateProfilePicture(userid, t.ProfilePicture)
+			log.Println(err)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
 func refresh(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("refresh")
 }
@@ -675,6 +720,40 @@ func removeDeck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getTopTen(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	_, valid := checkToken(w, r)
+	if valid {
+
+		topTenPlayers, err := Database.GetTopTenPlayers()
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var deckString string
+		for deckIndex := range topTenPlayers {
+			if topTenPlayers[deckIndex].UserID != "" {
+				deckString = fmt.Sprintf(`%s, {"username": "%s", "rating": %s, "profilePicture": "%s"}`, deckString, topTenPlayers[deckIndex].Username, strconv.Itoa(topTenPlayers[deckIndex].Rating), topTenPlayers[deckIndex].ProfilePicture)
+			}
+		}
+		var array string
+		if len(deckString) > 2 {
+			array = deckString[2:]
+		} else {
+			array = ""
+		}
+		friendInfo := fmt.Sprintf("{\"topTenPlayers\": [%s]}", array)
+		fmt.Fprint(w, friendInfo)
+	}
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
@@ -695,6 +774,8 @@ func setupRoutes() {
 	http.HandleFunc("/removeCardFromDeck", removeCardFromDeck)
 	http.HandleFunc("/setActiveDeck", setDeckActive)
 	http.HandleFunc("/removeDeck", removeDeck)
+	http.HandleFunc("/getTopTen", getTopTen)
+	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
 }
 
 func Server() {
