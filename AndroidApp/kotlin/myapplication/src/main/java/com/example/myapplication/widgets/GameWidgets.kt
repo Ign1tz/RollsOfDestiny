@@ -40,10 +40,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.viewmodels.GameViewModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.example.myapplication.types.Column
+import com.example.myapplication.types.card
 import com.example.myapplication.viewmodels.Card
 import kotlinx.coroutines.delay
 
@@ -95,25 +97,33 @@ fun PlayField(viewModel: GameViewModel) {
 
     }
 }
+
 @Composable
-fun CardField (gameViewModel: GameViewModel) {
-    LazyRow (modifier = Modifier) {
-        items(gameViewModel.getCardList()) { card ->
-            OwnSingleCard(card)
+fun CardField(gameViewModel: GameViewModel) {
+    LazyRow(modifier = Modifier) {
+        items(gameViewModel.gameInfo?.YourInfo?.deck?.inHand ?: listOf()) { card ->
+            OwnSingleCard(card, gameViewModel)
         }
     }
 }
 
 @Composable
-fun OwnSingleCard (card: Card) {
-    Image(painter = painterResource(id = card.cardImageId), contentDescription = "", modifier = Modifier.clickable {  })
+fun OwnSingleCard(card: card, gameViewModel: GameViewModel) {
+    Image(
+        painter = painterResource(id = gameViewModel.getCardImageById(card.name)),
+        contentDescription = "",
+        modifier = Modifier.clickable {
+            if (gameViewModel.isActive.value) {
+                gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"playCard\", \"messageBody\":\"${card.cardid}\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.user.userid}\"}")
+            }
+        })
 }
 
 @Composable
-fun EnemyCardField (gameViewModel: GameViewModel) {
+fun EnemyCardField(gameViewModel: GameViewModel) {
     LazyRow {
 
-        items(gameViewModel.gameInfo?.EnemyInfo?.deck?.inHand?: 0) {
+        items(gameViewModel.gameInfo?.EnemyInfo?.deck?.inHand ?: 0) {
             EnemyCard()
         }
 
@@ -121,10 +131,9 @@ fun EnemyCardField (gameViewModel: GameViewModel) {
 }
 
 @Composable
-fun EnemyCard () {
+fun EnemyCard() {
     Image(
-        painter = painterResource(id = R.drawable.double_mana_app),
-        contentDescription = ""
+        painter = painterResource(id = R.drawable.double_mana_app), contentDescription = ""
     )
 }
 
@@ -142,34 +151,27 @@ fun OwnField(viewModel: GameViewModel) {
             contentScale = ContentScale.Crop
         )*/
         Row() {
-            column(
-                if (info != null) {
-                    info.YourInfo.LeftColumn
-                } else null,
-                { handleColumnClick(viewModel, info?.YourInfo?.LeftColumn, 0) }
-            )
-            column(
-                if (info != null) {
-                    info.YourInfo.MiddleColumn
-                } else null,
-                { handleColumnClick(viewModel, info?.YourInfo?.MiddleColumn, 1) }
-            )
-            column(
-                if (info != null) {
-                    info.YourInfo.RightColumn
-                } else null,
-                { handleColumnClick(viewModel, info?.YourInfo?.RightColumn, 2) }
-            )
+            column(if (info != null) {
+                info.YourInfo.LeftColumn
+            } else null, { handleColumnClick(viewModel, info?.YourInfo?.LeftColumn, 0) })
+            column(if (info != null) {
+                info.YourInfo.MiddleColumn
+            } else null, { handleColumnClick(viewModel, info?.YourInfo?.MiddleColumn, 1) })
+            column(if (info != null) {
+                info.YourInfo.RightColumn
+            } else null, { handleColumnClick(viewModel, info?.YourInfo?.RightColumn, 2) })
         }
     }
 }
 
-fun handleColumnClick(viewModel: GameViewModel, column: Column?, key: Int){
+fun handleColumnClick(viewModel: GameViewModel, column: Column?, key: Int) {
     Log.d("isFull?", column?.IsFull.toString())
-    if (column?.IsFull ?: true){
+    if (column?.IsFull ?: true && !viewModel.hasRolled.value && viewModel.pickedColumn.value) {
         return
     }
-    viewModel.WebSocketClient!!.sendMessage("{\"type\":\"${viewModel.GameType.value}PickColumn\", \"messageBody\":\"${key.toString()}\", \"gameId\":\"${viewModel.gameInfo?.gameid}\"}")
+    if (viewModel.isActive.value) {
+        viewModel.WebSocketClient!!.sendMessage("{\"type\":\"${viewModel.GameType.value}PickColumn\", \"messageBody\":\"${key.toString()}\", \"gameId\":\"${viewModel.gameInfo?.gameid}\", \"userid\":\"${viewModel.user.userid}\"}")
+    }
 }
 
 @Composable
@@ -195,8 +197,7 @@ fun column(column: Column?, onClick: () -> Unit = {}) {
             .height(170.dp)
             .width(57.dp)
             .clickable { onClick() }
-            .background(Color.Transparent)
-    ) {
+            .background(Color.Transparent)) {
         Column(
             Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -216,7 +217,7 @@ fun column(column: Column?, onClick: () -> Unit = {}) {
                     .border(2.dp, Color.Black),
                 horizontalArrangement = Arrangement.Center,
 
-            ) {
+                ) {
                 gridBox(second)
             }
             Row(
@@ -305,15 +306,6 @@ fun getDice(int: Int) {
 fun EnemyField(viewModel: GameViewModel) {
     val info = viewModel.gameInfo
     Box() {
-        /*val image: Painter = painterResource(id = R.drawable.grid_image)
-        Image(
-            painter = image,
-            contentDescription = null,
-            modifier = Modifier
-                .width(170.dp)
-                .height(170.dp),
-            contentScale = ContentScale.Crop
-        )*/
         Row() {
             enemyColumn(
                 if (info != null) {
@@ -362,21 +354,27 @@ fun enemyColumn(column: Column?) {
                 Modifier
                     .height(170.dp * 0.33333f)
                     .fillMaxWidth()
-                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 gridBox(third)
             }
             Row(
                 Modifier
                     .height(170.dp * 0.33333f)
                     .fillMaxWidth()
-                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 gridBox(second)
             }
             Row(
                 Modifier
                     .height(170.dp * 0.33333f)
                     .fillMaxWidth()
-                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+                    .border(2.dp, Color.Black),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 gridBox(first)
             }
         }
@@ -385,10 +383,7 @@ fun enemyColumn(column: Column?) {
 
 @Composable
 fun ProfileRow(
-    profileImage: Int,
-    username: String,
-    score: Int,
-    mana: String
+    profileImage: Int, username: String, score: Int, mana: String
 ) {
     Box(
         modifier = Modifier
@@ -470,22 +465,29 @@ fun DefaultDie(gameViewModel: GameViewModel) {
             modifier = Modifier
                 .width(90.dp)
                 .height(90.dp)
-                .clickable { gameViewModel.hasRolled.value = true },
+                .clickable {
+                    gameViewModel.hasRolled.value = true
+
+                    if (gameViewModel.isActive.value && !gameViewModel.roll.value) {
+                        gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"rolled\", \"messageBody\":\"\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.user.userid}\"}")
+                    }
+                },
             contentScale = ContentScale.FillBounds
         )
     }
 }
 
 fun handleDieRoll(gameViewModel: GameViewModel) {
-    Log.d("game", gameViewModel.roll.value.toString())
     gameViewModel.roll.value = true
-    Log.d("game", gameViewModel.roll.value.toString())
 }
 
 @Composable
 fun Die(gameViewModel: GameViewModel) {
     Box(
-        modifier = Modifier.clickable(onClick = { handleDieRoll(gameViewModel) })
+        modifier = Modifier.clickable(onClick = {
+            Log.d("roll", gameViewModel.roll.value.toString())
+            handleDieRoll(gameViewModel)
+        })
     ) {
 
         val diceSize = 90.dp
@@ -495,8 +497,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "1" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice1
+                            LocalContext.current, R.drawable.dice1
                         ),
 
                         ),
@@ -508,8 +509,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "2" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice2
+                            LocalContext.current, R.drawable.dice2
                         )
                     ),
                     contentDescription = null,
@@ -520,8 +520,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "3" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice3
+                            LocalContext.current, R.drawable.dice3
                         )
                     ),
                     contentDescription = null,
@@ -532,8 +531,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "4" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice4
+                            LocalContext.current, R.drawable.dice4
                         )
                     ),
                     contentDescription = null,
@@ -544,8 +542,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "5" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice5
+                            LocalContext.current, R.drawable.dice5
                         )
                     ),
                     contentDescription = null,
@@ -556,8 +553,7 @@ fun Die(gameViewModel: GameViewModel) {
                 "6" -> Image(
                     painter = rememberDrawablePainter(
                         drawable = getDrawable(
-                            LocalContext.current,
-                            R.drawable.dice6
+                            LocalContext.current, R.drawable.dice6
                         )
                     ),
                     contentDescription = null,

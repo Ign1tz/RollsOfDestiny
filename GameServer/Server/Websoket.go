@@ -103,13 +103,23 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 
 func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map[string]string, map[string]string) {
 
+	var msg = make(map[string]string)
+	if message.Type == "id" {
+		msg["id"] = connectionId
+		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
+		log.Println("id: ", msg["id"], msg)
+		return msg, nil
+	}
+	playfield, err := Database.GetPlayfield(message.GameId)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+	if playfield.ActivePlayer.UserID != message.Userid {
+		return nil, nil
+	}
 	if message.Type == "surrender" {
 		log.Println("surrender")
-		playfield, err := Database.GetPlayfield(message.GameId)
-		if err != nil {
-			log.Println(err)
-			return nil, nil
-		}
 		if strings.Contains(playfield.GameID, "bot: ") {
 			Database.DeleteGame(playfield.Host.Grid.GridId)
 			Database.DeleteGame(playfield.Guest.Grid.GridId)
@@ -125,13 +135,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		}
 		return handleGameEnded(playfield, true, surenderer)
 	}
-	var msg = make(map[string]string)
-	if message.Type == "id" {
-		msg["id"] = connectionId
-		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
-		log.Println("id: ", msg["id"], msg)
-		return msg, nil
-	}
+
 	position, err := Database.GetPosition(message.GameId)
 	if err != nil {
 		log.Println("position", err)
@@ -143,6 +147,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		if position.CurrentStep == "afterRoll" {
 			msg1, msg2 := handlePickedColumn(message)
 			position.CurrentStep = "afterColumnPick"
+			err = Database.UpdatePosition(position)
 			return msg1, msg2
 		} else {
 			return nil, nil
@@ -151,6 +156,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		if position.CurrentStep == "afterRoll" {
 			msg1, msg2 := handlePickedColumn(message)
 			position.CurrentStep = "afterColumnPick"
+			err = Database.UpdatePosition(position)
 			return msg1, msg2
 		} else {
 			return nil, nil
@@ -165,6 +171,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		if position.CurrentStep == "afterColumnPick" {
 			msg1, msg2 := handleEndTurn(message)
 			position.CurrentStep = "start"
+			err = Database.UpdatePosition(position)
 			return msg1, msg2
 
 		} else {
@@ -289,6 +296,7 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					handCards++
 				}
 			}
+			log.Println("Hand cards: ", handCards)
 			if handCards != 4 {
 				cards, err := Database.GetCardsByDeckID(playfield.Guest.Deck.DeckID)
 				if err != nil {
@@ -299,6 +307,7 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				for i := 0; i < 4-handCards; i++ {
 					if !cards[i].InHand {
 						cards[i].InHand = true
+						Database.UpdateCard(cards[i])
 					} else {
 						i--
 					}
@@ -336,6 +345,7 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				for i := 0; i < 4-handCards; i++ {
 					if !cards[i].InHand {
 						cards[i].InHand = true
+						Database.UpdateCard(cards[i])
 					} else {
 						i--
 					}

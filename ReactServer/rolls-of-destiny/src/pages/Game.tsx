@@ -41,6 +41,7 @@ export default function Game() {
     const [gameEnded, setGameEnded] = useState(false)
     const [endResults, setEndResults] = useState<endResults | null>()
     const [volume, setVolume] = useState<number>(30);
+    const [reroll, setReroll] = useState(false)
 
 
     const togglePause = () => {
@@ -48,7 +49,7 @@ export default function Game() {
     };
 
     const handleQuit = () => {
-        websocket.send(JSON.stringify({type: "surrender", message: "", gameId: gameId}))
+        websocket.send(JSON.stringify({type: "surrender", message: "", gameId: gameId, userid: userID}))
         window.location.href = "/";
     };
 
@@ -118,7 +119,7 @@ export default function Game() {
             if (message.info == "connected") {
                 console.log("connected")
                 setConnected(true)
-                websocket.send(JSON.stringify({type: "id", message: "", gameId: ""}))
+                websocket.send(JSON.stringify({type: "id", message: "", gameId: "", userid: ""}))
             } else if (message.info == "id") {
                 console.log("id:", message.message.id)
                 setWebsocketId(message.message.id)
@@ -152,7 +153,7 @@ export default function Game() {
             websocket.send(JSON.stringify({
                 type: sessionStorage.getItem("GameType") + "PickColumn",
                 messageBody: key.toString(),
-                gameId: gameId
+                gameId: gameId, userid: userID
             }))
         }
     };
@@ -242,7 +243,8 @@ export default function Game() {
         if (gameInfo.ActivePlayer) {
             console.log(gameInfo.ActivePlayer.active)
             if (gameInfo.ActivePlayer.active) {
-                setRolled(!placed)
+                setRolled(!placed || reroll)
+                setReroll(false)
                 setPlaced(false)
             } else {
                 setRolled(true)
@@ -279,7 +281,8 @@ export default function Game() {
     ];
 
     function playCard(card: card) {
-        websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId}))
+        setReroll(card.name === "Roll Again")
+        websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId, userid: userID}))
     }
 
     function getCardPicture(card: card) {
@@ -408,7 +411,7 @@ export default function Game() {
                                 <Dice sound={diceSound} onRoll={(value) => {
                                     console.log(value);
                                     setRolled(true)
-                                    websocket.send(JSON.stringify({type: "rolled", message: "", gameId: gameId}))
+                                    websocket.send(JSON.stringify({type: "rolled", message: "", gameId: gameId, userid: userID}))
                                 }} defaultValue={6} size={100}
                                       cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
                                       disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>

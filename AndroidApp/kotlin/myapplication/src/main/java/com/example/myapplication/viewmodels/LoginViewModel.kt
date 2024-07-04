@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
-    val IPADDRESS = "192.168.0.181"
+    val IPADDRESS = "10.0.0.2"
 
 
     suspend private fun loginRequest(userName: String, password: String): Boolean {

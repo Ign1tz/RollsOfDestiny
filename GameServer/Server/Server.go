@@ -169,9 +169,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	log.Println("Client Successfully Connected")
+	//log.Println("Client Successfully Connected")
 	reader(ws, &c2)
-	log.Println("Websocket Closed")
+	//log.Println("Websocket Closed")
 	Database.DeleteFromQueueWebsocket(strings.Split(ws.RemoteAddr().String(), ":")[len(strings.Split(ws.RemoteAddr().String(), ":"))-1])
 }
 

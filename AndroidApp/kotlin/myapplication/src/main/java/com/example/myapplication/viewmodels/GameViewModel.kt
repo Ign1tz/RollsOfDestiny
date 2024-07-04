@@ -20,6 +20,7 @@ import com.example.myapplication.localdb.Repository
 import com.example.myapplication.types.ActivePlayer
 import com.example.myapplication.types.EndResults
 import com.example.myapplication.types.EndResultsBody
+import com.example.myapplication.types.card
 import com.example.myapplication.types.enemyInfo
 import com.example.myapplication.types.yourInfo
 import com.example.myapplication.types.gameInfo
@@ -58,7 +59,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
 
-    private val IPADDRESS = "192.168.0.181"
+    private val IPADDRESS = "10.0.0.2"
 
     fun resetAllValues () {
         connected.value = false
@@ -127,7 +128,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         if (!connected.value && started.value) {
             webSocketClient.connectBlocking()
         }
-        webSocketClient.sendMessage("{\"type\": \"id\"}")
+        webSocketClient.sendMessage("{\"type\": \"id\", \"message\": \"\", \"gameId\": \"\", \"userid\": \"\"}")
         WebSocketClient = webSocketClient
         return webSocketClient
     }
@@ -212,7 +213,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         return cards.map { name -> Card(name, getCardImageById(name)) }
     }
 
-    private fun getCardImageById (cardName: String): Int {
+    fun getCardImageById (cardName: String): Int {
         return when (cardName) {
             "Destroy Column" -> R.drawable.destroy_column_app
             "Double Mana" -> R.drawable.double_mana_app
@@ -221,5 +222,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
             else -> R.drawable.double_mana_app
         }
     }
+
+
 }
 data class Card (val cardName: String, val cardImageId: Int)
