@@ -7,11 +7,11 @@ import {profile} from "../types/profileTypes";
 import VolumeSlider from "../components/VolumeSlider";
 import {authFetch} from "../auth";
 
-export default function Settings({profile}: {profile:profile }) {
+export default function Settings({profile}: { profile: profile }) {
 
     const [newUsername, setNewUsername] = useState("");
     const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword ] = useState("");
+    const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [isUsernameError, setIsUsernameError] = useState(false);
     const [isPasswordError, setIsPasswordError] = useState(false);
@@ -35,7 +35,7 @@ export default function Settings({profile}: {profile:profile }) {
         if (imageString) {
             imageString = JSON.parse(imageString).profilePicture
             setImage(<img className={"img"} src={"data:image/jpeg;base64," + imageString}
-                                                                                 alt={"Something went wrong"}/>)
+                          alt={"Something went wrong"}/>)
         }
         let userinfo = sessionStorage.getItem("userInfo")
         if (userinfo) {
@@ -45,12 +45,11 @@ export default function Settings({profile}: {profile:profile }) {
     }, []);
 
 
-
     function checkPasswordChange() {
         // return false if oldPassword is incorrect
         // if (oldPassword != database entry password ...)
 
-        if (oldPassword === newPassword || newPassword !== confirmNewPassword)  {
+        if (oldPassword === newPassword || newPassword !== confirmNewPassword) {
             return false;
         }
         if (newPassword.length < 6 || newPassword.length > 50) {
@@ -118,7 +117,11 @@ export default function Settings({profile}: {profile:profile }) {
                     'Accept': 'application/json, text/plain',
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
-                body: JSON.stringify({oldPassword: oldPassword, newPassword: newPassword, confirmNewPassword: confirmNewPassword})
+                body: JSON.stringify({
+                    oldPassword: oldPassword,
+                    newPassword: newPassword,
+                    confirmNewPassword: confirmNewPassword
+                })
             }).then(r => {
                 if (r.status === 200) {
                 }
@@ -126,7 +129,7 @@ export default function Settings({profile}: {profile:profile }) {
             });
         } else {
             setIsPasswordError(true);
-            if (oldPassword !== "" && newPassword !=="" && confirmNewPassword!=="") {
+            if (oldPassword !== "" && newPassword !== "" && confirmNewPassword !== "") {
                 setErrorMessage("New Password may not be valid. Old Password may be false. Maybe Password and Confirm Password are not the same.");
             } else {
                 setErrorMessage("Please fill out every field if you want to change your password.");
@@ -149,6 +152,23 @@ export default function Settings({profile}: {profile:profile }) {
                 setErrorMessage("Something went wrong while trying to save your password. Please try again.");
             });
         }
+    }
+
+    function deleteAccount() {
+        authFetch("http://localhost:9090/deleteAccount", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            }
+        }).then(r => {
+            localStorage.setItem("access_token", "")
+            sessionStorage.setItem("userInfo", "")
+            sessionStorage.setItem("gameInfo", "")
+            sessionStorage.setItem("GameType", "")
+            sessionStorage.setItem("loggedIn", "false")
+            window.location.href = "/"
+        });
     }
 
     function handleImage(e: any) {
@@ -191,12 +211,15 @@ export default function Settings({profile}: {profile:profile }) {
                         <input className={"profile_input"} type={"file"} accept={"image/png, image/gif, image/jpeg"}
                                name={"file"}
                                onChange={handleImage}/>
-                        <Button variant={"contained"} color = "secondary" onClick={submitProfilePicture}>Submit Profile Picture</Button>
+                        <Button variant={"contained"} color="secondary" onClick={submitProfilePicture}>Submit Profile
+                            Picture</Button>
                     </div>
                     <div className="volume">
                         <h2 id={"h2Text"}>Volume</h2>
                         <VolumeSlider volume={volume} setVolume={setVolume}/>
                         <h5>Attention: it is required to "slide" the bar, not click it.</h5>
+                        <Button style={{marginTop: "30px"}} variant={"contained"} color="secondary"
+                                onClick={deleteAccount}>Delete Account</Button>
                     </div>
                     <div className="username">
                         <h2 id={"h2Text"}>Username</h2>
@@ -206,7 +229,8 @@ export default function Settings({profile}: {profile:profile }) {
                                    onChange={(event) => setNewUsername(event.target.value)}/>
                         <br/>
                         <br/>
-                        <Button variant={"contained"} color = "secondary" onClick={submitNewUsername}>Submit Username Change</Button>
+                        <Button variant={"contained"} color="secondary" onClick={submitNewUsername}>Submit Username
+                            Change</Button>
                     </div>
                     <div className="password">
                         <h2 id={"h2Text"}>Password</h2>
@@ -224,7 +248,8 @@ export default function Settings({profile}: {profile:profile }) {
                                    onChange={(event) => setConfirmNewPassword(event.target.value)}/>
                         <br/>
                         <br/>
-                        <Button variant={"contained"} color = "secondary" onClick={submitPasswordChange}>Submit Password Change</Button>
+                        <Button variant={"contained"} color="secondary" onClick={submitPasswordChange}>Submit Password
+                            Change</Button>
                     </div>
                 </div>
             </div>

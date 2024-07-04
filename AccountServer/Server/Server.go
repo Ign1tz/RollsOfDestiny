@@ -298,6 +298,7 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
+		log.Println("deleteAccount", valid)
 		if valid {
 			err := Database.DeleteAccount(userid)
 			if err != nil {
