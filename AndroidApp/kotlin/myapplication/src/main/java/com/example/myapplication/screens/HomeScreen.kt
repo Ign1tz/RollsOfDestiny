@@ -50,7 +50,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel) {
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                FriendList()
+                FriendList(modifier = Modifier)
             }
         },
         content = {
