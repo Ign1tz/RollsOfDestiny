@@ -2,6 +2,7 @@ package Server
 
 import (
 	"RollsOfDestiny/AccountServer/AccountLogic"
+	"RollsOfDestiny/AccountServer/CardLogic"
 	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/DeckLogic"
 	"RollsOfDestiny/AccountServer/SignUpLogic"
@@ -760,6 +761,93 @@ func getTopTen(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getYourCards(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	userid, valid := checkToken(w, r)
+	if valid {
+
+		cards, err := Database.GetCardsByUserId(userid)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var cardString string
+		for cardIndex := range cards {
+			if cards[cardIndex].UserID != "" {
+				cardString = fmt.Sprintf("%s, \"%s\"", cardString, cards[cardIndex].Name)
+			}
+		}
+
+		var array string
+		if len(cardString) > 2 {
+			array = cardString[2:]
+		} else {
+			array = ""
+		}
+
+		friendInfo := fmt.Sprintf("{\"cards\": [%s]}", array)
+		fmt.Fprint(w, friendInfo)
+	}
+}
+
+func getNewCards(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	userid, valid := checkToken(w, r)
+	if valid {
+
+		newCards, oldCards, err := CardLogic.HandleNewCard(userid)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		var oldCardString string
+		for cardIndex := range oldCards {
+			if oldCards[cardIndex].UserID != "" {
+				oldCardString = fmt.Sprintf("%s, \"%s\"", oldCardString, oldCards[cardIndex].Name)
+			}
+		}
+
+		var newCardString string
+		for cardIndex := range newCards {
+			if newCards[cardIndex].UserID != "" {
+				newCardString = fmt.Sprintf("%s, \"%s\"", newCardString, newCards[cardIndex].Name)
+			}
+		}
+
+		var oldArray string
+		if len(oldCardString) > 2 {
+			oldArray = oldCardString[2:]
+		} else {
+			oldArray = ""
+		}
+
+		var newArray string
+		if len(newCardString) > 2 {
+			newArray = newCardString[2:]
+		} else {
+			newArray = ""
+		}
+
+		message := fmt.Sprintf("{\"oldCards\": [%s], \"newCards\": [%s]}", oldArray, newArray)
+
+		fmt.Fprint(w, message)
+	}
+}
+
 func setupRoutes() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/signup", signUp)
@@ -782,6 +870,8 @@ func setupRoutes() {
 	http.HandleFunc("/removeDeck", removeDeck)
 	http.HandleFunc("/getTopTen", getTopTen)
 	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
+	http.HandleFunc("/getYourCards", changeProfilePicture)
+	http.HandleFunc("/getNewCard", getNewCards)
 }
 
 func Server() {

@@ -6,7 +6,7 @@ import com.example.myapplication.localdb.Repository
 
 class Factory (private val repository: Repository):ViewModelProvider.Factory{
 
-    private val IPADDRESS = "10.0.0.2"
+    private val IPADDRESS = "menews.site"
     @Override
     override fun <T:ViewModel> create(model: Class<T>):T=when (model) {
         LoginViewModel::class.java -> LoginViewModel(repository = repository, IPADDRESS)
