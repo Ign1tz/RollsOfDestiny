@@ -9,10 +9,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.screens.GameScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
+import com.example.myapplication.screens.ScoreBoardScreen
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.Injector
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.ScoreboardViewModel
 
 @Composable
 fun Navigation() {
@@ -21,6 +23,7 @@ fun Navigation() {
     val loginViewModel: LoginViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val homeViewModel: HomeViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val gameViewModel: GameViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val scoreboardViewModel: ScoreboardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
 
 
     NavHost(navController = navController,
@@ -30,7 +33,7 @@ fun Navigation() {
         }
 
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen(navController = navController, homeViewModel = homeViewModel, loginViewModel, gameViewModel)
+            HomeScreen(navController = navController, homeViewModel = homeViewModel, loginViewModel, gameViewModel, scoreboardViewModel)
         }
 
         composable(route = Screen.GameScreen.route) {
@@ -42,6 +45,10 @@ fun Navigation() {
             gameViewModel.GameType.value = "bot"
             gameViewModel.resetAllValues()
             GameScreen(navController = navController, gameViewModel = gameViewModel)
+        }
+
+        composable(route = Screen.ScoreBoard.route) {
+            ScoreBoardScreen(navController = navController, scoreboardViewModel = scoreboardViewModel)
         }
     }
 }

@@ -13,11 +13,12 @@ import androidx.compose.ui.Modifier
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.UpButton
 
 
 @Composable
-fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, loginViewModel: LoginViewModel, gameViewModel: GameViewModel) {
+fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, loginViewModel: LoginViewModel, gameViewModel: GameViewModel, scoreboardViewModel: ScoreboardViewModel) {
     Scaffold (
         topBar = {
             HeaderTopBar(navController, "<")
@@ -27,7 +28,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
         }
     ){ innerPadding ->
         Column (modifier = Modifier.padding(innerPadding)) {
-            HomeScreenButtons(navController = navController, loginViewModel = loginViewModel, gameViewModel = gameViewModel )
+            HomeScreenButtons(navController = navController, loginViewModel = loginViewModel, gameViewModel = gameViewModel, scoreboardViewModel )
 
         }
     }
