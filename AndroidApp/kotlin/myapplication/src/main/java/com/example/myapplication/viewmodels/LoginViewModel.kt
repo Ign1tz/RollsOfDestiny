@@ -37,7 +37,7 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
 
 
     suspend private fun loginRequest(userName: String, password: String): Boolean {
-        var client = HttpClient(CIO) {
+        val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
@@ -121,5 +121,4 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         }
         return worked
     }
-
 }
