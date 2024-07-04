@@ -53,8 +53,9 @@ android {
 }
 
 dependencies {
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     implementation("androidx.privacysandbox.tools:tools-core:1.0.0-alpha09")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     val room_version = "2.6.1"
     val ktor_version = "2.3.12"
     implementation("androidx.room:room-runtime:$room_version")

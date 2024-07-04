@@ -12,14 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.SettingViewModel
+import com.example.myapplication.viewmodels.ScoreboardViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -154,10 +157,10 @@ fun RankedPlayButton(navController: NavController, gameViewModel: GameViewModel)
 }
 
 @Composable
-fun ScoreboardButton() {
+fun ScoreboardButton (navController: NavController, scoreboardViewModel: ScoreboardViewModel) {
     Button(
-        modifier = Modifier.size(300.dp, 50.dp),
-        onClick = {},
+        modifier = Modifier.size(300.dp,50.dp),
+        onClick = {navController.navigate(route = "scoreboard")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -192,8 +195,8 @@ fun SettingsButton(navController: NavController) {
 @Composable
 fun LogOut(viewModel: LoginViewModel, navController: NavController) {
     Button(
-        modifier = Modifier.size(300.dp, 50.dp),
-        onClick = { viewModel.repository.returnDelete(); navController.navigate("login") },
+        modifier = Modifier.size(300.dp,50.dp),
+        onClick = {viewModel.repository.returnDelete(); navController.navigate("login")},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )

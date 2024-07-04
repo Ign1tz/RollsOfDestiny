@@ -11,9 +11,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.ScoreboardViewModel
 
 @Composable
-fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewModel, gameViewModel: GameViewModel) {
+fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewModel, gameViewModel: GameViewModel, scoreboardViewModel: ScoreboardViewModel) {
     val padding = 10.dp
     Column (
         modifier = Modifier.fillMaxWidth(),
@@ -26,7 +27,7 @@ fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewMo
         Spacer(Modifier.padding(padding))
         RankedPlayButton(navController, gameViewModel)
         Spacer(Modifier.padding(padding))
-        ScoreboardButton()
+        ScoreboardButton(navController, scoreboardViewModel = scoreboardViewModel )
         Spacer(Modifier.padding(padding))
         SettingsButton(navController)
         Spacer(Modifier.padding(padding))

@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
+import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.UpButton
 import com.example.myapplication.widgets.FriendList
 import com.example.myapplication.widgets.TitleTopBar
