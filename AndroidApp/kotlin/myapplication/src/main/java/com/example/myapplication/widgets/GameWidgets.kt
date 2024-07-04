@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,12 +44,14 @@ import com.example.myapplication.R
 import com.example.myapplication.viewmodels.GameViewModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.example.myapplication.types.Column
+import com.example.myapplication.viewmodels.Card
 import kotlinx.coroutines.delay
 
 @Composable
 fun PlayField(viewModel: GameViewModel) {
 
     Column(verticalArrangement = Arrangement.SpaceBetween) {
+        EnemyCardField(viewModel)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,11 +76,11 @@ fun PlayField(viewModel: GameViewModel) {
         ) {
             OwnField(viewModel)
         }
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp),
-            horizontalAlignment = Alignment.Start
+            horizontalArrangement = Arrangement.Start
         ) {
             Box() {
 
@@ -85,10 +90,42 @@ fun PlayField(viewModel: GameViewModel) {
                     DefaultDie(gameViewModel = viewModel)
                 }
             }
-
+            CardField(gameViewModel = viewModel)
         }
 
     }
+}
+@Composable
+fun CardField (gameViewModel: GameViewModel) {
+    LazyRow (modifier = Modifier) {
+        items(gameViewModel.getCardList()) { card ->
+            OwnSingleCard(card)
+        }
+    }
+}
+
+@Composable
+fun OwnSingleCard (card: Card) {
+    Image(painter = painterResource(id = card.cardImageId), contentDescription = "", modifier = Modifier.clickable {  })
+}
+
+@Composable
+fun EnemyCardField (gameViewModel: GameViewModel) {
+    LazyRow {
+
+        items(gameViewModel.gameInfo?.EnemyInfo?.deck?.inHand?: 0) {
+            EnemyCard()
+        }
+
+    }
+}
+
+@Composable
+fun EnemyCard () {
+    Image(
+        painter = painterResource(id = R.drawable.double_mana_app),
+        contentDescription = ""
+    )
 }
 
 @Composable
@@ -321,22 +358,25 @@ fun enemyColumn(column: Column?) {
             .background(Color.Transparent)
     ) {
         Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier
-                .height(170.dp * 0.33333f)
-                .fillMaxWidth()
-                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
                 gridBox(third)
             }
-            Row(Modifier
-                .height(170.dp * 0.33333f)
-                .fillMaxWidth()
-                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
                 gridBox(second)
             }
-            Row(Modifier
-                .height(170.dp * 0.33333f)
-                .fillMaxWidth()
-                .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .height(170.dp * 0.33333f)
+                    .fillMaxWidth()
+                    .border(2.dp, Color.Black), horizontalArrangement = Arrangement.Center) {
                 gridBox(first)
             }
         }
@@ -347,14 +387,15 @@ fun enemyColumn(column: Column?) {
 fun ProfileRow(
     profileImage: Int,
     username: String,
-    score: Int
+    score: Int,
+    mana: String
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(60.dp)
             .background(Color.Gray, shape = RoundedCornerShape(2.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -365,7 +406,7 @@ fun ProfileRow(
                 painter = painterResource(id = profileImage),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(55.dp)
+                    .size(45.dp)
                     .padding(1.dp),
                 contentScale = ContentScale.Crop
             )
@@ -394,6 +435,21 @@ fun ProfileRow(
                 )
                 Text(
                     text = score.toString(),
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Column {
+                Text(
+                    text = "Mana:",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.Serif
+                )
+                Text(
+                    text = mana,
                     fontSize = 20.sp,
                     color = Color.White,
                     fontFamily = FontFamily.Serif

@@ -40,7 +40,24 @@ data class yourInfo(
     val LeftColumn: Column,
     val MiddleColumn: Column,
     val RightColumn: Column,
-    val Score: Int
+    val Score: Int,
+    val mana: String,
+    val deck: yourDeck
+)
+
+@Serializable
+data class yourDeck (
+    val cardsLeft: Int,
+    val inHand: List<card>
+)
+
+@Serializable
+data class card (
+    val name: String,
+    val cost: Int,
+    val picture: String,
+    val effect: String,
+    val cardid: String
 )
 
 @Serializable
@@ -58,7 +75,14 @@ data class enemyInfo(
     val LeftColumn: Column,
     val MiddleColumn: Column,
     val RightColumn: Column,
-    val Score: Int
+    val Score: Int,
+    val mana: String,
+    val deck: enemyDeck
+)
+@Serializable
+data class enemyDeck(
+    val cardsLeft: Int,
+    val inHand: Int
 )
 
 @Serializable
