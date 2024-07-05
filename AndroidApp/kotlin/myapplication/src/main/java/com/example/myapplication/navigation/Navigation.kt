@@ -14,6 +14,7 @@ import com.example.myapplication.screens.DeckScreen
 import com.example.myapplication.screens.GameScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
+import com.example.myapplication.screens.RulesScreen
 import com.example.myapplication.viewmodels.CardViewModel
 import com.example.myapplication.viewmodels.DeckViewModel
 import com.example.myapplication.screens.ScoreBoardScreen
@@ -66,6 +67,10 @@ fun Navigation() {
         composable(route = "game/bot") {
             gameViewModel.GameType.value = "bot"
             GameScreen(navController = navController, gameViewModel = gameViewModel)
+        }
+
+        composable(route = Screen.RulesScreen.route) {
+            RulesScreen(navController = navController)
         }
 
         composable(route = "game/friend/{friendId}",

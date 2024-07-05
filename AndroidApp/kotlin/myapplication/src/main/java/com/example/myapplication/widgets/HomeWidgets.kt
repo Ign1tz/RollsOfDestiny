@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.screens.RulesButton
+import com.example.myapplication.screens.RulesScreen
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
@@ -44,5 +46,7 @@ fun HomeScreenButtons(
         SettingsButton(navController)
         Spacer(Modifier.padding(padding))
         DecksButton(navController = navController)
+        Spacer(Modifier.padding(padding))
+        RulesButton(navController)
     }
 }
