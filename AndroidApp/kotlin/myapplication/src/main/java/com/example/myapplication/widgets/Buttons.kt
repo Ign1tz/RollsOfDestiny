@@ -309,7 +309,7 @@ fun SettingsButton(navController: NavController) {
 @Composable
 fun LogOut(viewModel: LoginViewModel, navController: NavController) {
     Button(
-        modifier = Modifier.size(300.dp,50.dp),
+        modifier = Modifier.size(100.dp,35.dp),
         onClick = { navController.navigate("login"); viewModel.repository.returnDelete()},
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
@@ -317,7 +317,7 @@ fun LogOut(viewModel: LoginViewModel, navController: NavController) {
     ) {
         Text("LogOut",
             color = Color.White,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
             fontFamily = FontFamily.Serif
         )
     }

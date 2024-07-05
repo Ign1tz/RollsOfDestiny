@@ -126,7 +126,7 @@ fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
 
             topBar = { ProfileRow(profileImage = R.drawable.caught, gameViewModel, username = gameViewModel.gameInfo?.EnemyInfo?.Username ?: "", score = gameViewModel.gameInfo?.EnemyInfo?.Score ?: 0, mana = gameViewModel.gameInfo?.EnemyInfo?.mana?: "0")},
 
-            bottomBar = { ProfileRow(profileImage = null, gameViewModel, username = gameViewModel.user.userName, score =  gameViewModel.gameInfo?.YourInfo?.Score ?: 0, mana = gameViewModel.gameInfo?.YourInfo?.mana?: "0") }
+            bottomBar = { ProfileRow(profileImage = null, gameViewModel, username = gameViewModel.getUser()!!.userName, score =  gameViewModel.gameInfo?.YourInfo?.Score ?: 0, mana = gameViewModel.gameInfo?.YourInfo?.mana?: "0") }
 
 
 

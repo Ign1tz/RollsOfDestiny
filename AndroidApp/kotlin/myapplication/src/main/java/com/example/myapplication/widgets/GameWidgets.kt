@@ -113,7 +113,7 @@ fun OwnSingleCard(card: card, gameViewModel: GameViewModel) {
         contentDescription = "",
         modifier = Modifier.clickable {
             if (gameViewModel.isActive.value) {
-                gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"playCard\", \"messageBody\":\"${card.cardid}\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.user.userid}\"}")
+                gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"playCard\", \"messageBody\":\"${card.cardid}\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.getUser()?.userid}\"}")
             }
         })
 }
@@ -169,7 +169,7 @@ fun handleColumnClick(viewModel: GameViewModel, column: Column?, key: Int) {
         return
     }
     if (viewModel.isActive.value) {
-        viewModel.WebSocketClient!!.sendMessage("{\"type\":\"${viewModel.GameType.value}PickColumn\", \"messageBody\":\"${key.toString()}\", \"gameId\":\"${viewModel.gameInfo?.gameid}\", \"userid\":\"${viewModel.user.userid}\"}")
+        viewModel.WebSocketClient!!.sendMessage("{\"type\":\"${viewModel.GameType.value}PickColumn\", \"messageBody\":\"${key.toString()}\", \"gameId\":\"${viewModel.gameInfo?.gameid}\", \"userid\":\"${viewModel.getUser()?.userid}\"}")
     }
 }
 
@@ -385,7 +385,7 @@ fun enemyColumn(column: Column?) {
 fun ProfileRow(profileImage: Int?,
     gameViewModel: GameViewModel, username: String, score: Int, mana: String
 ) {
-    var user = gameViewModel.user
+    var user = gameViewModel.getUser()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -402,7 +402,7 @@ fun ProfileRow(profileImage: Int?,
 
                 Image(
                     painter = painterResource(id = profileImage) ,
-                    contentDescription = user.userName,
+                    contentDescription = user?.userName,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(1.dp)
@@ -412,8 +412,8 @@ fun ProfileRow(profileImage: Int?,
             }else{
 
                 Image(
-                    bitmap = BitmapFactory.decodeByteArray(Base64.decode(user.profilePicture, 0), 0, Base64.decode(user.profilePicture, 0).size).asImageBitmap(),
-                    contentDescription = user.userName,
+                    bitmap = BitmapFactory.decodeByteArray(Base64.decode(user!!.profilePicture, 0), 0, Base64.decode(user!!.profilePicture, 0).size).asImageBitmap(),
+                    contentDescription = user?.userName,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(1.dp)
@@ -485,7 +485,7 @@ fun DefaultDie(gameViewModel: GameViewModel) {
                     gameViewModel.hasRolled.value = true
 
                     if (gameViewModel.isActive.value && !gameViewModel.roll.value) {
-                        gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"rolled\", \"messageBody\":\"\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.user.userid}\"}")
+                        gameViewModel.WebSocketClient!!.sendMessage("{\"type\":\"rolled\", \"messageBody\":\"\", \"gameId\":\"${gameViewModel.gameInfo?.gameid}\", \"userid\":\"${gameViewModel.getUser()?.userid}\"}")
                     }
                 },
             contentScale = ContentScale.FillBounds

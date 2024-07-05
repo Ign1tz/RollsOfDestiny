@@ -34,6 +34,7 @@ import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.FriendList
+import com.example.myapplication.widgets.LogOut
 import com.example.myapplication.widgets.TitleTopBar
 import kotlinx.coroutines.launch
 
@@ -61,6 +62,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                             modifier = Modifier
                                 .fillMaxWidth(),
                             title = {},
+                            navigationIcon = { LogOut(loginViewModel, navController = navController) },
                             actions = {
                                 IconButton(onClick = { scope.launch {   drawerState.open()} }) {
                                     Icon(

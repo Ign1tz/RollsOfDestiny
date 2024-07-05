@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
 import com.example.myapplication.localdb.Repository
+import com.example.myapplication.localdb.User
 import com.example.myapplication.types.EndResults
 import com.example.myapplication.types.gameMessageBody
 import com.example.myapplication.types.idMessageBody
@@ -43,11 +44,20 @@ class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewMod
     var isActive = mutableStateOf(false)
     var hasRolled = mutableStateOf(false)
     var pickedColumn = mutableStateOf(false)
-    var user by mutableStateOf(repository.getUser())
     var roll = mutableStateOf(false)
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
     var FriendId = mutableStateOf("")
+
+    fun getUser(): User? {
+        val user = repository.getUser()
+        try {
+            user.userName
+            return user
+        } catch (e: Exception) {
+            return null
+        }
+    }
 
     fun resetAllValues() {
         connected.value = false

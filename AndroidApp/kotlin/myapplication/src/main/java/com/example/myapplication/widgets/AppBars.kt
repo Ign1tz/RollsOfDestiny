@@ -57,7 +57,7 @@ fun ScreenTopBar (navController: NavController, title: String) {
         CenterAlignedTopAppBar(
             modifier = Modifier
                 .fillMaxWidth(),
-            title = { Text(title) },
+            title = { Text(fontFamily = FontFamily.Serif,text = title) },
             navigationIcon = { TopButton(navController = navController)},
         )
     }

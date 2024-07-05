@@ -15,7 +15,7 @@ import com.example.myapplication.widgets.ScreenTopBar
 @Composable
 fun SettingScreen (navController: NavController, settingViewModel: SettingViewModel) {
     Scaffold (
-        topBar = { ScreenTopBar(navController,"<") },
+        topBar = { ScreenTopBar(navController,"Settings") },
 
     ){
         innerPadding ->

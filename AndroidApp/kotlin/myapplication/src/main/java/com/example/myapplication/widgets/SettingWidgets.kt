@@ -33,17 +33,6 @@ fun CenterSettings (viewModel: SettingViewModel, navController: NavController) {
     Column (modifier = Modifier
         .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "Settings",
-            Modifier
-                .background(Color.Black)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            fontSize = 35.sp,
-            fontFamily = FontFamily.Serif)
-
-
 
         OutlinedTextField(
             value = viewModel.username.value,

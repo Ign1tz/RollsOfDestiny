@@ -9,11 +9,16 @@ import androidx.navigation.NavController
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.LoginBox
+import com.example.myapplication.widgets.TitleTopBar
 
 
 @Composable
 fun LoginScreen (navController: NavController, loginViewModel: LoginViewModel) {
     Scaffold (
+
+        topBar = {
+                 TitleTopBar()
+        },
 
         bottomBar = {
             BottomBar()
