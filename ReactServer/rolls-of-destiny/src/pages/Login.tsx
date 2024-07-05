@@ -42,7 +42,7 @@ export default function Login() {
 
     function submit() {
         if (checkUsername() && checkPassword()) {
-            fetch("http://10.0.0.2:9090/login", {
+            fetch("http://menews.site:9090/login", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -101,7 +101,7 @@ export default function Login() {
             <Button variant="contained" onClick={submit}>Login</Button>
             <p className={"link"}> Don't have an account yet?
                 <br/>
-                <Link to="http://10.0.0.2:3000/signup">Sign Up Here</Link>
+                <Link to="http://menews.site:3000/signup">Sign Up Here</Link>
             </p>
         </div>
     )

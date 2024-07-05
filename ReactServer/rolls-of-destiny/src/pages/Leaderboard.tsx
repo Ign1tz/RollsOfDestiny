@@ -13,7 +13,7 @@ export default function Leaderboard({ loggedIn }: { loggedIn: boolean }) {
 
 
     useEffect(() => {
-        authFetch("http://10.0.0.2:9090/getTopTen").then((response) => response.json()).then(r =>
+        authFetch("http://menews.site:9090/getTopTen").then((response) => response.json()).then(r =>
             setUsers(r.topTenPlayers.sort((a:profile, b:profile) => b.rating - a.rating))
         )
     }, []);

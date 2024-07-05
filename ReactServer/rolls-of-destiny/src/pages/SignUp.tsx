@@ -25,7 +25,7 @@ export default function SignUp() {
         const passwordPassed = checkPassword();
         const emailPassed = checkEmail();
         if (usernamePassed && passwordPassed && emailPassed) {
-            fetch("http://10.0.0.2:9090/signup", {
+            fetch("http://menews.site:9090/signup", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -130,7 +130,7 @@ export default function SignUp() {
                 <Button variant="contained" onClick={submit}>Submit</Button>
                 <p className={"link"}> Already have an account?
                     <br/>
-                    <Link to="http://10.0.0.2:3000/login">Login Here</Link>
+                    <Link to="http://menews.site:3000/login">Login Here</Link>
                 </p>
             </div>
         </div>

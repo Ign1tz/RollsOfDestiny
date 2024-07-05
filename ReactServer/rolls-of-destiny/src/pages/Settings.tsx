@@ -22,7 +22,7 @@ export default function Settings({profile}: { profile: profile }) {
     const [username, setUsername] = useState("")
 
     useEffect(() => {
-        authFetch("http://10.0.0.2:9090/userInfo").then(r => {
+        authFetch("http://menews.site:9090/userInfo").then(r => {
 
             return r.json()
         }).then(response => {
@@ -86,7 +86,7 @@ export default function Settings({profile}: { profile: profile }) {
 
     function submitNewUsername() {
         if (checkUsernameChange()) {
-            authFetch("http://10.0.0.2:9090/changeUsername", {
+            authFetch("http://menews.site:9090/changeUsername", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -95,7 +95,7 @@ export default function Settings({profile}: { profile: profile }) {
                 body: JSON.stringify({oldUsername: profile.username, newUsername: newUsername})
             }).then(r => {
                 if (r.status === 200) {
-                    authFetch("http://10.0.0.2:9090/userInfo").then(r => {
+                    authFetch("http://menews.site:9090/userInfo").then(r => {
                         return r.json()
                     }).then(response => {
                         sessionStorage.setItem("userInfo", JSON.stringify(response))
@@ -112,7 +112,7 @@ export default function Settings({profile}: { profile: profile }) {
 
     function submitPasswordChange() {
         if (checkPasswordChange()) {
-            authFetch("http://10.0.0.2:9090/changePassword", {
+            authFetch("http://menews.site:9090/changePassword", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -141,7 +141,7 @@ export default function Settings({profile}: { profile: profile }) {
 
     function submitProfilePicture() {
         if (imageString != "") {
-            authFetch("http://10.0.0.2:9090/changeProfilePicture", {
+            authFetch("http://menews.site:9090/changeProfilePicture", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -157,7 +157,7 @@ export default function Settings({profile}: { profile: profile }) {
     }
 
     function deleteAccount() {
-        authFetch("http://10.0.0.2:9090/deleteAccount", {
+        authFetch("http://menews.site:9090/deleteAccount", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
