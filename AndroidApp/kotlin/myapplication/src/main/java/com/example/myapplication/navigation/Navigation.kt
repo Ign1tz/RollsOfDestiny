@@ -1,5 +1,6 @@
 package com.example.myapplication.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -82,8 +83,12 @@ fun Navigation() {
         composable(route = "decks") {
             DeckScreen(navController = navController,deckViewModel = deckViewModel)
         }
-        composable (route = "cards") {
-            CardScreen(navController = navController, cardViewModel = cardViewModel)
+        composable (route = "deckDetails/{deckid}",
+            arguments = listOf(navArgument(name = "deckid") { type = NavType.StringType }))
+        { backStackEntry ->
+
+            cardViewModel.deckid = backStackEntry.arguments?.getString("deckid")?: ""
+                CardScreen(navController = navController, cardViewModel = cardViewModel)
         }
     }
 }

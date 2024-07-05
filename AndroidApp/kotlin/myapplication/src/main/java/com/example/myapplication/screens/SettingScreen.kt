@@ -8,13 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.myapplication.viewmodels.SettingViewModel
 import com.example.myapplication.widgets.BottomBar
-import com.example.myapplication.widgets.HeaderTopBar
 import com.example.myapplication.widgets.CenterSettings
+import com.example.myapplication.widgets.HomeTopBar
+import com.example.myapplication.widgets.ScreenTopBar
 
 @Composable
 fun SettingScreen (navController: NavController, settingViewModel: SettingViewModel) {
     Scaffold (
-        topBar = { HeaderTopBar(navController,"<") },
+        topBar = { ScreenTopBar(navController,"<") },
 
     ){
         innerPadding ->

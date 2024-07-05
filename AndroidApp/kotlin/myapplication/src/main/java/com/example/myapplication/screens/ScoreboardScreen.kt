@@ -33,12 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.myapplication.types.scoreboardPlayer
 import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.BottomBar
-import com.example.myapplication.widgets.HeaderTopBar
+import com.example.myapplication.widgets.ScreenTopBar
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -92,7 +90,7 @@ fun ScoreBoardScreen(navController: NavController, scoreboardViewModel: Scoreboa
 
     Scaffold(
         topBar = {
-            HeaderTopBar(navController, "<")
+            ScreenTopBar(navController, "<")
         },
         bottomBar = {
             BottomBar()

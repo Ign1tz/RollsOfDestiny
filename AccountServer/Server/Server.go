@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var secretKey = []byte(os.Getenv("SECRET_KEY"))
@@ -515,6 +516,42 @@ func getDecks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getDeck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	if r.Method == "OPTIONS" {
+
+		return
+	}
+	_, valid := checkToken(w, r)
+	if valid {
+
+		myUrl, _ := url.Parse(r.URL.String())
+		params, _ := url.ParseQuery(myUrl.RawQuery)
+		deckid := params.Get("deckid")
+
+		log.Println(deckid)
+
+		deck, err := Database.GetDeckByDeckId(deckid)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		var deckString string
+		var cardString string
+		if deck.UserID != "" {
+			cardString = DeckLogic.GetCardsOfDeckAsJsonString(deck.DeckID)
+			deckString = fmt.Sprintf(`%s{"name": "%s", "deckid": "%s", "active": %s, "cards": [%s]}`, deckString, deck.Name, deck.DeckID, strconv.FormatBool(deck.Active), cardString)
+		}
+		deckInfo := fmt.Sprintf("{\"deck\": %s}", deckString)
+		log.Println(deckInfo)
+		fmt.Fprint(w, deckInfo)
+	}
+}
+
 func createDeck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
@@ -546,10 +583,16 @@ func createDeck(w http.ResponseWriter, r *http.Request) {
 
 			err = json.Unmarshal(body, &t)
 			if err != nil {
+				log.Println(err)
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			DeckLogic.CreateNewDeck(t.Name, userid)
+			log.Println(t.Name)
+			replacedName := strings.Replace(t.Name, " ", "", 0)
+			log.Println(replacedName)
+			if replacedName != "" {
+				DeckLogic.CreateNewDeck(t.Name, userid)
+			}
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -832,7 +875,7 @@ func getNewCards(w http.ResponseWriter, r *http.Request) {
 		}
 
 		message := fmt.Sprintf("{\"oldCards\": [%s], \"newCards\": [%s]}", oldArray, newArray)
-
+		log.Println("newCards", message)
 		fmt.Fprint(w, message)
 	}
 }
@@ -884,21 +927,22 @@ func setupRoutes() {
 	http.HandleFunc("/isLoggedIn", isLoggedIn)
 	http.HandleFunc("/refresh", refresh)
 	http.HandleFunc("/userInfo", accountInfo)
+	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
 	http.HandleFunc("/changeUsername", changeUsername)
 	http.HandleFunc("/changePassword", changePassword)
 	http.HandleFunc("/deleteAccount", deleteAccount)
 	http.HandleFunc("/getFriends", getFriends)
 	http.HandleFunc("/getAccounts", getAccounts)
+	http.HandleFunc("/getTopTen", getTopTen)
 	http.HandleFunc("/addFriend", newFriend)
 	http.HandleFunc("/removeFriend", deleteFriend)
+	http.HandleFunc("/getDeck", getDeck)
 	http.HandleFunc("/getDecks", getDecks)
 	http.HandleFunc("/createDeck", createDeck)
 	http.HandleFunc("/addCardToDeck", addCardToDeck)
 	http.HandleFunc("/removeCardFromDeck", removeCardFromDeck)
 	http.HandleFunc("/setActiveDeck", setDeckActive)
 	http.HandleFunc("/removeDeck", removeDeck)
-	http.HandleFunc("/getTopTen", getTopTen)
-	http.HandleFunc("/changeProfilePicture", changeProfilePicture)
 	http.HandleFunc("/getYourCards", getYourCards)
 	http.HandleFunc("/getNewCards", getNewCards)
 	http.HandleFunc("/aknowledgeNewCard", aknowledgeCard)

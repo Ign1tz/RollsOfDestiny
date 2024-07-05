@@ -27,29 +27,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.myapplication.widgets.BottomBar
-import com.example.myapplication.widgets.HomeTopBar
 import com.example.myapplication.widgets.HomeScreenButtons
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodels.GameViewModel
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.unit.dp
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.ScoreboardViewModel
-import com.example.myapplication.widgets.UpButton
 import com.example.myapplication.widgets.FriendList
 import com.example.myapplication.widgets.TitleTopBar
-import com.example.myapplication.widgets.TopButton
 import kotlinx.coroutines.launch
-import kotlin.math.log
-import com.example.myapplication.widgets.FriendList
-import com.example.myapplication.widgets.TitleTopBar
-import com.example.myapplication.widgets.TopButton
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlin.math.log
 
 
 @OptIn(ExperimentalMaterial3Api::class)

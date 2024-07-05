@@ -14,8 +14,8 @@ class Factory (private val repository: Repository):ViewModelProvider.Factory{
         SettingViewModel::class.java -> SettingViewModel(repository = repository, IPADDRESS)
         GameViewModel::class.java -> GameViewModel(repository = repository, IPADDRESS)
         ScoreboardViewModel::class.java -> ScoreboardViewModel(repository = repository, IPADDRESS)
-        DeckViewModel::class.java -> DeckViewModel(repository = repository)
-        CardViewModel::class.java -> CardViewModel(repository = repository)
+        DeckViewModel::class.java -> DeckViewModel(repository = repository, IPADDRESS)
+        CardViewModel::class.java -> CardViewModel(repository = repository, IPADDRESS, "")
         else -> throw IllegalArgumentException("Oh oh!")
     } as T
 }
