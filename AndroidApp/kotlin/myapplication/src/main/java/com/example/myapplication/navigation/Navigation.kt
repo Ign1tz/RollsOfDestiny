@@ -28,6 +28,8 @@ fun Navigation() {
     val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
 
     val scoreboardViewModel: ScoreboardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+
 
 
     NavHost(navController = navController,

@@ -1,10 +1,14 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
 import com.example.myapplication.localdb.User
@@ -31,6 +35,39 @@ class HomeViewModel (val repository: Repository, val IPADDRESS: String) : ViewMo
 
     var friends = mutableStateOf<List<friends>?>(null)
     var addFriend = mutableStateOf("")
+
+    var isFriendPlayClicked by mutableStateOf(false)
+        private set
+    fun toggleFriendClick() {
+        isFriendPlayClicked = !isFriendPlayClicked
+        isHostButtonClicked = false
+        isJoinButtonClicked = false
+    }
+
+    var isHostButtonClicked by mutableStateOf(false)
+    fun toggleHostButtonClicked() {
+        isHostButtonClicked = !isHostButtonClicked
+        isJoinButtonClicked = false
+        isFriendPlayClicked = false
+    }
+
+    var isJoinButtonClicked by mutableStateOf(false)
+
+    fun toggleJoinButtonClicked() {
+        isJoinButtonClicked = !isJoinButtonClicked
+        isHostButtonClicked = false
+        isFriendPlayClicked = false
+    }
+
+    fun getUser(): User? {
+        val user = repository.getUser()
+        try {
+            user.userName
+            return user
+        } catch (e: Exception) {
+            return null
+        }
+    }
 
     var drawerState = DrawerValue.Closed
 
