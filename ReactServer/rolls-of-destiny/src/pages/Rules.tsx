@@ -2,10 +2,10 @@ import React from 'react';
 import TopAppBar from "../bars/TopAppBar";
 import "../css/Rules.css"
 
-export default function Rules() {
+export default function Rules({ loggedIn }: { loggedIn: boolean }) {
     return (
         <>
-            <TopAppBar loggedIn={true} />
+            <TopAppBar loggedIn={loggedIn} />
             <div className="rules-container">
                 <div className="rules-header">
                     <h1>Rules</h1>

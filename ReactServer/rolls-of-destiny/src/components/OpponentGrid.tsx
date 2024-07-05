@@ -11,10 +11,11 @@ export default function OpponentGrid({grid}: { grid: enemyInfo | null }) {
             flexDirection="row"
             justifyContent="center"
             alignItems="center"
+            style={{width: "100%", minHeight: "100%"}}
         >
-            <Box><OpponentColumn key={0} columnKey={0} column={grid?.LeftColumn} handleClick={() => {}}/></Box>
-            <Box><OpponentColumn key={1} columnKey={1} column={grid?.MiddleColumn} handleClick={() => {}}/></Box>
-            <Box><OpponentColumn key={2} columnKey={2} column={grid?.RightColumn} handleClick={() => {}}/></Box>
+            <Box style={{height: "100%", aspectRatio: "1/3"}}><OpponentColumn key={0} columnKey={0} column={grid?.LeftColumn} handleClick={() => {}}/></Box>
+            <Box style={{height: "100%", aspectRatio: "1/3"}}><OpponentColumn key={1} columnKey={1} column={grid?.MiddleColumn} handleClick={() => {}}/></Box>
+            <Box style={{height: "100%", aspectRatio: "1/3"}}><OpponentColumn key={2} columnKey={2} column={grid?.RightColumn} handleClick={() => {}}/></Box>
         </Box>
     );
 }

@@ -4,7 +4,6 @@ import (
 	"RollsOfDestiny/AccountServer/Database"
 	"RollsOfDestiny/AccountServer/Encryption"
 	"RollsOfDestiny/AccountServer/Types"
-	"fmt"
 	"github.com/google/uuid"
 	"log"
 )
@@ -14,7 +13,6 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 	validUsername := newInfo.CheckUsername()
 	validEmail := newInfo.CheckEmail()
 
-	fmt.Println(validPassword, validUsername, validEmail)
 	if validPassword && validUsername && validEmail {
 		hashedPassword, _ := Encryption.HashPassword(newInfo.Password)
 		newAccount := Types.Account{
@@ -22,7 +20,7 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 			Username:       newInfo.Username,
 			Password:       hashedPassword,
 			Email:          newInfo.Email,
-			ProfilePicture: "https://via.placeholder.com/100",
+			ProfilePicture: defaultImage(),
 			Rating:         1000,
 		}
 		err := Database.InsertAccount(newAccount)
@@ -43,32 +41,44 @@ func SignUpNewAccount(newInfo SignUpInfo) {
 
 func createDefaultCards(account Types.Account) []Types.Card {
 	rollAgain := Types.Card{
-		UserID: account.UserID,
-		Name:   "Roll Again",
-		Effect: "rollAgain",
-		DeckID: "",
-		Count:  0,
+		UserID:    account.UserID,
+		Name:      "Roll Again",
+		Effect:    "rollAgain",
+		DeckID:    "",
+		Count:     1,
+		Cost:      4,
+		Image:     "/static/media/roll_again.21331c0ee525eb47281c.png",
+		Threshold: 1000,
 	}
 	doubleMana := Types.Card{
-		UserID: account.UserID,
-		Name:   "Double Mana",
-		Effect: "doubleMana",
-		DeckID: "",
-		Count:  0,
+		UserID:    account.UserID,
+		Name:      "Double Mana",
+		Effect:    "doubleMana",
+		DeckID:    "",
+		Count:     1,
+		Cost:      3,
+		Image:     "/static/media/double_mana.7c47c6670f52b76c8fa6.png",
+		Threshold: 1000,
 	}
 	destroyColumn := Types.Card{
-		UserID: account.UserID,
-		Name:   "Destroy Column",
-		Effect: "destroyColumn",
-		DeckID: "",
-		Count:  0,
+		UserID:    account.UserID,
+		Name:      "Destroy Column",
+		Effect:    "destroyColumn",
+		DeckID:    "",
+		Count:     0,
+		Cost:      7,
+		Image:     "/static/media/destroy_column.23caf4dcff16d50757e3.png",
+		Threshold: 1020,
 	}
 	flipClockwise := Types.Card{
-		UserID: account.UserID,
-		Name:   "Flip Clockwise",
-		Effect: "flipClockwise",
-		DeckID: "",
-		Count:  0,
+		UserID:    account.UserID,
+		Name:      "Flip Clockwise",
+		Effect:    "flipClockwise",
+		DeckID:    "",
+		Count:     0,
+		Cost:      6,
+		Image:     "/static/media/rotate_grid.6a18f6243e59b2edf045.png",
+		Threshold: 1050,
 	}
 	cards := []Types.Card{rollAgain, doubleMana, destroyColumn, flipClockwise}
 	return cards

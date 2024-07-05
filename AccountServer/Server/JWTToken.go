@@ -41,7 +41,6 @@ func createToken(userid string) (string, error) {
 
 func checkToken(w http.ResponseWriter, r *http.Request) (string, bool) {
 	tokenString := r.Header.Get("Authorization")
-	fmt.Println("tokenstrong", tokenString)
 	if tokenString == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "Missing authorization header")

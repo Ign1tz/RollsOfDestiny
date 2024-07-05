@@ -22,22 +22,27 @@ type ColumnLogic interface {
 	IsFull()
 }
 
-func (c *Column) Remove(s int) {
+func (c *Column) Remove(s int) int {
+	numberOfRemoved := 0
 	removed := false
 	if c.First == s {
 		c.First = 0
+		numberOfRemoved++
 		removed = true
 	}
 	if c.Second == s {
 		c.Second = 0
+		numberOfRemoved++
 		removed = true
 	}
 	if c.Third == s {
 		c.Third = 0
+		numberOfRemoved++
 	}
 	if removed {
 		c.shift()
 	}
+	return numberOfRemoved
 }
 
 func (c *Column) shift() {
