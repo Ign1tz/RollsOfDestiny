@@ -164,11 +164,8 @@ export default function Settings({profile}: { profile: profile }) {
                 'Content-Type': 'application/json;charset=UTF-8'
             }
         }).then(r => {
-            localStorage.setItem("access_token", "")
-            sessionStorage.setItem("userInfo", "")
-            sessionStorage.setItem("gameInfo", "")
-            sessionStorage.setItem("GameType", "")
-            sessionStorage.setItem("loggedIn", "false")
+            localStorage.clear()
+            sessionStorage.clear()
             window.location.href = "/"
         });
     }
