@@ -58,7 +58,7 @@ export default function Settings({profile}: {profile:profile }) {
 
     function submitNewUsername() {
         if (checkUsernameChange()) {
-            authFetch("http://localhost:9090/changeUsername", {
+            authFetch("http://menews.site:9090/changeUsername", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -67,7 +67,7 @@ export default function Settings({profile}: {profile:profile }) {
                 body: JSON.stringify({oldUsername: profile.username, newUsername: newUsername})
             }).then(r => {
                 if (r.status === 200) {
-                    authFetch("http://localhost:9090/userInfo").then(r => {
+                    authFetch("http://menews.site:9090/userInfo").then(r => {
                         return r.json()
                     }).then(response => {
                         sessionStorage.setItem("userInfo", JSON.stringify(response))
@@ -83,7 +83,7 @@ export default function Settings({profile}: {profile:profile }) {
 
     function submitPasswordChange() {
         if (checkPasswordChange()) {
-            authFetch("http://localhost:9090/changePassword", {
+            authFetch("http://menews.site:9090/changePassword", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',

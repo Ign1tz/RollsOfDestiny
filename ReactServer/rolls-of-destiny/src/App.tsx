@@ -21,12 +21,12 @@ function App() {
 
     useEffect(() => {
         if (localStorage.getItem("access_token")) {
-            authFetch("http://localhost:9090/isLoggedIn").then(response => {
+            authFetch("http://menews.site:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
                 setFetched(true)
                 console.log("userInfo")
                 if (response.status === 200) {
-                    authFetch("http://localhost:9090/userInfo").then(r => {
+                    authFetch("http://menews.site:9090/userInfo").then(r => {
 
                         return r.json()
                     }).then(response => {

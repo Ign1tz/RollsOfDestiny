@@ -23,7 +23,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
 
     function submitSearchBar() {
         // for connecting with backend
-        authFetch("http://localhost:9090/getAccounts?username=" + searchBar).then(r => {
+        authFetch("http://menews.site:9090/getAccounts?username=" + searchBar).then(r => {
             if (r.status === 200) {
                 r.json().then(r => {
                     console.log(r)
@@ -41,7 +41,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     }
 
     const addToFriendlist = (username: string) => {
-        authFetch("http://localhost:9090/addFriend", {
+        authFetch("http://menews.site:9090/addFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -53,7 +53,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
 
     useEffect(() => {
             console.log("test")
-            authFetch("http://localhost:9090/getFriends").then(response => {
+            authFetch("http://menews.site:9090/getFriends").then(response => {
                 console.log(response); return response.json()
             }).then(response => {
                 console.log(response)
@@ -71,7 +71,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
         window.location.reload();
     };
     const removeFromFriendlist = (username: string) => {
-        authFetch("http://localhost:9090/removeFriend", {
+        authFetch("http://menews.site:9090/removeFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',

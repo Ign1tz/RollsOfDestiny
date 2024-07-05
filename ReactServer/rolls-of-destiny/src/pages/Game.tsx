@@ -20,7 +20,7 @@ export default function Game() {
     if (!startGameInfo) {
         startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
-    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://localhost:8080/ws'))
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://menews.site:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [userID, setUserID] = useState("")
@@ -143,7 +143,7 @@ export default function Game() {
         let userinfo = sessionStorage.getItem("userInfo")
         if (userinfo) {
             console.log("test")
-            const response = await fetch("http://localhost:8080/queue", {
+            const response = await fetch("http://menews.site:8080/queue", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -162,7 +162,7 @@ export default function Game() {
         let userinfo = sessionStorage.getItem("userInfo")
         if (userinfo) {
             console.log("test")
-            const response = await fetch("http://localhost:8080/startBot", {
+            const response = await fetch("http://menews.site:8080/startBot", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
