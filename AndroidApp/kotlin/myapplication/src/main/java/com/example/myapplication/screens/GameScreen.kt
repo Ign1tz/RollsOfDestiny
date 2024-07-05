@@ -24,6 +24,7 @@ import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
 import com.example.myapplication.types.AudioPlayer
 import com.example.myapplication.viewmodels.GameViewModel
+import com.example.myapplication.widgets.EndScreenRow
 import com.example.myapplication.widgets.ProfileRow
 import com.example.myapplication.widgets.PlayField
 import java.net.URI
@@ -59,68 +60,7 @@ fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
     }
 
     if (gameViewModel.endResults != null){
-        Scaffold (
-
-        ){innerPadding ->
-            Column (modifier = Modifier
-                .padding(innerPadding)
-                .background(Color.White)) {
-                Box(){
-                    Text(
-                        text = "Game finished",
-                        fontSize = 10.sp,
-                        color = Color.Black,
-                        fontFamily = FontFamily.Serif
-                    )
-                }
-                Box(){
-                    Text(
-                        text = gameViewModel.endResults!!.youWon,
-                        fontSize = 10.sp,
-                        color = Color.Black,
-                        fontFamily = FontFamily.Serif
-                    )
-                }
-                Box(){
-                    Text(
-                        text = "Score",
-                        fontSize = 10.sp,
-                        color = Color.Black,
-                        fontFamily = FontFamily.Serif
-                    )
-                }
-                Row {
-                    Box(){
-                        Text(
-                            text = gameViewModel.endResults!!.yourScore.toString(),
-                            fontSize = 10.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                    Box(){
-                        Text(
-                            text = "to",
-                            fontSize = 10.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                    Box(){
-                        Text(
-                            text = gameViewModel.endResults!!.enemyScore.toString(),
-                            fontSize = 10.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
-                Button(onClick = { gameViewModel.WebSocketClient!!.close(); navController.navigate("home"); gameViewModel.resetAllValues(); }) {
-
-                }
-
-            }
-        }
+        EndScreenRow(gameViewModel = gameViewModel, navController = navController)
     }else{
         Scaffold (
 
