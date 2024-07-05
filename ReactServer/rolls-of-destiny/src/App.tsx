@@ -27,13 +27,13 @@ function App() {
     useEffect(() => {
         const tempLoggedIn = sessionStorage.getItem("loggedIn")
         if (localStorage.getItem("access_token") && tempLoggedIn !== "true") {
-            authFetch("http://localhost:9090/isLoggedIn").then(response => {
+            authFetch("http://10.0.0.2:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
                 sessionStorage.setItem("loggedIn", "true")
                 setFetched(true)
                 console.log("userInfo")
                 if (response.status === 200) {
-                    authFetch("http://localhost:9090/userInfo").then(r => {
+                    authFetch("http://10.0.0.2:9090/userInfo").then(r => {
 
                         return r.json()
                     }).then(response => {

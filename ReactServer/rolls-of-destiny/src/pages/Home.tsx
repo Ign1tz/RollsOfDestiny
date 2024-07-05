@@ -27,7 +27,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     useEffect(() => {
         if (localStorage.getItem("access_token") != "") {
             console.log("Access token", localStorage.getItem("access_token"));
-            authFetch("http://localhost:9090/userInfo").then(r => {
+            authFetch("http://10.0.0.2:9090/userInfo").then(r => {
 
                 return r.json()
             }).then(response => {

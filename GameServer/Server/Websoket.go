@@ -93,6 +93,30 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	}
 }
 
+func newmessage(gameid string) (map[string]string, map[string]string) {
+	playfield, err := Database.GetPlayfield(gameid)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+
+	hostIsActive := playfield.Host.UserID == playfield.ActivePlayer.UserID
+
+	var hostMsg = make(map[string]string)
+	var guestMsg = make(map[string]string)
+
+	hostMsg["id"] = playfield.Host.WebsocketConnectionID
+	newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+	infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+	hostMsg["message"] = infoMessage
+
+	guestMsg["id"] = playfield.Guest.WebsocketConnectionID
+	newMessage = `{"gameid": "` + playfield.GameID + `", "YourInfo": ` + playfield.Guest.ToJson(true) + `, "EnemyInfo":` + playfield.Host.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(!hostIsActive) + `, "roll": "` + playfield.LastRoll + `"}}`
+	infoMessage = `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
+	guestMsg["message"] = infoMessage
+	return hostMsg, guestMsg
+}
+
 func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map[string]string, map[string]string) {
 
 	var msg = make(map[string]string)
@@ -153,7 +177,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 			return nil, nil
 		}
 	case "playCard":
-		if position.CurrentStep == "afterRoll" || position.CurrentStep == "afterColumnPick" {
+		if position.CurrentStep == "afterRoll" {
 			return GameLogic.HandleCards(message, position)
 		} else {
 			return nil, nil
@@ -236,44 +260,53 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 	case "0":
 		err := playfield.ActivePlayer.Grid.Left.Add(columnInt)
 		if err != nil {
-			panic(err)
-		}
-		numberOfRemoved = enemy.Grid.Left.Remove(columnInt)
-		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Left)
-		if err != nil {
-			return nil, nil
-		}
-		err = Database.UpdateColumn(enemy.Grid.Left)
-		if err != nil {
-			return nil, nil
+			log.Println(err)
+			position.CurrentStep = "afterColumnPick"
+			return newmessage(message.GameId)
+		} else {
+			numberOfRemoved = enemy.Grid.Left.Remove(columnInt)
+			err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Left)
+			if err != nil {
+				return nil, nil
+			}
+			err = Database.UpdateColumn(enemy.Grid.Left)
+			if err != nil {
+				return nil, nil
+			}
 		}
 	case "1":
 		err := playfield.ActivePlayer.Grid.Middle.Add(columnInt)
 		if err != nil {
-			panic(err)
-		}
-		numberOfRemoved = enemy.Grid.Middle.Remove(columnInt)
-		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
-		if err != nil {
-			return nil, nil
-		}
-		err = Database.UpdateColumn(enemy.Grid.Middle)
-		if err != nil {
-			return nil, nil
+			position.CurrentStep = "afterColumnPick"
+			log.Println(err)
+			return newmessage(message.GameId)
+		} else {
+			numberOfRemoved = enemy.Grid.Middle.Remove(columnInt)
+			err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
+			if err != nil {
+				return nil, nil
+			}
+			err = Database.UpdateColumn(enemy.Grid.Middle)
+			if err != nil {
+				return nil, nil
+			}
 		}
 	case "2":
 		err := playfield.ActivePlayer.Grid.Right.Add(columnInt)
 		if err != nil {
-			panic(err)
-		}
-		numberOfRemoved = enemy.Grid.Right.Remove(columnInt)
-		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Right)
-		if err != nil {
-			return nil, nil
-		}
-		err = Database.UpdateColumn(enemy.Grid.Right)
-		if err != nil {
-			return nil, nil
+			log.Println(err)
+			position.CurrentStep = "afterColumnPick"
+			return newmessage(message.GameId)
+		} else {
+			numberOfRemoved = enemy.Grid.Right.Remove(columnInt)
+			err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Right)
+			if err != nil {
+				return nil, nil
+			}
+			err = Database.UpdateColumn(enemy.Grid.Right)
+			if err != nil {
+				return nil, nil
+			}
 		}
 	default:
 		return nil, nil

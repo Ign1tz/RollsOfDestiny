@@ -85,7 +85,7 @@ export default function Decks() {
     }
 
     const closeNewCardModal = () => {
-        authFetch("http://localhost:9090/aknowledgeNewCard", {
+        authFetch("http://10.0.0.2:9090/aknowledgeNewCard", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -102,7 +102,7 @@ export default function Decks() {
     const addCardToDeck = (name: string) => {
         setCardsForNewDeck(cardsForNewDeck)
 
-        authFetch("http://localhost:9090/addCardToDeck", {
+        authFetch("http://10.0.0.2:9090/addCardToDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -119,7 +119,7 @@ export default function Decks() {
     const removeCardFromDeck = (cardname: string) => {
         setCardsForNewDeck(cardsForNewDeck)
 
-        authFetch("http://localhost:9090/removeCardFromDeck", {
+        authFetch("http://10.0.0.2:9090/removeCardFromDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -136,7 +136,7 @@ export default function Decks() {
     }
 
     useEffect(() => {
-        authFetch("http://localhost:9090/getDecks").then(response => {
+        authFetch("http://10.0.0.2:9090/getDecks").then(response => {
 
             return response.json()
         }).then(r => {
@@ -144,7 +144,7 @@ export default function Decks() {
             }
         )
 
-        authFetch("http://localhost:9090/getNewCards").then(response => {
+        authFetch("http://10.0.0.2:9090/getNewCards").then(response => {
             return response.json()
         }).then(r => {
             setOldCards(r.oldCards)
@@ -157,7 +157,7 @@ export default function Decks() {
 
     function setActiveDeck(deck: Deck) {
         console.log(deck.deckid)
-        authFetch("http://localhost:9090/setActiveDeck", {
+        authFetch("http://10.0.0.2:9090/setActiveDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -180,7 +180,7 @@ export default function Decks() {
         setNewDeckName("")
         setCreateDeckButtonClicked(false)
 
-        authFetch("http://localhost:9090/createDeck", {
+        authFetch("http://10.0.0.2:9090/createDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -195,7 +195,7 @@ export default function Decks() {
     function deleteDeck(deck: Deck) {
         console.log("delete deck clicked")
 
-        authFetch("http://localhost:9090/removeDeck", {
+        authFetch("http://10.0.0.2:9090/removeDeck", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',

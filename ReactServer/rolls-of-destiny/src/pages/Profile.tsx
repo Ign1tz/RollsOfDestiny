@@ -11,7 +11,7 @@ export default function Profile() {
     const [friends, setFriends] = useState<profile[]>([
     ])
     useEffect(() => {
-        authFetch("http://localhost:9090/getFriends").then(response => {
+        authFetch("http://10.0.0.2:9090/getFriends").then(response => {
             console.log(response); return response.json()
         }).then(response => {
             console.log(response)
