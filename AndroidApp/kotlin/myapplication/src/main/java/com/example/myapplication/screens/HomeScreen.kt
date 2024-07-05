@@ -1,6 +1,7 @@
 package com.example.myapplication.screens
 
 import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -42,6 +43,7 @@ import com.example.myapplication.widgets.FriendList
 import com.example.myapplication.widgets.TitleTopBar
 import com.example.myapplication.widgets.TopButton
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.log
 
 
@@ -51,7 +53,6 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
     homeViewModel.getFriends()
     ModalNavigationDrawer(
 
@@ -70,7 +71,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                                 .fillMaxWidth(),
                             title = {},
                             actions = {
-                                IconButton(onClick = { scope.launch { drawerState.open() }}) {
+                                IconButton(onClick = { runBlocking {   drawerState.open()} }) {
                                     Icon(
                                         imageVector = Icons.Filled.Menu,
                                         contentDescription = "Friendlist"
@@ -79,6 +80,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                             }
                         )
                         TitleTopBar()
+                        Log.d("bug", "before")
                     }
                 },
                 bottomBar = {

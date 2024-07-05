@@ -99,6 +99,7 @@ export default function Settings({profile}: { profile: profile }) {
                         return r.json()
                     }).then(response => {
                         sessionStorage.setItem("userInfo", JSON.stringify(response))
+                        window.location.reload()
                     })
                 }
                 setErrorMessage("Username already taken.");
@@ -124,6 +125,7 @@ export default function Settings({profile}: { profile: profile }) {
                 })
             }).then(r => {
                 if (r.status === 200) {
+                    window.location.reload()
                 }
                 setErrorMessage("Something went wrong while trying to save your password. Please try again.");
             });

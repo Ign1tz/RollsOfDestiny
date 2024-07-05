@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
 import com.example.myapplication.localdb.Repository
@@ -115,6 +116,7 @@ class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewMod
                     pickedColumn.value = false
                 }
             } else if (msg.info == "gameEnded") {
+
                 val gameInfoJson = Json.parseToJsonElement(msg.message).jsonObject
                 gameInfo =
                     Json.decodeFromString<gameMessageBody>(gameInfoJson["gameInfo"]!!.toString())

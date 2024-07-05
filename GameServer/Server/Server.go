@@ -160,6 +160,42 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func removeFromQueue(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		return
+	}
+	log.Println("try to queue")
+	if r.Method == "POST" {
+		// Read the raw body
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		fmt.Printf("Raw body: %s\n", body)
+
+		var t Types.QueueInfo
+
+		err = json.Unmarshal(body, &t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("Received gameid: %s\n", t.UserId)
+		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
+
+		Database.DeleteFromQueueWebsocket(t.WebsocketConnectionId)
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
@@ -178,6 +214,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 func setupRoutes() {
 	fmt.Println("handle something")
 	http.HandleFunc("/queue", queueForGame)
+	http.HandleFunc("/deleteQueue", removeFromQueue)
 	http.HandleFunc("/queueFroGameWithFriend", queueForGameWithFriend)
 	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/startBot", startBot)
@@ -202,7 +239,7 @@ func Server() {
 						_ = err
 					}
 				} else {
-					log.Println("message or storrage is empty")
+					log.Println("message or storrage is empty", msg["id"], somekindofstorrage[msg["id"]])
 				}
 			}
 		}

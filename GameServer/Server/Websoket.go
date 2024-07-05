@@ -27,7 +27,6 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 		//fmt.Printf(conn.RemoteAddr())
 		//
 		_, p, err := conn.ReadMessage()
-		fmt.Println("message recived")
 		if err != nil {
 			log.Println(err)
 			return
@@ -116,6 +115,7 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		return nil, nil
 	}
 	if playfield.ActivePlayer.UserID != message.Userid {
+		log.Println("not active player")
 		return nil, nil
 	}
 	if message.Type == "surrender" {
@@ -253,8 +253,14 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 			panic(err)
 		}
 		numberOfRemoved = enemy.Grid.Left.Remove(columnInt)
-		Database.UpdateColumn(playfield.ActivePlayer.Grid.Left)
-		Database.UpdateColumn(enemy.Grid.Left)
+		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Left)
+		if err != nil {
+			return nil, nil
+		}
+		err = Database.UpdateColumn(enemy.Grid.Left)
+		if err != nil {
+			return nil, nil
+		}
 	case "1":
 		err := playfield.ActivePlayer.Grid.Middle.Add(columnInt)
 		if err != nil {
@@ -262,22 +268,35 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 		}
 		numberOfRemoved = enemy.Grid.Middle.Remove(columnInt)
 		fmt.Println("websocket placement", playfield.ActivePlayer.Grid.Middle.Placement)
-		Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
-		Database.UpdateColumn(enemy.Grid.Middle)
+		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
+		if err != nil {
+			return nil, nil
+		}
+		err = Database.UpdateColumn(enemy.Grid.Middle)
+		if err != nil {
+			return nil, nil
+		}
 	case "2":
 		err := playfield.ActivePlayer.Grid.Right.Add(columnInt)
 		if err != nil {
 			panic(err)
 		}
 		numberOfRemoved = enemy.Grid.Right.Remove(columnInt)
-		Database.UpdateColumn(playfield.ActivePlayer.Grid.Right)
-		Database.UpdateColumn(enemy.Grid.Right)
+		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Right)
+		if err != nil {
+			return nil, nil
+		}
+		err = Database.UpdateColumn(enemy.Grid.Right)
+		if err != nil {
+			return nil, nil
+		}
 	default:
 		return nil, nil
 	}
+
 	var hostIsActive bool
 	if playfield.ActivePlayer.UserID == playfield.Host.UserID {
-		log.Println("HOST WAS ACTIVE")
+		log.Println("Host WAS ACTIVE")
 		playfield.Host = playfield.ActivePlayer
 		playfield.Guest = enemy
 		addMana := 1
@@ -285,7 +304,10 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 			addMana = 2
 			numberOfRemoved *= 2
 			position.GuestInfo = ""
-			Database.UpdatePosition(position)
+			err := Database.UpdatePosition(position)
+			if err != nil {
+				log.Println("updatePosition", err)
+			}
 		}
 		playfield.Guest.Mana = min(max(playfield.Guest.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = false
@@ -324,7 +346,11 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 			addMana = 2
 			numberOfRemoved *= 2
 			position.HostInfo = ""
-			Database.UpdatePosition(position)
+
+			err := Database.UpdatePosition(position)
+			if err != nil {
+				log.Println("updatePosition", err)
+			}
 		}
 		playfield.Host.Mana = min(max(playfield.Host.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = true
@@ -359,9 +385,22 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 	playfield.ActivePlayer = playfield.EnemyPlayer()
 	playfield.LastRoll = playfield.Host.Die.Throw()
 
-	Database.UpdatePlayerMana(playfield.ActivePlayer)
-	Database.UpdateActivePlayerGames(playfield)
-	Database.UpdateLastRollGames(playfield)
+	err = Database.UpdatePlayerMana(playfield.ActivePlayer)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+	err = Database.UpdateActivePlayerGames(playfield)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+
+	}
+	err = Database.UpdateLastRollGames(playfield)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
 
 	fmt.Println(playfield.Host.Grid.Left.First)
 

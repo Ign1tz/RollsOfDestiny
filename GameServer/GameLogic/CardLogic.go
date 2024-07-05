@@ -131,7 +131,6 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 		playfield.Host = playfield.ActivePlayer
 		hostIsActive = true
 	} else {
-		log.Println("GUEST WAS ACTIVE")
 		playfield.Guest = playfield.ActivePlayer
 		hostIsActive = false
 	}

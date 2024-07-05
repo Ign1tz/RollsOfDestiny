@@ -102,10 +102,10 @@ fun UpButton() {
 
 @Composable
 fun QuickPlayButton(navController: NavController, gameViewModel: GameViewModel) {
-    gameViewModel.GameType.value = "bot"
+
     Button(
         modifier = Modifier.size(300.dp, 50.dp),
-        onClick = { navController.navigate(route = "game/bot") },
+        onClick = { navController.navigate(route = "game/bot"); gameViewModel.GameType.value = "bot" },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )
@@ -139,10 +139,10 @@ fun FriendPlayButton() {
 
 @Composable
 fun RankedPlayButton(navController: NavController, gameViewModel: GameViewModel) {
-    gameViewModel.GameType.value = ""
+
     Button(
         modifier = Modifier.size(300.dp, 50.dp),
-        onClick = { navController.navigate(route = "game") },
+        onClick = { navController.navigate(route = "game"); gameViewModel.GameType.value = "" },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black
         )

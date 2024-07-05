@@ -10,6 +10,7 @@ import background_music from "../soundtracks/background_music.mp3";
 import diceSound from "../soundtracks/dice-95077.mp3"
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
+import cardBack from "../images/cardBack.jpg"
 import {activePlayer, card, endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
 import VolumeSlider from "../components/VolumeSlider";
 import destroyColumnCard from "../cards/destroy_column.png"
@@ -32,7 +33,7 @@ export default function Game() {
     const [gameId, setGameId] = useState("")
     const [gameInfo, setGameInfo] = useState<messageBody>({} as messageBody)
     const [rolled, setRolled] = useState(false)
-    const [placed, setPlaced] = useState(true)
+    const [placed, setPlaced] = useState(false)
     const [player1Score, setPlayer1Score] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [confirmSurrender, setConfirmSurrender] = useState(false);
@@ -43,6 +44,27 @@ export default function Game() {
     const [volume, setVolume] = useState<number>(30);
     const [reroll, setReroll] = useState(false)
 
+    window.onbeforeunload = () =>{
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = fetch("http://localhost:8080/deleteQueue", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+        websocket.close()
+    }
 
     const togglePause = () => {
         setIsPaused(!isPaused);
@@ -243,7 +265,8 @@ export default function Game() {
         if (gameInfo.ActivePlayer) {
             console.log(gameInfo.ActivePlayer.active)
             if (gameInfo.ActivePlayer.active) {
-                setRolled(!placed || reroll)
+                console.log("setting", placed,  reroll)
+                setRolled(reroll)
                 setReroll(false)
                 setPlaced(false)
             } else {
@@ -281,7 +304,7 @@ export default function Game() {
     ];
 
     function playCard(card: card) {
-        setReroll(card.name === "Roll Again")
+        setReroll(card.name !== "Roll Again")
         websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId, userid: userID}))
     }
 
@@ -363,7 +386,7 @@ export default function Game() {
                             {(typeof enemyInfo).toString() != null &&
                                 Array.from({length: enemyInfo?.deck.inHand || 0}, (_, k) => (
                                     <div className={"specificOpponentCard"}>
-                                        <img src={rollAgainCard} alt={"card image"}/>
+                                        <img src={cardBack} alt={"card image"}/>
                                     </div>
                                 ))
                             }

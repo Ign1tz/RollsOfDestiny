@@ -95,7 +95,6 @@ func InsertWholeGame(playfield Types.Playfield) error {
 		return err
 	}
 
-	log.Println("deckId host", playfield.Host.Deck.DeckID)
 	if playfield.Host.Deck.DeckID != "" {
 		err = InsertDeck(playfield.Host.Deck)
 		if err != nil {

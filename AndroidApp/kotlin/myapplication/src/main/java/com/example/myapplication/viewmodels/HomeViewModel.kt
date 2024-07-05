@@ -1,6 +1,9 @@
 package com.example.myapplication.viewmodels
 
 import android.util.Log
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.localdb.Repository
@@ -29,6 +32,8 @@ class HomeViewModel (val repository: Repository, val IPADDRESS: String) : ViewMo
     var friends = mutableStateOf<List<friends>?>(null)
     var addFriend = mutableStateOf("")
 
+    var drawerState = DrawerValue.Closed
+
     fun getUsername(): String {
         val user = repository.getUser()
         try {
@@ -36,6 +41,11 @@ class HomeViewModel (val repository: Repository, val IPADDRESS: String) : ViewMo
         }catch (e : Exception){
             return ""
         }
+    }
+
+    fun openDrawer(drawerState: DrawerState): DrawerState{
+        runBlocking{drawerState.open()}
+        return drawerState
     }
 
 

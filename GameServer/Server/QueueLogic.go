@@ -225,16 +225,17 @@ func alreadyInGame(userID string) bool {
 }
 
 func createCards(stringCards []string, deckid string) []Types.Card {
-	var cards = make([]Types.Card, 20)
+
+	var cards = make([]Types.Card, len(stringCards)*5)
 	log.Println(stringCards)
 	cardCount := -1
-
 	for index := range stringCards {
 		switch stringCards[index] {
+		case "":
+			cards = cards[:len(cards)-5]
 		case "Roll Again":
 			for j := 0; j < 5; j++ {
 				cardCount += 1
-				log.Println("Card Count: ", cardCount)
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
@@ -249,7 +250,6 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 		case "Double Mana":
 			for j := 0; j < 5; j++ {
 				cardCount += 1
-				log.Println("Card Count: ", cardCount)
 				cards[cardCount] = Types.Card{
 					CardID:  uuid.New().String(),
 					Name:    stringCards[index],
@@ -298,6 +298,8 @@ func createCards(stringCards []string, deckid string) []Types.Card {
 	cards[1].InHand = true
 	cards[2].InHand = true
 	cards[3].InHand = true
+
+	log.Println(cards)
 
 	return cards
 }

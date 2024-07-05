@@ -83,7 +83,7 @@ fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
                         )
                     }
                 }
-                Button(onClick = { navController.navigate("home") }) {
+                Button(onClick = { gameViewModel.WebSocketClient!!.close(); navController.navigate("home"); gameViewModel.resetAllValues(); }) {
 
                 }
 

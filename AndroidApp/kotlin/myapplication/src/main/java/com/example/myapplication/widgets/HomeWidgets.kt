@@ -1,5 +1,6 @@
 package com.example.myapplication.widgets
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import com.example.myapplication.viewmodels.ScoreboardViewModel
 @Composable
 fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewModel, gameViewModel: GameViewModel, scoreboardViewModel: ScoreboardViewModel) {
     val padding = 10.dp
+
     Column (
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally

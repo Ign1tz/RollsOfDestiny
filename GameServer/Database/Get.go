@@ -259,7 +259,7 @@ func GetCardsByDeckIDFromAccount(deckID string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	var cardNames = make([]string, 100)
+	var cardNames = make([]string, 4)
 	id := 0
 	for dbCards.Next() {
 		if err := dbCards.Scan(&cardNames[id]); err != nil {
@@ -275,7 +275,7 @@ func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards = make([]Types.Card, 20)
+	var cards = make([]Types.Card, 100)
 	id := 0
 	for dbCards.Next() {
 		if err := dbCards.Scan(&cards[id].Name, &cards[id].Cost, &cards[id].Effect, &cards[id].Picture, &cards[id].CardID, &cards[id].DeckID, &cards[id].Played, &cards[id].InHand); err != nil {
@@ -283,6 +283,7 @@ func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
 		}
 		id++
 	}
+	cards = cards[:id]
 	return cards, err
 }
 

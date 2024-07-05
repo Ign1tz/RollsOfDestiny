@@ -2,7 +2,7 @@ package Database
 
 import (
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
+	"log"
 )
 
 func UpdatePlayerMana(player Types.Player) error {
@@ -16,7 +16,7 @@ func UpdatePlayerWebsocketID(userid string, websocketid string) error {
 }
 
 func UpdateColumn(column Types.Column) error {
-	fmt.Println(column.First, column.Second, column.Third, column.GridId, column.Placement)
+	log.Println(column.First, column.Second, column.Third, column.GridId, column.Placement)
 	_, err := Database.Exec("Update columns set first = $1, second = $2, third = $3 where gridid = $4 and placement = $5", column.First, column.Second, column.Third, column.GridId, column.Placement)
 	return err
 }
