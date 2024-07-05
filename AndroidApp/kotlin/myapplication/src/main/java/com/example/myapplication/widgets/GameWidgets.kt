@@ -1,5 +1,6 @@
 package com.example.myapplication.widgets
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,12 +20,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +45,8 @@ import com.example.myapplication.types.Column
 import com.example.myapplication.types.card
 import com.example.myapplication.viewmodels.Card
 import kotlinx.coroutines.delay
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun PlayField(viewModel: GameViewModel) {
@@ -374,10 +380,12 @@ fun enemyColumn(column: Column?) {
     }
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProfileRow(
-    profileImage: Int, username: String, score: Int, mana: String
+fun ProfileRow(profileImage: Int?,
+    gameViewModel: GameViewModel, username: String, score: Int, mana: String
 ) {
+    var user = gameViewModel.user
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -390,14 +398,29 @@ fun ProfileRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = profileImage),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(45.dp)
-                    .padding(1.dp),
-                contentScale = ContentScale.Crop
-            )
+            if (profileImage != null){
+
+                Image(
+                    painter = painterResource(id = profileImage) ,
+                    contentDescription = user.userName,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(1.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }else{
+
+                Image(
+                    bitmap = BitmapFactory.decodeByteArray(Base64.decode(user.profilePicture, 0), 0, Base64.decode(user.profilePicture, 0).size).asImageBitmap(),
+                    contentDescription = user.userName,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(1.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(

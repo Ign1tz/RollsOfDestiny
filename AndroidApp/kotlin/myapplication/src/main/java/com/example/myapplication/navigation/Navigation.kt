@@ -14,6 +14,7 @@ import com.example.myapplication.screens.LoginScreen
 import com.example.myapplication.screens.ScoreBoardScreen
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.screens.SettingScreen
+import com.example.myapplication.types.AudioPlayer
 import com.example.myapplication.viewmodels.HomeViewModel
 import com.example.myapplication.viewmodels.Injector
 import com.example.myapplication.viewmodels.LoginViewModel

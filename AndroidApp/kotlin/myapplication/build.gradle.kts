@@ -56,6 +56,7 @@ dependencies {
 
     implementation("androidx.privacysandbox.tools:tools-core:1.0.0-alpha09")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose-android:2.8.3")
     val room_version = "2.6.1"
     val ktor_version = "2.3.12"
     implementation("androidx.room:room-runtime:$room_version")
@@ -88,4 +89,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("org.java-websocket:Java-WebSocket:1.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 }
