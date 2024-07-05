@@ -313,6 +313,7 @@ func RandShuffle(a []Types.Card) []Types.Card {
 func AddToFriendQueue(queueEntry Types.QueueInfoFriend, c2 *chan map[string]string) {
 	log.Println("friendId", queueEntry.FriendId)
 	if alreadyInGame(queueEntry.UserId) {
+		log.Println("alreadyInGame")
 		err := Database.UpdatePlayerWebsocketID(queueEntry.UserId, queueEntry.WebsocketConnectionId)
 		if err != nil {
 			panic(err)

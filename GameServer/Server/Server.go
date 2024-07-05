@@ -95,7 +95,7 @@ func queueForGameWithFriend(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	log.Println("try to queue")
+	log.Println("try to queue Friend")
 	if r.Method == "POST" {
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -114,9 +114,6 @@ func queueForGameWithFriend(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
-		log.Printf("Received gameid: %s\n", t.UserId)
-		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
 
 		AddToFriendQueue(t, &c2)
 
@@ -151,9 +148,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("Received gameid: %s\n", t.UserId)
-		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
-
 		AddToQueue(t, &c2)
 
 		w.WriteHeader(http.StatusOK)
@@ -186,9 +180,6 @@ func removeFromQueue(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
-		log.Printf("Received gameid: %s\n", t.UserId)
-		log.Printf("Received column key: %s\n", t.WebsocketConnectionId)
 
 		Database.DeleteFromQueueWebsocket(t.WebsocketConnectionId)
 

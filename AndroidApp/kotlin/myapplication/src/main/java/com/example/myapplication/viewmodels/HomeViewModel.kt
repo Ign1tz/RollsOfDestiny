@@ -36,6 +36,8 @@ class HomeViewModel (val repository: Repository, val IPADDRESS: String) : ViewMo
     var friends = mutableStateOf<List<friends>?>(null)
     var addFriend = mutableStateOf("")
 
+    var friendId = mutableStateOf("")
+
     var isFriendPlayClicked by mutableStateOf(false)
         private set
     fun toggleFriendClick() {

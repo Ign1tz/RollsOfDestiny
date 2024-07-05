@@ -76,7 +76,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                                 .fillMaxWidth(),
                             title = {},
                             actions = {
-                                IconButton(onClick = { runBlocking {   drawerState.open()} }) {
+                                IconButton(onClick = { scope.launch {   drawerState.open()} }) {
                                     Icon(
                                         imageVector = Icons.Filled.Menu,
                                         contentDescription = "Friendlist"
@@ -93,7 +93,7 @@ fun HomeScreen (navController: NavController, homeViewModel: HomeViewModel, logi
                 }
             ){ innerPadding ->
                 Column (modifier = Modifier.padding(innerPadding)) {
-                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel, scoreboardViewModel)
+                    HomeScreenButtons(navController = navController, loginViewModel, gameViewModel, scoreboardViewModel, homeViewModel)
                 }
             }
         })

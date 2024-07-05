@@ -133,7 +133,7 @@ fun QuickPlayButton(navController: NavController, gameViewModel: GameViewModel) 
 }
 
 @Composable
-fun FriendPlayButton(homeViewModel: HomeViewModel) {
+fun FriendPlayButton(homeViewModel: HomeViewModel, navController: NavController) {
 
     val isFriendPlayClicked by homeViewModel::isFriendPlayClicked
     val isHostButtonClicked by homeViewModel::isHostButtonClicked
@@ -187,18 +187,17 @@ fun FriendPlayButton(homeViewModel: HomeViewModel) {
     }
     if (isJoinButtonClicked) {
 
-        var nameState by remember { mutableStateOf("") }
 
-        TextField(value = nameState,
+        TextField(value = homeViewModel.friendId.value,
             onValueChange = { newName ->
-                nameState = newName },
+                homeViewModel.friendId.value = newName },
             label = {Text("Enter User ID")},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp))
             Button(
                 modifier = Modifier.size(130.dp,50.dp),
-                onClick = { /* TODO JOIN GAME */ },
+                onClick = { navController.navigate("game/friend/" + homeViewModel.friendId.value) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black
                 )
@@ -214,7 +213,7 @@ fun FriendPlayButton(homeViewModel: HomeViewModel) {
         UserIDTextWithCopyClickboard(homeViewModel)
         Button(
             modifier = Modifier.size(130.dp,50.dp),
-            onClick = { /* TODO JOIN GAME */ },
+            onClick = { navController.navigate("game/friend/ ") },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black
             )

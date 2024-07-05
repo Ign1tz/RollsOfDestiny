@@ -39,7 +39,6 @@ import com.example.myapplication.types.scoreboardPlayer
 import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.widgets.BottomBar
 import com.example.myapplication.widgets.HeaderTopBar
-import com.example.myapplication.widgets.HomeScreenButtons
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 

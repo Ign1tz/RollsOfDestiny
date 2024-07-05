@@ -326,13 +326,21 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					return nil, nil
 				}
 				cards = RandShuffle(cards)
+				index := 0
 				for i := 0; i < 4-handCards; i++ {
-					if !cards[i].InHand {
-						cards[i].InHand = true
-						Database.UpdateCard(cards[i])
+
+					log.Println(cards[index].InHand, i)
+					if !cards[index].InHand {
+						cards[index].InHand = true
+						err := Database.UpdateCard(cards[index])
+						if err != nil {
+							log.Println(err)
+							return nil, nil
+						}
 					} else {
 						i--
 					}
+					index++
 				}
 				playfield.Guest.Deck.Cards = cards
 			}
@@ -352,6 +360,7 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				log.Println("updatePosition", err)
 			}
 		}
+		log.Println("GUEST WAS ACTIVE2")
 		playfield.Host.Mana = min(max(playfield.Host.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = true
 		if playfield.Host.Deck.DeckID != "" {
@@ -361,48 +370,62 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					handCards++
 				}
 			}
+			log.Println("GUEST WAS ACTIVE2.1")
 			if handCards != 4 {
 				cards, err := Database.GetCardsByDeckID(playfield.Host.Deck.DeckID)
 				if err != nil {
 					log.Println(err)
 					return nil, nil
 				}
+				log.Println("GUEST WAS ACTIVE2.2")
 				cards = RandShuffle(cards)
+				index := 0
 				for i := 0; i < 4-handCards; i++ {
-					if !cards[i].InHand {
-						cards[i].InHand = true
-						Database.UpdateCard(cards[i])
+					log.Println(cards[i].InHand, i)
+					if !cards[index].InHand {
+						cards[index].InHand = true
+						err := Database.UpdateCard(cards[index])
+						if err != nil {
+							log.Println(err)
+							return nil, nil
+						}
 					} else {
 						i--
 					}
+					index++
 				}
+				log.Println("GUEST WAS ACTIVE2.3")
 				playfield.Host.Deck.Cards = cards
 			}
 		}
+		log.Println("GUEST WAS ACTIVE3")
 
 	}
 	gameEnded := playfield.ActivePlayer.Grid.IsFull()
 	playfield.ActivePlayer = playfield.EnemyPlayer()
 	playfield.LastRoll = playfield.Host.Die.Throw()
 
+	log.Println("GUEST WAS ACTIVE4")
 	err = Database.UpdatePlayerMana(playfield.ActivePlayer)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 	}
+	log.Println("GUEST WAS ACTIVE5")
 	err = Database.UpdateActivePlayerGames(playfield)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 
 	}
+	log.Println("GUEST WAS ACTIVE6")
 	err = Database.UpdateLastRollGames(playfield)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 	}
 
-	fmt.Println(playfield.Host.Grid.Left.First)
+	log.Println(playfield.Host.Grid.Left.First)
 
 	var hostMsg = make(map[string]string)
 	var guestMsg = make(map[string]string)

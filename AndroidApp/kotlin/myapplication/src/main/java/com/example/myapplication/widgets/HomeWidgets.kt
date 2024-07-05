@@ -26,7 +26,7 @@ fun HomeScreenButtons (navController: NavController, loginViewModel: LoginViewMo
         Spacer(Modifier.padding(20.dp))
         QuickPlayButton(navController, gameViewModel)
         Spacer(Modifier.padding(padding))
-        FriendPlayButton(homeViewModel)
+        FriendPlayButton(homeViewModel,navController)
         Spacer(Modifier.padding(padding))
         RankedPlayButton(navController, gameViewModel)
         Spacer(Modifier.padding(padding))

@@ -3,9 +3,11 @@ package com.example.myapplication.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.myapplication.screens.GameScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
@@ -26,9 +28,7 @@ fun Navigation() {
     val homeViewModel: HomeViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val gameViewModel: GameViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
     val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-
     val scoreboardViewModel: ScoreboardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
 
 
 
@@ -54,8 +54,17 @@ fun Navigation() {
             gameViewModel.GameType.value = ""
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
+
         composable(route = "game/bot") {
             gameViewModel.GameType.value = "bot"
+            GameScreen(navController = navController, gameViewModel = gameViewModel)
+        }
+
+        composable(route = "game/friend/{friendId}",
+            arguments = listOf(navArgument(name = "friendId") { type = NavType.StringType }))
+        { backStackEntry ->
+            gameViewModel.GameType.value = "Friend"
+            gameViewModel.FriendId.value = backStackEntry.arguments?.getString("friendId")?: ""
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
 
