@@ -106,10 +106,6 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		log.Println(err)
 		return nil, nil
 	}
-	if playfield.ActivePlayer.UserID != message.Userid {
-		log.Println("not active player", err)
-		return nil, nil
-	}
 	if message.Type == "surrender" {
 		if strings.Contains(playfield.GameID, "bot: ") {
 			Database.DeleteGame(playfield.Host.Grid.GridId)
@@ -125,6 +121,10 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 			surenderer = playfield.Guest
 		}
 		return handleGameEnded(playfield, true, surenderer)
+	}
+	if playfield.ActivePlayer.UserID != message.Userid {
+		log.Println("not active player", err)
+		return nil, nil
 	}
 
 	position, err := Database.GetPosition(message.GameId)
