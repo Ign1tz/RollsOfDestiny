@@ -26,29 +26,50 @@ import com.example.myapplication.viewmodels.Injector
 import com.example.myapplication.viewmodels.LoginViewModel
 import com.example.myapplication.viewmodels.ScoreboardViewModel
 import com.example.myapplication.viewmodels.SettingViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
 
-    val loginViewModel: LoginViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val homeViewModel: HomeViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val gameViewModel: GameViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val deckViewModel: DeckViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val cardViewModel: CardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val settingViewModel: SettingViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
-    val scoreboardViewModel: ScoreboardViewModel = viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val loginViewModel: LoginViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val homeViewModel: HomeViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val gameViewModel: GameViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val deckViewModel: DeckViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val cardViewModel: CardViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val settingViewModel: SettingViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
+    val scoreboardViewModel: ScoreboardViewModel =
+        viewModel(factory = Injector.provideModelFactory(context = LocalContext.current))
 
 
 
-    NavHost(navController = navController,
-        startDestination = if (loginViewModel.checkAlreadyLoggedIn()) {Screen.HomeScreen.route} else {Screen.LoginScreen.route}) {
+    NavHost(
+        navController = navController,
+        startDestination = if (loginViewModel.checkAlreadyLoggedIn()) {
+            Screen.HomeScreen.route
+        } else {
+            Screen.LoginScreen.route
+        }
+    ) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController = navController, loginViewModel = loginViewModel)
         }
 
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen(navController = navController, homeViewModel = homeViewModel, loginViewModel, gameViewModel, scoreboardViewModel)
+            HomeScreen(
+                navController = navController,
+                homeViewModel = homeViewModel,
+                loginViewModel,
+                gameViewModel,
+                scoreboardViewModel
+            )
         }
 
         composable(route = Screen.SettingScreen.route) {
@@ -61,11 +82,18 @@ fun Navigation() {
         }
         composable(route = Screen.GameScreen.route) {
             gameViewModel.GameType.value = ""
+            gameViewModel.endResults = null
+            gameViewModel.gameInfo = null
+            gameViewModel.connected.value = false
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
 
         composable(route = "game/bot") {
+
             gameViewModel.GameType.value = "bot"
+            gameViewModel.endResults = null
+            gameViewModel.gameInfo = null
+            gameViewModel.connected.value = false
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
 
@@ -74,26 +102,34 @@ fun Navigation() {
         }
 
         composable(route = "game/friend/{friendId}",
-            arguments = listOf(navArgument(name = "friendId") { type = NavType.StringType }))
+            arguments = listOf(navArgument(name = "friendId") { type = NavType.StringType })
+        )
         { backStackEntry ->
             gameViewModel.GameType.value = "Friend"
-            gameViewModel.FriendId.value = backStackEntry.arguments?.getString("friendId")?: ""
+            gameViewModel.gameInfo = null
+            gameViewModel.endResults = null
+            gameViewModel.connected.value = false
+            gameViewModel.FriendId.value = backStackEntry.arguments?.getString("friendId") ?: ""
             GameScreen(navController = navController, gameViewModel = gameViewModel)
         }
 
         composable(route = Screen.ScoreBoard.route) {
-            ScoreBoardScreen(navController = navController, scoreboardViewModel = scoreboardViewModel)
+            ScoreBoardScreen(
+                navController = navController,
+                scoreboardViewModel = scoreboardViewModel
+            )
         }
 
         composable(route = "decks") {
-            DeckScreen(navController = navController,deckViewModel = deckViewModel)
+            DeckScreen(navController = navController, deckViewModel = deckViewModel)
         }
-        composable (route = "deckDetails/{deckid}",
-            arguments = listOf(navArgument(name = "deckid") { type = NavType.StringType }))
+        composable(route = "deckDetails/{deckid}",
+            arguments = listOf(navArgument(name = "deckid") { type = NavType.StringType })
+        )
         { backStackEntry ->
 
-            cardViewModel.deckid = backStackEntry.arguments?.getString("deckid")?: ""
-                CardScreen(navController = navController, cardViewModel = cardViewModel)
+            cardViewModel.deckid = backStackEntry.arguments?.getString("deckid") ?: ""
+            CardScreen(navController = navController, cardViewModel = cardViewModel)
         }
     }
 }

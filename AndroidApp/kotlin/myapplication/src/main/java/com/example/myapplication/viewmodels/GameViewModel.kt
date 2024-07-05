@@ -75,6 +75,7 @@ class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewMod
 
 
     fun websocket(): WebSocketClient? {
+       // resetAllValues()
         if (connected.value && started.value) {
             return null
         }
@@ -169,6 +170,45 @@ class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewMod
         }
         return false
     }
+
+    fun remove(){
+        viewModelScope.launch { removeQueueRequest() }
+    }
+
+    suspend private fun removeQueueRequest(): Boolean {
+        Log.d("websocket", "ququeing")
+
+        val userInfo = repository.getUser()
+
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+        }
+
+        try {
+            val responseText: HttpResponse = client.post("http://$IPADDRESS:8080/deleteQueue") {
+                contentType(ContentType.Application.Json)
+                setBody("{\"userid\":\"${userInfo.userid}\", \"websocketconnectionid\":\"${WebsocketId.value}\", \"username\":\"${userInfo.userName}\"}")
+            }
+
+            if (responseText.status.value != 200) {
+                return false
+            }
+
+            client.close()
+            return true
+        } catch (e: Exception) {
+            Log.d("HttpTest", "Received error: ${e.message}")
+        }
+        return false
+    }
+
 
     suspend private fun queueForGameWithFriendsRequest(): Boolean {
         Log.d("friendQueue", "Friend ququeing")

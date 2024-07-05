@@ -344,17 +344,19 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				cards = RandShuffle(cards)
 				index := 0
 				for i := 0; i < 4-handCards; i++ {
-					if !cards[index].InHand {
-						cards[index].InHand = true
-						err := Database.UpdateCard(cards[index])
-						if err != nil {
-							log.Println(err)
-							return nil, nil
+					if len(cards) > index {
+						if !cards[index].InHand {
+							cards[index].InHand = true
+							err := Database.UpdateCard(cards[index])
+							if err != nil {
+								log.Println(err)
+								return nil, nil
+							}
+						} else {
+							i--
 						}
-					} else {
-						i--
+						index++
 					}
-					index++
 				}
 				playfield.Guest.Deck.Cards = cards
 			}
@@ -391,17 +393,19 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				cards = RandShuffle(cards)
 				index := 0
 				for i := 0; i < 4-handCards; i++ {
-					if !cards[index].InHand {
-						cards[index].InHand = true
-						err := Database.UpdateCard(cards[index])
-						if err != nil {
-							log.Println(err)
-							return nil, nil
+					if len(cards) > index {
+						if !cards[index].InHand {
+							cards[index].InHand = true
+							err := Database.UpdateCard(cards[index])
+							if err != nil {
+								log.Println(err)
+								return nil, nil
+							}
+						} else {
+							i--
 						}
-					} else {
-						i--
+						index++
 					}
-					index++
 				}
 				playfield.Host.Deck.Cards = cards
 			}

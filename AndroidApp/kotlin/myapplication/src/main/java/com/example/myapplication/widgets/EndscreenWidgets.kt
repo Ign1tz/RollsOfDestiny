@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.viewmodels.GameViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun EndScreenRow (gameViewModel: GameViewModel, navController: NavController) {
@@ -86,7 +88,7 @@ fun EndScreenRow (gameViewModel: GameViewModel, navController: NavController) {
                     )
                 }
             }
-            Button(onClick = { gameViewModel.WebSocketClient!!.close(); navController.navigate("home"); gameViewModel.resetAllValues(); },
+            Button(onClick = { runBlocking {  gameViewModel.WebSocketClient!!.close()}; navController.navigate("home") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier.size(100.dp,35.dp)
             ) {

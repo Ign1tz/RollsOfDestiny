@@ -32,6 +32,7 @@ import java.net.URI
 
 @Composable
 fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
+    gameViewModel.remove()
     gameViewModel.websocket()
     var audio = AudioPlayer.getInstance().startAudio()
     if (audio != null){
