@@ -3,7 +3,6 @@ package GameLogic
 import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 	"github.com/google/uuid"
 	"log"
 	"math/rand"
@@ -11,8 +10,6 @@ import (
 )
 
 func BotTurn(gameInfo Types.Resp) bool {
-
-	log.Println(gameInfo.Gameid, gameInfo.ColumnKey)
 	ended, err := PickColumn(gameInfo.Gameid, gameInfo.ColumnKey)
 
 	if err != nil {
@@ -77,7 +74,6 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 	_, err := Database.GetPlayer(queueEntry.Userid)
 
 	if err == nil {
-		log.Println("relog")
 		playfield, err := Database.GetPlayfieldByUserid(queueEntry.Userid)
 		if err != nil {
 			log.Println("noPlayfield", err)
@@ -181,7 +177,6 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 
 	err = Database.InsertWholeGame(playfield)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 	var msg = make(map[string]string)

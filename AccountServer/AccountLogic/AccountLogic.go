@@ -28,12 +28,10 @@ func ChangeUsername(message NewUsernameMessage) {
 	}
 	for _, u := range message.NewUsername {
 		if !strings.Contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", string(u)) {
-			log.Println("invalid")
 			return
 		}
 	}
 
-	log.Println(message.OldUsername)
 	err := Database.UpdateUsername(message.OldUsername, message.NewUsername)
 
 	if err != nil {

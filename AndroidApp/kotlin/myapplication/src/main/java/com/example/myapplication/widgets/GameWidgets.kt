@@ -126,7 +126,7 @@ fun EnemyCardField(gameViewModel: GameViewModel) {
 @Composable
 fun EnemyCard() {
     Image(
-        painter = painterResource(id = R.drawable.double_mana_app), contentDescription = ""
+        painter = painterResource(id = R.drawable.cardback), contentDescription = ""
     )
 }
 

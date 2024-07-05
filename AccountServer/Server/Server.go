@@ -27,7 +27,6 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 func signUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
@@ -108,7 +107,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.WriteHeader(http.StatusOK)
-			fmt.Println("logged in")
 			test := `{"token": "` + tokenString + `"}`
 			fmt.Fprint(w, test)
 			return
@@ -132,7 +130,6 @@ func isLoggedIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func accountInfo(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("test")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
 		w.Header().Set("Access-Control-Allow-Headers", "*") // You can add more headers here if needed
@@ -274,7 +271,6 @@ func changeProfilePicture(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
-			log.Println("before update")
 			err = Database.UpdateProfilePicture(userid, t.ProfilePicture)
 			log.Println(err)
 			if err != nil {
@@ -402,7 +398,6 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		userid, valid := checkToken(w, r)
 		if valid {
-			log.Println("DeleteFriend")
 			// Read the raw body
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -434,7 +429,6 @@ func deleteFriend(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
-			log.Println(userid, friend.UserID)
 
 			err = Database.DeleteFriend(userid, friend.UserID)
 			if err != nil {
@@ -479,7 +473,6 @@ func getAccounts(w http.ResponseWriter, r *http.Request) {
 			array = ""
 		}
 		friendInfo := fmt.Sprintf("{\"friends\": [%s]}", array)
-		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 	}
 }
@@ -518,7 +511,6 @@ func getDecks(w http.ResponseWriter, r *http.Request) {
 			array = ""
 		}
 		friendInfo := fmt.Sprintf("{\"decks\": [%s]}", array)
-		log.Println(friendInfo)
 		fmt.Fprint(w, friendInfo)
 	}
 }
@@ -597,9 +589,7 @@ func addCardToDeck(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			log.Println(t.Deckid, t.Name, userid)
 			DeckLogic.AddCardToDeck(t, userid)
-			log.Println("add")
 			w.WriteHeader(http.StatusOK)
 		}
 	}
@@ -915,7 +905,6 @@ func setupRoutes() {
 }
 
 func Server() {
-	fmt.Println("starting")
 	setupRoutes()
 	log.Fatal(http.ListenAndServe(":9090", nil))
 }

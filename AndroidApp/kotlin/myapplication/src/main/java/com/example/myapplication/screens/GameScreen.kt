@@ -1,5 +1,6 @@
 package com.example.myapplication.screens
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
+import com.example.myapplication.types.AudioPlayer
 import com.example.myapplication.viewmodels.GameViewModel
 import com.example.myapplication.widgets.ProfileRow
 import com.example.myapplication.widgets.PlayField
@@ -26,6 +29,13 @@ import java.net.URI
 @Composable
 fun GameScreen (navController: NavController, gameViewModel: GameViewModel) {
     gameViewModel.websocket()
+    var audio = AudioPlayer.getInstance().startAudio()
+    if (audio != null){
+        audio.start()
+    }
+
+    Log.d("sound", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+
     if (gameViewModel.endResults != null){
         Scaffold (
 

@@ -24,8 +24,6 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 	//fmt.Printf("test")
 	for {
 		fmt.Println("reader start")
-		//fmt.Printf(conn.RemoteAddr())
-		//
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
@@ -39,10 +37,8 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 		err = json.Unmarshal(p, &message)
 		if err != nil {
 			log.Println(err)
-			log.Println(string(p))
 			return
 		}
-		log.Println(connectionID)
 		if message.Type == "botPickColumn" {
 			ended := GameLogic.BotTurn(
 				Types.Resp{Gameid: message.GameId, ColumnKey: message.MessageBody})
@@ -54,7 +50,6 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 				return
 			}
 			var hostMsg = make(map[string]string)
-			log.Println(ended)
 			if ended {
 				hostWon := playfield.Host.Grid.Value() > playfield.Guest.Grid.Value()
 				guestWon := playfield.Host.Grid.Value() < playfield.Guest.Grid.Value()
@@ -79,7 +74,6 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 				Database.DeleteGame(playfield.Host.Grid.GridId)
 				Database.DeleteGame(playfield.Guest.Grid.GridId)
 			} else {
-				log.Println(playfield.Host.WebsocketConnectionID)
 				hostMsg["id"] = playfield.Host.WebsocketConnectionID
 				newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": ` + strconv.FormatBool(true) + `, "roll": "` + playfield.LastRoll + `"}}`
 				infoMessage := `{"info": "gameInfo", "message": {"gameInfo": ` + newMessage + `}}`
@@ -89,7 +83,6 @@ func reader(conn *websocket.Conn, c2 *chan map[string]string) {
 		} else {
 			log.Println("before message Categorization")
 			msg, msg2 := categorizeMessage(message, connectionID)
-			log.Println(msg["id"])
 			*c2 <- msg
 			if msg2 != nil {
 				*c2 <- msg2
@@ -106,7 +99,6 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 	if message.Type == "id" {
 		msg["id"] = connectionId
 		msg["message"] = `{"info": "id", "message": {"id": "` + connectionId + `"}}`
-		log.Println("id: ", msg["id"], msg)
 		return msg, nil
 	}
 	playfield, err := Database.GetPlayfield(message.GameId)
@@ -115,11 +107,10 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		return nil, nil
 	}
 	if playfield.ActivePlayer.UserID != message.Userid {
-		log.Println("not active player")
+		log.Println("not active player", err)
 		return nil, nil
 	}
 	if message.Type == "surrender" {
-		log.Println("surrender")
 		if strings.Contains(playfield.GameID, "bot: ") {
 			Database.DeleteGame(playfield.Host.Grid.GridId)
 			Database.DeleteGame(playfield.Guest.Grid.GridId)
@@ -179,7 +170,6 @@ func categorizeMessage(message Types.WebsocketMessage, connectionId string) (map
 		}
 	case "rolled":
 		position.CurrentStep = "afterRoll"
-		log.Println("rolled", position.CurrentStep)
 		err := Database.UpdatePosition(position)
 		if err != nil {
 			log.Println(err)
@@ -211,12 +201,9 @@ func handleEndTurn(message Types.WebsocketMessage) (map[string]string, map[strin
 	Database.UpdateActivePlayerGames(playfield)
 	Database.UpdateLastRollGames(playfield)
 
-	fmt.Println(playfield.Host.Grid.Left.First)
-
 	var hostMsg = make(map[string]string)
 	var guestMsg = make(map[string]string)
 	if gameEnded {
-		fmt.Println("game ended")
 		hostMsg, guestMsg = handleGameEnded(playfield, false, Types.Player{})
 	} else {
 		hostMsg["id"] = playfield.Host.WebsocketConnectionID
@@ -233,7 +220,6 @@ func handleEndTurn(message Types.WebsocketMessage) (map[string]string, map[strin
 }
 
 func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[string]string) {
-	log.Println("friendly")
 	playfield, err := Database.GetPlayfield(message.GameId)
 	if err != nil {
 		panic(err)
@@ -267,7 +253,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 			panic(err)
 		}
 		numberOfRemoved = enemy.Grid.Middle.Remove(columnInt)
-		fmt.Println("websocket placement", playfield.ActivePlayer.Grid.Middle.Placement)
 		err = Database.UpdateColumn(playfield.ActivePlayer.Grid.Middle)
 		if err != nil {
 			return nil, nil
@@ -296,7 +281,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 
 	var hostIsActive bool
 	if playfield.ActivePlayer.UserID == playfield.Host.UserID {
-		log.Println("Host WAS ACTIVE")
 		playfield.Host = playfield.ActivePlayer
 		playfield.Guest = enemy
 		addMana := 1
@@ -318,7 +302,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					handCards++
 				}
 			}
-			log.Println("Hand cards: ", handCards)
 			if handCards != 4 {
 				cards, err := Database.GetCardsByDeckID(playfield.Guest.Deck.DeckID)
 				if err != nil {
@@ -328,8 +311,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				cards = RandShuffle(cards)
 				index := 0
 				for i := 0; i < 4-handCards; i++ {
-
-					log.Println(cards[index].InHand, i)
 					if !cards[index].InHand {
 						cards[index].InHand = true
 						err := Database.UpdateCard(cards[index])
@@ -346,7 +327,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 			}
 		}
 	} else {
-		log.Println("GUEST WAS ACTIVE")
 		playfield.Guest = playfield.ActivePlayer
 		playfield.Host = enemy
 		addMana := 1
@@ -360,7 +340,6 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 				log.Println("updatePosition", err)
 			}
 		}
-		log.Println("GUEST WAS ACTIVE2")
 		playfield.Host.Mana = min(max(playfield.Host.Mana+addMana+numberOfRemoved, 0), 10)
 		hostIsActive = true
 		if playfield.Host.Deck.DeckID != "" {
@@ -370,18 +349,15 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					handCards++
 				}
 			}
-			log.Println("GUEST WAS ACTIVE2.1")
 			if handCards != 4 {
 				cards, err := Database.GetCardsByDeckID(playfield.Host.Deck.DeckID)
 				if err != nil {
 					log.Println(err)
 					return nil, nil
 				}
-				log.Println("GUEST WAS ACTIVE2.2")
 				cards = RandShuffle(cards)
 				index := 0
 				for i := 0; i < 4-handCards; i++ {
-					log.Println(cards[i].InHand, i)
 					if !cards[index].InHand {
 						cards[index].InHand = true
 						err := Database.UpdateCard(cards[index])
@@ -394,43 +370,35 @@ func handlePickedColumn(message Types.WebsocketMessage) (map[string]string, map[
 					}
 					index++
 				}
-				log.Println("GUEST WAS ACTIVE2.3")
 				playfield.Host.Deck.Cards = cards
 			}
 		}
-		log.Println("GUEST WAS ACTIVE3")
 
 	}
 	gameEnded := playfield.ActivePlayer.Grid.IsFull()
 	playfield.ActivePlayer = playfield.EnemyPlayer()
 	playfield.LastRoll = playfield.Host.Die.Throw()
 
-	log.Println("GUEST WAS ACTIVE4")
 	err = Database.UpdatePlayerMana(playfield.ActivePlayer)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 	}
-	log.Println("GUEST WAS ACTIVE5")
 	err = Database.UpdateActivePlayerGames(playfield)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 
 	}
-	log.Println("GUEST WAS ACTIVE6")
 	err = Database.UpdateLastRollGames(playfield)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
 	}
 
-	log.Println(playfield.Host.Grid.Left.First)
-
 	var hostMsg = make(map[string]string)
 	var guestMsg = make(map[string]string)
 	if gameEnded {
-		fmt.Println("game ended")
 		hostMsg, guestMsg = handleGameEnded(playfield, false, Types.Player{})
 	} else {
 		hostMsg["id"] = playfield.Host.WebsocketConnectionID

@@ -79,7 +79,6 @@ func HandleCards(message Types.WebsocketMessage, position Types.Position) (map[s
 		}
 	case "destroyColumn":
 		if playfield.ActivePlayer.Mana >= 7 {
-			log.Println("destroyColumn")
 			column := rand.IntN(3)
 			switch column {
 			case 0:

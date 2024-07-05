@@ -4,7 +4,6 @@ import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
 	"errors"
-	"log"
 	"strconv"
 )
 
@@ -24,7 +23,6 @@ func RollDie(gameId string) string {
 }
 
 func PickColumn(gameId string, columnNumber string) (bool, error) {
-	log.Println(gameId)
 	gamefield, err := Database.GetPlayfield(gameId)
 
 	if err != nil {

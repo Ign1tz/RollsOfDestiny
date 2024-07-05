@@ -17,7 +17,6 @@ func GetCardsOfDeckAsJsonString(deckid string) string {
 		log.Println(err)
 		return ""
 	}
-	log.Println(cards[0].DeckID)
 	var cardString = ""
 	for cardIndex := range cards {
 		if cards[cardIndex].UserID != "" {
@@ -27,7 +26,6 @@ func GetCardsOfDeckAsJsonString(deckid string) string {
 	if cardString != "" {
 		cardString = cardString[2:]
 	}
-	log.Println(cardString)
 	return cardString
 }
 
@@ -45,7 +43,6 @@ func CreateNewDeck(name string, userid string) {
 }
 
 func AddCardToDeck(cardInfos Types.AddCard, userid string) {
-	log.Println(cardInfos.Deckid, cardInfos.Name, userid)
 	err := Database.UpdateCardDeckId(cardInfos, userid)
 	if err != nil {
 		return

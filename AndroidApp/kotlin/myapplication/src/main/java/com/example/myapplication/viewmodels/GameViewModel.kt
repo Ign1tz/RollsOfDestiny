@@ -1,9 +1,12 @@
 package com.example.myapplication.viewmodels
 
+import android.app.Application
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
@@ -45,7 +48,6 @@ class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewMod
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
     var FriendId = mutableStateOf("")
-
 
     fun resetAllValues() {
         connected.value = false

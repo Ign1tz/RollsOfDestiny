@@ -17,17 +17,14 @@ var c = make(chan *websocket.Conn, 50) //5 is an arbitrary buffer size
 var c2 = make(chan map[string]string, 50)
 
 func startBot(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
 
 	if r.Method == "POST" {
-		fmt.Println("POST request")
 
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -41,8 +38,6 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 
 		var t Types.BotResp
 
-		fmt.Println(string(body))
-
 		err = json.Unmarshal(body, &t)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -53,17 +48,14 @@ func startBot(w http.ResponseWriter, r *http.Request) {
 }
 
 func playBot(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {
-		fmt.Println("OPTIONS request")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // You can add more headers here if needed
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
 
 	if r.Method == "POST" {
-		fmt.Println("POST request")
 
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -76,8 +68,6 @@ func playBot(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Raw body: %s\n", body)
 
 		var t Types.Resp
-
-		fmt.Println(string(body))
 
 		err = json.Unmarshal(body, &t)
 		if err != nil {
@@ -95,7 +85,6 @@ func queueForGameWithFriend(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	log.Println("try to queue Friend")
 	if r.Method == "POST" {
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -128,7 +117,6 @@ func queueForGame(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	log.Println("try to queue")
 	if r.Method == "POST" {
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -161,7 +149,6 @@ func removeFromQueue(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "*")
 		return
 	}
-	log.Println("try to queue")
 	if r.Method == "POST" {
 		// Read the raw body
 		body, err := ioutil.ReadAll(r.Body)
@@ -203,7 +190,6 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupRoutes() {
-	fmt.Println("handle something")
 	http.HandleFunc("/queue", queueForGame)
 	http.HandleFunc("/deleteQueue", removeFromQueue)
 	http.HandleFunc("/queueFroGameWithFriend", queueForGameWithFriend)
@@ -212,7 +198,6 @@ func setupRoutes() {
 }
 
 func Server() {
-	fmt.Println("starting")
 	setupRoutes()
 	go func() {
 		var somekindofstorrage = map[string]*websocket.Conn{}

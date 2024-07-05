@@ -2,8 +2,6 @@ package Database
 
 import (
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
-	"log"
 )
 
 func GetDBPlayer(playerId string) (Types.Player, error) { //ONLY USED FOR TESTING IF ALREADY IN GAME
@@ -56,7 +54,6 @@ func GetGrid(gridId string) (Types.Grid, error) {
 }
 
 func GetDeckByDeckId(deckId string) (Types.Deck, error) {
-	log.Println("Error querying cards", deckId)
 	dbDeck := Database.QueryRow("Select * from decks where deckid = $1", deckId)
 	var deck Types.Deck
 	if err := dbDeck.Scan(&deck.DeckID, &deck.UserID); err != nil {
@@ -129,14 +126,12 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 	dbGame := Database.QueryRow("Select * from games where gameid = $1", gameId)
 	var game Types.Game
 	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
-	fmt.Println(err)
 	if err != nil {
 		return Types.Playfield{}, err
 	}
 	var playfield Types.Playfield
 	playfield.GameID = game.GameID
 	playfield.LastRoll = game.LastRoll
-	fmt.Println(game.ActivePlayer)
 	activePlayer, err := GetPlayer(game.ActivePlayer)
 	if err != nil {
 		return playfield, err
@@ -184,19 +179,15 @@ func GetPlayfield(gameId string) (Types.Playfield, error) {
 }
 
 func GetPlayfieldByUserid(userid string) (Types.Playfield, error) {
-
-	log.Println("test", userid)
 	dbGame := Database.QueryRow("Select * from games where host = $1 or guest = $1", userid)
 	var game Types.Game
 	err := dbGame.Scan(&game.GameID, &game.HostId, &game.GuestId, &game.ActivePlayer, &game.HostGrid, &game.GuestGrid, &game.LastRoll)
-	fmt.Println(err)
 	if err != nil {
 		return Types.Playfield{}, err
 	}
 	var playfield Types.Playfield
 	playfield.GameID = game.GameID
 	playfield.LastRoll = game.LastRoll
-	fmt.Println(game.ActivePlayer)
 	activePlayer, err := GetPlayer(game.ActivePlayer)
 	if err != nil {
 		return playfield, err

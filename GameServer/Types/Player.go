@@ -3,7 +3,6 @@ package Types
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 )
 
@@ -49,7 +48,6 @@ func (p Player) ToJson(extraInfo bool) string {
 }
 
 func handleDeckToString(deck Deck) string {
-	log.Println(deck.DeckID)
 	cardsLeft := 0
 	cardsLeft = 0
 	cardsInHand := ""
