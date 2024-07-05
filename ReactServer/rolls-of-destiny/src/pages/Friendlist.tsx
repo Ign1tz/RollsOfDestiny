@@ -129,7 +129,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
                     {users.map((user, index) => (
                         <li key={index} className="friendlist-item">
                             <div className="friendlist-image-info">
-                                <img src={user.profilePicture} alt={user.username} className="leaderboard-picture"/>
+                                <img src={"data:image/jpeg;base64," + user.profilePicture} alt={user.username} className="leaderboard-picture"/>
                                 <div className="friendlist-info">
                                     <h2 className="friendlist-username">{user.username}</h2>
                                     <p className="friendlist-rating">Rating: {user.rating}</p>
