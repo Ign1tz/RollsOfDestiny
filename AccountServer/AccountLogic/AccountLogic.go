@@ -18,18 +18,20 @@ type NewPasswordMessage struct {
 	ConfirmNewPassword string `json:"confirmNewPassword"`
 }
 
+type NewProfilePicture struct {
+	ProfilePicture string `json:"profilePicture"`
+}
+
 func ChangeUsername(message NewUsernameMessage) {
 	if len(message.NewUsername) < 3 || len(message.NewUsername) > 20 {
 		return
 	}
 	for _, u := range message.NewUsername {
 		if !strings.Contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", string(u)) {
-			log.Println("invalid")
 			return
 		}
 	}
 
-	log.Println(message.OldUsername)
 	err := Database.UpdateUsername(message.OldUsername, message.NewUsername)
 
 	if err != nil {

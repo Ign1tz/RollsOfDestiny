@@ -14,6 +14,7 @@ type GridLogic interface {
 	Value()
 	IsFull()
 	PrettyPrint()
+	FlipClockwise()
 }
 
 func (g *Grid) Clear() {
@@ -35,4 +36,32 @@ func (g Grid) PrettyPrint() {
 	fmt.Println(g.Left.Second, g.Middle.Second, g.Right.Second)
 	fmt.Println(g.Left.Third, g.Middle.Third, g.Right.Third)
 	fmt.Println()
+}
+
+func (g *Grid) FlipClocwise() {
+	tempGrid := *g
+	g.Left.First = tempGrid.Left.Third
+	g.Left.Second = tempGrid.Middle.Third
+	g.Left.Third = tempGrid.Right.Third
+	g.Middle.First = tempGrid.Left.Second
+	g.Middle.Third = tempGrid.Right.Second
+	g.Right.First = tempGrid.Left.First
+	g.Right.Second = tempGrid.Middle.First
+	g.Right.Third = tempGrid.Right.First
+	g.Left.shift()
+	g.Middle.shift()
+	g.Right.shift()
+}
+
+func (g *Grid) CheckGridForOverlap(grid Grid) Grid {
+	grid.Left.Remove(g.Left.First)
+	grid.Left.Remove(g.Left.Second)
+	grid.Left.Remove(g.Left.Third)
+	grid.Middle.Remove(g.Middle.First)
+	grid.Middle.Remove(g.Middle.Second)
+	grid.Middle.Remove(g.Middle.Third)
+	grid.Right.Remove(g.Right.First)
+	grid.Right.Remove(g.Right.Second)
+	grid.Right.Remove(g.Right.Third)
+	return grid
 }

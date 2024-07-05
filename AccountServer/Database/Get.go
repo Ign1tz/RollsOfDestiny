@@ -2,6 +2,8 @@ package Database
 
 import (
 	"RollsOfDestiny/AccountServer/Types"
+	"os"
+	"strconv"
 )
 
 func GetAccountByUserID(userID string) (Types.Account, error) {
@@ -36,10 +38,10 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 	if err != nil {
 		return []Types.Deck{}, err
 	}
-	var decks []Types.Deck
+	var decks = make([]Types.Deck, 100)
 	id := 0
 	for dbDecks.Next() {
-		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name); err != nil {
+		if err := dbDecks.Scan(&decks[id].UserID, &decks[id].DeckID, &decks[id].Name, &decks[id].Active); err != nil {
 			return []Types.Deck{}, err
 		}
 		id++
@@ -48,14 +50,49 @@ func GetDecksByUserID(userID string) ([]Types.Deck, error) {
 }
 
 func GetCardsByDeckID(deckID string) ([]Types.Card, error) {
-	dbCards, err := Database.Query("Select * from accountcards where deckid like %$1%", deckID)
+	dbCards, err := Database.Query("Select * from accountcards where deckids like '%' || $1 || '%'", deckID)
 	if err != nil {
 		return []Types.Card{}, err
 	}
-	var cards []Types.Card
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
 	id := 0
 	for dbCards.Next() {
-		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count); err != nil {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {
+			return []Types.Card{}, err
+		}
+		id++
+	}
+	return cards, err
+}
+
+func GetCardsByUserId(userid string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from accountcards where userid = $1 and not cost = 0", userid)
+	if err != nil {
+		return []Types.Card{}, err
+	}
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
+	id := 0
+	for dbCards.Next() {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {
+			return []Types.Card{}, err
+		}
+		id++
+	}
+	return cards, err
+}
+
+func GetAllCardsByUserId(userid string) ([]Types.Card, error) {
+	dbCards, err := Database.Query("Select * from accountcards where userid = $1", userid)
+	if err != nil {
+		return []Types.Card{}, err
+	}
+	numberOfCards, _ := strconv.Atoi(os.Getenv("NUMBER_OF_DIFFERENT_CARDS"))
+	var cards = make([]Types.Card, numberOfCards)
+	id := 0
+	for dbCards.Next() {
+		if err := dbCards.Scan(&cards[id].UserID, &cards[id].Name, &cards[id].Effect, &cards[id].DeckID, &cards[id].Count, &cards[id].Cost, &cards[id].Image, &cards[id].Threshold); err != nil {
 			return []Types.Card{}, err
 		}
 		id++
@@ -88,6 +125,25 @@ func GetFriendsByUserID(userID string) ([]Types.Friend, error) {
 
 func GetAccountByPartUsername(usernamePart string, userid string) ([]Types.Account, error) {
 	dbAccount, err := Database.Query("Select * from accounts where username ilike '%' || $1 || '%' and userid is distinct from $2 limit 10", usernamePart, userid)
+	if err != nil {
+		return []Types.Account{}, err
+	}
+	var accounts = make([]Types.Account, 10)
+	id := 0
+	for dbAccount.Next() {
+		var account Types.Account
+		if err := dbAccount.Scan(&account.UserID, &account.Username, &account.Password, &account.Email, &account.ProfilePicture, &account.Rating); err != nil {
+			return []Types.Account{}, err
+		}
+		accounts[id] = account
+		id++
+	}
+
+	return accounts, nil
+}
+
+func GetTopTenPlayers() ([]Types.Account, error) {
+	dbAccount, err := Database.Query("Select * from accounts order by rating desc limit 10")
 	if err != nil {
 		return []Types.Account{}, err
 	}

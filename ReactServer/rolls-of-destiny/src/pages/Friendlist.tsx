@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import TopAppBar from "../bars/TopAppBar";
-import {profile} from "../types/profileTypes";
+import { profile } from "../types/profileTypes";
 import '../css/Friendlist.css';
 import onlineImage from "../images/green.jpeg"
 import offlineImage from "../images/red.jpeg"
-import {authFetch} from "../auth";
-import Button from "@mui/material/Button";
-import {Modal, TextField} from "@mui/material";
+import testImage from "../soundtracks/testImage.png";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import {Modal} from "@mui/material";
+import {authFetch} from "../auth";
 
 export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     const [searchBar, setSearchBar] = useState("");

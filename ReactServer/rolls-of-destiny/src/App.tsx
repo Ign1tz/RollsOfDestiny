@@ -13,16 +13,23 @@ import testImage from "./soundtracks/testImage.png"
 import Leaderboard from "./pages/Leaderboard";
 import Friendlist from "./pages/Friendlist";
 import {authFetch} from "./auth";
+import Decks from "./pages/Decks";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
-    let p: profile = {username: "Bernd", profilePicture: testImage, rating:839}
+    let p: profile = {username: "Bernd", profilePicture: "testImage", rating:839}
     const [loggedIn, setLoggedIn] = useState<boolean> (false)
+    const [ingame, setIngame] = useState<boolean> (false)
+    const [gameInfo, setGameInfo] = useState<string> ("")
+    const [websocket, setWebsocket] = useState<WebSocket>()
     const [fetched, setFetched] = useState<boolean> (false)
 
     useEffect(() => {
-        if (localStorage.getItem("access_token")) {
+        const tempLoggedIn = sessionStorage.getItem("loggedIn")
+        if (localStorage.getItem("access_token") && tempLoggedIn !== "true") {
             authFetch("http://localhost:9090/isLoggedIn").then(response => {
                 setLoggedIn(response.status === 200)
+                sessionStorage.setItem("loggedIn", "true")
                 setFetched(true)
                 console.log("userInfo")
                 if (response.status === 200) {
@@ -35,24 +42,31 @@ function App() {
                     })
                 }
             })
+        } else {
+            setLoggedIn(tempLoggedIn === "true")
+            setFetched(true)
         }
     }, []);
 
     return (
     <>
-        {fetched && <BrowserRouter>
-            <Routes>
-                <Route index element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
-                <Route path={"/profile"} element={<Profile user={p}/>}/>
-                <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn}/>}/>
-                <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn}/>}/>
-                <Route path={"/game"} element={loggedIn ? <Game/> : <Login/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/signup" element={<SignUp/>}/>
-                <Route path="/rules" element={<Rules/>}/>
-                <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
-            </Routes>
-        </BrowserRouter>}
+        { fetched && (typeof loggedIn).toString() !== "undefined" &&
+            <BrowserRouter>
+                <Routes>
+                    <Route index element={ loggedIn ? <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/> : <LandingPage loggedIn={loggedIn || false}/>}/>
+                    <Route path={"/profile"} element={<Profile/>}/>
+                    <Route path="/leaderboard" element={<Leaderboard loggedIn={loggedIn || false}/>}/>
+                    <Route path="/friendlist" element={<Friendlist loggedIn={loggedIn || false}/>}/>
+                    <Route path={"/game" } element={loggedIn ? <Game/> : <Login/>}/>
+                    <Route path="/login" element={!loggedIn ? <Login/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route path="/signup" element={!loggedIn ? <SignUp/> : <Home loggedIn={loggedIn || false} setLoggedIn={setLoggedIn}/>}/>
+                    <Route path="/rules" element={<Rules loggedIn={loggedIn || false}/>}/>
+                    <Route path="/settings" element={loggedIn ? <Settings profile={p}/> : <Login/>}/>
+                    <Route path="/decks" element={loggedIn ? <Decks/> : <Login/>}/>
+                    <Route path="/landingpage" element={<LandingPage loggedIn={loggedIn || false}/>}/>
+                </Routes>
+            </BrowserRouter>
+        }
     </>
   );
 }
