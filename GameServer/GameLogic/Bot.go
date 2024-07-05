@@ -3,7 +3,6 @@ package GameLogic
 import (
 	"RollsOfDestiny/GameServer/Database"
 	"RollsOfDestiny/GameServer/Types"
-	"fmt"
 	"github.com/google/uuid"
 	"log"
 	"math/rand"
@@ -11,8 +10,6 @@ import (
 )
 
 func BotTurn(gameInfo Types.Resp) bool {
-
-	log.Println(gameInfo.Gameid, gameInfo.ColumnKey)
 	ended, err := PickColumn(gameInfo.Gameid, gameInfo.ColumnKey)
 
 	if err != nil {
@@ -79,10 +76,14 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 	if err == nil {
 		playfield, err := Database.GetPlayfieldByUserid(queueEntry.Userid)
 		if err != nil {
-			log.Println(err)
+			log.Println("noPlayfield", err)
 			return
 		}
-		Database.UpdatePlayerWebsocketID(queueEntry.Userid, queueEntry.WebsocketConnectionId)
+		err = Database.UpdatePlayerWebsocketID(queueEntry.Userid, queueEntry.WebsocketConnectionId)
+		if err != nil {
+			log.Println("websocketUpdate", err)
+			return
+		}
 		var msg = make(map[string]string)
 		msg["id"] = queueEntry.WebsocketConnectionId
 		newMessage := `{"gameid": "` + playfield.GameID + `", "YourInfo":` + playfield.Host.ToJson(true) + `, "EnemyInfo": ` + playfield.Guest.ToJson(false) + `, "ActivePlayer": {"active": true, "roll": "` + playfield.LastRoll + `"}}`
@@ -160,7 +161,7 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 		Mana:                  0,
 		Deck:                  Types.Deck{},
 		Die:                   Types.Die{PossibleThrows: []int{1, 2, 3, 4, 5, 6}},
-		WebsocketConnectionID: "",
+		WebsocketConnectionID: uuid.New().String(),
 		Grid:                  guestGrid,
 	}
 
@@ -176,7 +177,6 @@ func BotStartGame(queueEntry Types.BotResp, c2 *chan map[string]string) {
 
 	err = Database.InsertWholeGame(playfield)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 	var msg = make(map[string]string)

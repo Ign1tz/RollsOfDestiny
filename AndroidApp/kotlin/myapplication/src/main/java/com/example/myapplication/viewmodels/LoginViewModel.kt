@@ -28,15 +28,16 @@ import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.basic
 import io.ktor.client.plugins.auth.providers.bearer
 import okhttp3.Credentials.basic
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 
-class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
+class LoginViewModel(val repository: Repository, val IPADDRESS: String) : ViewModel(), BasicViewModel {
 
 
-    val IPADDRESS = "10.0.0.2"
 
 
     suspend private fun loginRequest(userName: String, password: String): Boolean {
-        var client = HttpClient(CIO) {
+        val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
@@ -120,5 +121,4 @@ class LoginViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         }
         return worked
     }
-
 }

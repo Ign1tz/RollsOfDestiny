@@ -11,7 +11,7 @@ class RollsofDestiny : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RollsofDestinyAppTheme {
+            RollsofDestinyAppTheme(darkTheme = false) {
                 Navigation()
             }
         }

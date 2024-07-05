@@ -63,6 +63,5 @@ func DatabaseTest() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("Version: %s\n", result)
 	}
 }

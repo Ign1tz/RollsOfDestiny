@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import TopAppBar from "../bars/TopAppBar";
-import {profile} from "../types/profileTypes";
+import { profile } from "../types/profileTypes";
 import '../css/Friendlist.css';
 import onlineImage from "../images/green.jpeg"
 import offlineImage from "../images/red.jpeg"
-import {authFetch} from "../auth";
-import Button from "@mui/material/Button";
-import {Modal, TextField} from "@mui/material";
+import testImage from "../soundtracks/testImage.png";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import {Modal} from "@mui/material";
+import {authFetch} from "../auth";
 
 export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     const [searchBar, setSearchBar] = useState("");
@@ -23,7 +25,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
 
     function submitSearchBar() {
         // for connecting with backend
-        authFetch("http://menews.site:9090/getAccounts?username=" + searchBar).then(r => {
+        authFetch("http://10.0.0.2:9090/getAccounts?username=" + searchBar).then(r => {
             if (r.status === 200) {
                 r.json().then(r => {
                     console.log(r)
@@ -41,7 +43,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
     }
 
     const addToFriendlist = (username: string) => {
-        authFetch("http://menews.site:9090/addFriend", {
+        authFetch("http://10.0.0.2:9090/addFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -53,7 +55,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
 
     useEffect(() => {
             console.log("test")
-            authFetch("http://menews.site:9090/getFriends").then(response => {
+            authFetch("http://10.0.0.2:9090/getFriends").then(response => {
                 console.log(response); return response.json()
             }).then(response => {
                 console.log(response)
@@ -71,7 +73,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
         window.location.reload();
     };
     const removeFromFriendlist = (username: string) => {
-        authFetch("http://menews.site:9090/removeFriend", {
+        authFetch("http://10.0.0.2:9090/removeFriend", {
             method: "POST",
             headers: {
                 'Accept': 'application/json, text/plain',
@@ -127,7 +129,7 @@ export default function Friendlist({loggedIn}: { loggedIn: boolean }) {
                     {users.map((user, index) => (
                         <li key={index} className="friendlist-item">
                             <div className="friendlist-image-info">
-                                <img src={user.profilePicture} alt={user.username} className="leaderboard-picture"/>
+                                <img src={"data:image/jpeg;base64," + user.profilePicture} alt={user.username} className="leaderboard-picture"/>
                                 <div className="friendlist-info">
                                     <h2 className="friendlist-username">{user.username}</h2>
                                     <p className="friendlist-rating">Rating: {user.rating}</p>

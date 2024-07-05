@@ -7,10 +7,16 @@ import {profile} from "../types/profileTypes";
 import "../css/Game.css";
 import React, {useEffect, useState} from "react";
 import background_music from "../soundtracks/background_music.mp3";
+import diceSound from "../soundtracks/dice-95077.mp3"
 import ReactAudioPlayer from "react-audio-player";
 import background from "../images/game.jpg";
-import testImage from "../images/1.png";
-import {endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
+import cardBack from "../images/cardBack.jpg"
+import {activePlayer, card, endResults, enemyInfo, messageBody, yourInfo} from "../types/gameTypes";
+import VolumeSlider from "../components/VolumeSlider";
+import destroyColumnCard from "../cards/destroy_column.png"
+import doubleManaCard from "../cards/double_mana.png"
+import rollAgainCard from "../cards/roll_again.png"
+import flipClockwiseCard from "../cards/rotate_grid.png"
 
 
 export default function Game() {
@@ -20,7 +26,7 @@ export default function Game() {
     if (!startGameInfo) {
         startGameInfo = '{"gameid": "", "YourInfo": { "WebsocketId": "", "Username": "Host"}, "EnemyInfo": { "WebsocketId":"", "Username": ""}}'
     }
-    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://menews.site:8080/ws'))
+    const [websocket, setWebsocket] = useState<WebSocket>(new WebSocket('ws://10.0.0.2:8080/ws'))
     const [websocketId, setWebsocketId] = useState("")
     const [connected, setConnected] = useState(false)
     const [userID, setUserID] = useState("")
@@ -35,34 +41,50 @@ export default function Game() {
     const [enemyInfo, setEnemyInfo] = useState<enemyInfo | null>(null)
     const [gameEnded, setGameEnded] = useState(false)
     const [endResults, setEndResults] = useState<endResults | null>()
+    const [volume, setVolume] = useState<number>(30);
+    const [reroll, setReroll] = useState(false)
 
+    window.onbeforeunload = () =>{
+        let userinfo = sessionStorage.getItem("userInfo")
+        if (userinfo) {
+            console.log("test")
+            const response = fetch("http://10.0.0.2:8080/deleteQueue", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+        websocket.close()
+    }
 
     const togglePause = () => {
         setIsPaused(!isPaused);
     };
 
     const handleQuit = () => {
-        websocket.send(JSON.stringify({type:"surrender", message: {}, gameId: gameId}))
+        websocket.send(JSON.stringify({type: "surrender", message: "", gameId: gameId, userid: userID}))
         window.location.href = "/";
     };
-
-
-    let volume = sessionStorage.getItem("volume");
-    let masterVolume = .30
-    if (volume) {
-        masterVolume = parseInt(volume) / 100
-    }
-
 
     const toggleSurrender = () => {
         setConfirmSurrender(!confirmSurrender)
     };
 
     const [player1, setPlayer1] = useState<profile>({
-        username: "Lukas",
+        username: "",
         rating: 3450913,
-        profilePicture: testImage
+        profilePicture: "testImage"
     })
+
     const [player2, setPlayer2] = useState<profile>({
         username: "default",
         rating: 0,
@@ -78,7 +100,16 @@ export default function Game() {
             setPlayer2(JSON.parse(user))
             setUserID(JSON.parse(user).userid)
         }
+
+        setVolume(Number(sessionStorage.getItem("volume")) || 30)
+
     }, []);
+
+
+    useEffect(() => {
+        console.log(volume)
+    }, [volume]);
+
 
     useEffect(() => {
         console.log(websocket)
@@ -93,6 +124,8 @@ export default function Game() {
             console.log("queuing websocket")
             if (sessionStorage.getItem("GameType") === "bot") {
                 startBot()
+            } else if (sessionStorage.getItem("GameType") === "Friend") {
+                queueForGameWithFriend()
             } else {
                 queueForGame()
             }
@@ -108,7 +141,7 @@ export default function Game() {
             if (message.info == "connected") {
                 console.log("connected")
                 setConnected(true)
-                websocket.send(JSON.stringify({type: "id"}))
+                websocket.send(JSON.stringify({type: "id", message: "", gameId: "", userid: ""}))
             } else if (message.info == "id") {
                 console.log("id:", message.message.id)
                 setWebsocketId(message.message.id)
@@ -126,16 +159,24 @@ export default function Game() {
                 setGameInfo(message.message.gameInfo)
                 setGameEnded(true)
                 setEndResults(message.message.endResults)
+            } else if (message.info === "rollAgain") {
+                let newActivePlayer: activePlayer = {active: message.message.active, roll: message.message.roll}
+                setGameInfo(prev => ({...prev, ActivePlayer: newActivePlayer}))
+                setRolled(false)
             }
         }
     }
 
     const handleColumnClick = (key: number) => {
         console.log("handleColumnClicK", connected)
-        if (websocket && connected && gameInfo){
+        if (websocket && connected && gameInfo) {
             console.log(gameId)
             setPlaced(true)
-            websocket.send(JSON.stringify({type: sessionStorage.getItem("GameType") + "PickColumn", messageBody: key.toString(), gameId: gameId}))
+            websocket.send(JSON.stringify({
+                type: sessionStorage.getItem("GameType") + "PickColumn",
+                messageBody: key.toString(),
+                gameId: gameId, userid: userID
+            }))
         }
     };
 
@@ -143,14 +184,39 @@ export default function Game() {
         let userinfo = sessionStorage.getItem("userInfo")
         if (userinfo) {
             console.log("test")
-            const response = await fetch("http://menews.site:8080/queue", {
+            const response = await fetch("http://10.0.0.2:8080/queue", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    userid: JSON.parse(userinfo).userid, websocketconnectionid: websocketId, username: JSON.parse(userinfo).username
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username
+                })
+            });
+        } else {
+            window.location.href = "/login"
+        }
+    }
+
+    async function queueForGameWithFriend() {
+        let userinfo = sessionStorage.getItem("userInfo")
+        console.log(JSON.parse(userinfo || ""))
+        if (userinfo) {
+            console.log("test")
+            const response = await fetch("http://10.0.0.2:8080/queueFroGameWithFriend", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json, text/plain',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    userid: JSON.parse(userinfo).userid,
+                    websocketconnectionid: websocketId,
+                    username: JSON.parse(userinfo).username,
+                    FriendId: sessionStorage.getItem("FriendId") || ""
                 })
             });
         } else {
@@ -162,7 +228,7 @@ export default function Game() {
         let userinfo = sessionStorage.getItem("userInfo")
         if (userinfo) {
             console.log("test")
-            const response = await fetch("http://menews.site:8080/startBot", {
+            const response = await fetch("http://10.0.0.2:8080/startBot", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json, text/plain',
@@ -195,11 +261,13 @@ export default function Game() {
     }
 
     useEffect(() => {
+        console.log(gameInfo)
         if (gameInfo.ActivePlayer) {
             console.log(gameInfo.ActivePlayer.active)
             if (gameInfo.ActivePlayer.active) {
-                console.log("setFalse")
-                setRolled(false)
+                console.log("setting", placed,  reroll)
+                setRolled(reroll)
+                setReroll(false)
                 setPlaced(false)
             } else {
                 setRolled(true)
@@ -216,26 +284,63 @@ export default function Game() {
         console.log(rolled)
     }, [rolled])
 
+    // testing purposes
+
+    type CardType = {
+        name: string,
+        mana: number,
+        image: string,
+        description: string
+    };
+
+    let cards: CardType[] = [
+        {
+            name: "Destroy Column",
+            mana: 7,
+            image: destroyColumnCard,
+            description: "Destroy a column from your opponent."
+        },
+        {name: "Double Mana", mana: 8, image: doubleManaCard, description: "You get double mana."}
+    ];
+
+    function playCard(card: card) {
+        setReroll(card.name !== "Roll Again")
+        websocket.send(JSON.stringify({type: "playCard", messageBody: card.cardid, gameId: gameId, userid: userID}))
+    }
+
+    function getCardPicture(card: card) {
+        switch (card.name) {
+            case "Roll Again":
+                return rollAgainCard
+            case "Double Mana":
+                return  doubleManaCard
+            case "Destroy Column":
+                return  destroyColumnCard
+            case "Flip Clockwise":
+                return flipClockwiseCard
+        }
+    }
+
+    function playSoundEffect() {
+        var snd = new Audio(diceSound); // buffers automatically when created
+        snd.play();
+    }
+
     return (
         <>
             <ReactAudioPlayer
                 src={background_music}
                 autoPlay={true}
                 loop={true}
-                volume={masterVolume}
+                volume={volume / 100}
             />
             <div className="gameDivision" style={{
                 backgroundImage: `url(${background})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                height: '100%',
+                height: '100vh',
                 width: '100%'
             }}>
-                <div className="header">
-                    <Button variant="contained" onClick={togglePause}>
-                        Pause
-                    </Button>
-                </div>
                 <div className="content">
                     <Modal open={gameEnded}>
                         <div className="pauseMenu">
@@ -264,11 +369,9 @@ export default function Game() {
                     <Modal open={isPaused} onClose={togglePause}>
                         <div className="pauseMenu">
                             <h2>Pause Menu</h2>
+                            <VolumeSlider volume={volume} setVolume={setVolume}/>
                             <Button variant="contained" onClick={togglePause}>
                                 Continue playing
-                            </Button>
-                            <Button variant="contained" onClick={() => console.log("Go to Settings")}>
-                                Settings
                             </Button>
                             <Button variant="contained" onClick={() => {
                                 toggleSurrender();
@@ -278,18 +381,30 @@ export default function Game() {
                             </Button>
                         </div>
                     </Modal>
-                    <div className="playerSection">
+                    <div className={"opponentAndCards"}>
+                        <div className={"opponentCards"}>
+                            {(typeof enemyInfo).toString() != null &&
+                                Array.from({length: enemyInfo?.deck.inHand || 0}, (_, k) => (
+                                    <div className={"specificOpponentCard"}>
+                                        <img src={cardBack} alt={"card image"}/>
+                                    </div>
+                                ))
+                            }
+                        </div>
                         <div className="playerInfoOpp">
                             <div className="score">
-                                <p>Score: <span id="player1Score">{player1Score}</span></p>
+                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
+                                <h3>Mana : {enemyInfo?.mana || "0"}</h3>
                             </div>
                             <div className="playerInfoUsernameRating">
-                                <h2>{player1.username + " (Opponent)"}</h2>
+                                <h2>{player1.username}</h2>
                                 <p>Rating: {player1.rating}</p>
-                                <p>Score: <span id="player1Score">{enemyInfo ? enemyInfo?.Score : 0}</span></p>
                             </div>
                             <img src={player1.profilePicture} alt={player1.username}/>
                         </div>
+                    </div>
+                    <div className="playerSection">
+
                         <div className="playerActions">
                             <div className="playerCards">
                                 <h3>Deck </h3>
@@ -305,13 +420,21 @@ export default function Game() {
                             </div>
                         </div>
                     </div>
-                    <div className="divider"></div>
+                    <div className={"dividerAndPauseButton"}>
+                        <div className="divider"></div>
+                        <Button variant="contained" color="secondary" onClick={togglePause}
+                                style={{marginLeft: "10px", marginRight: "10px"}}>
+                            Pause
+                        </Button>
+                        <div className="divider"></div>
+                    </div>
                     <div className="playerSection">
                         <div className="playerActions">
                             <div className="diceWrapper">
-                                <Dice onRoll={(value) => {
+                                <Dice sound={diceSound} onRoll={(value) => {
                                     console.log(value);
                                     setRolled(true)
+                                    websocket.send(JSON.stringify({type: "rolled", message: "", gameId: gameId, userid: userID}))
                                 }} defaultValue={6} size={100}
                                       cheatValue={gameInfo.ActivePlayer ? parseRoll(gameInfo?.ActivePlayer.roll) : undefined}
                                       disabled={(gameInfo.ActivePlayer ? !gameInfo?.ActivePlayer.active : true) || rolled}/>
@@ -325,15 +448,31 @@ export default function Game() {
                                 <SimpleBox diceValue={null}/>
                             </div>
                         </div>
+
+                    </div>
+                    <div className={"playerAndCards"}>
                         <div className="playerInfo">
-                            <img src={player2.profilePicture} alt={player2.username}/>
+                            <img src={"data:image/jpeg;base64," + sessionStorage.getItem("profilePicture")}
+                                 alt={player2.username}/>
                             <div className="playerInfoUsernameRating">
-                                <h2>{player2.username + " (You)"}</h2>
+                                <h2>{player2.username}</h2>
                                 <p>Rating: {player2.rating}</p>
                             </div>
                             <div className="score">
+                                <h3>Mana : {yourInfo?.mana || "0"}</h3>
                                 <p>Score: <span id="player2Score">{yourInfo ? yourInfo?.Score : 0}</span></p>
                             </div>
+                        </div>
+                        <div className={"playerOwnCards"}>
+                            {(typeof yourInfo).toString() != null && yourInfo?.deck.inHand.map((card) => (
+                                <div className={"specificPlayerCard"} onClick={() => {
+                                    if ((gameInfo.ActivePlayer ? gameInfo?.ActivePlayer.active : false)) {
+                                        playCard(card)
+                                    }
+                                }}>
+                                    <img src={getCardPicture(card)} alt={"card image"}/>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

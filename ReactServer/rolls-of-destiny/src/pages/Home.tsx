@@ -18,19 +18,6 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     const [connected, setConnected] = useState(false)
     const [websoketId, setWebsoketId] = useState("")
 
-    const users: profile[] = [
-        { username: "Bernd", rating: 839, profilePicture: testImage},
-        { username: "Anna", rating: 902, profilePicture: testImage},
-        { username: "Carlos", rating: 756, profilePicture: "https://via.placeholder.com/100"},
-        { username: "Diana", rating: 820, profilePicture: testImage},
-        { username: "Edward", rating: 890, profilePicture: "https://via.placeholder.com/100"}
-    ];
-
-    const [searchBar, setSearchBar] = useState("");
-    const [searchResults, setSearchResults] = useState<profile[]>([]);
-    const [resultsFound, setResultsFound] = useState(false);
-    const [noResultsFound, setNoResultsFound] = useState(false);
-
 
     const relocate = () => {
         window.location.href = "/profile";
@@ -38,13 +25,14 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
     };
 
     useEffect(() => {
-        if (localStorage.getItem("access_token")) {
+        if (localStorage.getItem("access_token") != "") {
             console.log("Access token", localStorage.getItem("access_token"));
-            authFetch("http://menews.site:9090/userInfo").then(r => {
+            authFetch("http://10.0.0.2:9090/userInfo").then(r => {
 
                 return r.json()
             }).then(response => {
                 sessionStorage.setItem("userInfo", JSON.stringify(response))
+                sessionStorage.setItem("profilePicture", response.profilePicture)
             })
         }
     }, []);
@@ -53,9 +41,7 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
         if (playOpened) {
             return (
                 <>
-                    <HomeScreenButtonGroup setPlayOpened={setPlayOpened}
-                                           playOpened={playOpened}
-                                           />
+                    <HomeScreenButtonGroup/>
                 </>
             );
         } else {
@@ -64,9 +50,6 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
             )
         }
     }
-
-
-
 
 
     return (
@@ -85,10 +68,9 @@ export default function Home({loggedIn, setLoggedIn}: { loggedIn: boolean, setLo
                         <p className={"contributor"}><Link to={"https://github.com/Sweisser7"}>Simon Weisser</Link></p>
                     </div>
                     <div className="homeButtons">
-                        {visibleButtons()}
+                        <HomeScreenButtonGroup/>
                     </div>
                 </div>
-                
             </div>
         </>
     );

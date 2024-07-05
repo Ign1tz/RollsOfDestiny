@@ -1,20 +1,19 @@
 package com.example.myapplication.viewmodels
 
+import android.app.Application
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.R
 import com.example.myapplication.connection.websocket.WebSocketClient
 import com.example.myapplication.localdb.Repository
-import com.example.myapplication.types.ActivePlayer
+import com.example.myapplication.localdb.User
 import com.example.myapplication.types.EndResults
-import com.example.myapplication.types.EndResultsBody
-import com.example.myapplication.types.enemyInfo
-import com.example.myapplication.types.yourInfo
-import com.example.myapplication.types.gameInfo
 import com.example.myapplication.types.gameMessageBody
 import com.example.myapplication.types.idMessageBody
 import com.example.myapplication.types.message
@@ -34,7 +33,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import java.net.URI
 
-class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
+class GameViewModel(val repository: Repository, val IPADDRESS: String) : ViewModel(),
+    BasicViewModel {
 
     var connected = mutableStateOf(false)
     var WebSocketClient: WebSocketClient? = null
@@ -44,14 +44,22 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
     var isActive = mutableStateOf(false)
     var hasRolled = mutableStateOf(false)
     var pickedColumn = mutableStateOf(false)
-    var user by mutableStateOf(repository.getUser())
     var roll = mutableStateOf(false)
     var started = mutableStateOf(false)
     var GameType = mutableStateOf("")
+    var FriendId = mutableStateOf("")
 
-    private val IPADDRESS = "10.0.0.2"
+    fun getUser(): User? {
+        val user = repository.getUser()
+        try {
+            user.userName
+            return user
+        } catch (e: Exception) {
+            return null
+        }
+    }
 
-    fun resetAllValues () {
+    fun resetAllValues() {
         connected.value = false
         WebSocketClient = null
         WebsocketId.value = ""
@@ -62,10 +70,12 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         pickedColumn.value = false
         roll.value = false
         started.value = false
+        FriendId.value = ""
     }
 
 
     fun websocket(): WebSocketClient? {
+       // resetAllValues()
         if (connected.value && started.value) {
             return null
         }
@@ -75,7 +85,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         Log.d("bot?3", GameType.value)
         val serverUri = URI("http://$IPADDRESS:8080/ws")
         Log.d("bot?4", GameType.value)
-        val botOrNot = GameType.value == "bot"
+        val gameType = GameType.value
         val webSocketClient = WebSocketClient(serverUri) { message ->
             // display incoming message in ListView
             Log.d("websocket", message)
@@ -90,9 +100,12 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
                 val idBody: idMessageBody = Json.decodeFromString(msg.message)
                 WebsocketId.value = idBody.id
                 runBlocking {
-                    if (botOrNot){
+                    Log.d("GameType", gameType)
+                    if (gameType == "bot") {
                         botRequest()
-                    }else {
+                    } else if (gameType == "Friend") {
+                        queueForGameWithFriendsRequest()
+                    } else {
                         queueRequest()
                     }
                 }
@@ -106,6 +119,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
                     pickedColumn.value = false
                 }
             } else if (msg.info == "gameEnded") {
+
                 val gameInfoJson = Json.parseToJsonElement(msg.message).jsonObject
                 gameInfo =
                     Json.decodeFromString<gameMessageBody>(gameInfoJson["gameInfo"]!!.toString())
@@ -118,7 +132,7 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
         if (!connected.value && started.value) {
             webSocketClient.connectBlocking()
         }
-        webSocketClient.sendMessage("{\"type\": \"id\"}")
+        webSocketClient.sendMessage("{\"type\": \"id\", \"message\": \"\", \"gameId\": \"\", \"userid\": \"\"}")
         WebSocketClient = webSocketClient
         return webSocketClient
     }
@@ -144,6 +158,81 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
                 contentType(ContentType.Application.Json)
                 setBody("{\"userid\":\"${userInfo.userid}\", \"websocketconnectionid\":\"${WebsocketId.value}\", \"username\":\"${userInfo.userName}\"}")
             }
+
+            if (responseText.status.value != 200) {
+                return false
+            }
+
+            client.close()
+            return true
+        } catch (e: Exception) {
+            Log.d("HttpTest", "Received error: ${e.message}")
+        }
+        return false
+    }
+
+    fun remove(){
+        viewModelScope.launch { removeQueueRequest() }
+    }
+
+    suspend private fun removeQueueRequest(): Boolean {
+        Log.d("websocket", "ququeing")
+
+        val userInfo = repository.getUser()
+
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+        }
+
+        try {
+            val responseText: HttpResponse = client.post("http://$IPADDRESS:8080/deleteQueue") {
+                contentType(ContentType.Application.Json)
+                setBody("{\"userid\":\"${userInfo.userid}\", \"websocketconnectionid\":\"${WebsocketId.value}\", \"username\":\"${userInfo.userName}\"}")
+            }
+
+            if (responseText.status.value != 200) {
+                return false
+            }
+
+            client.close()
+            return true
+        } catch (e: Exception) {
+            Log.d("HttpTest", "Received error: ${e.message}")
+        }
+        return false
+    }
+
+
+    suspend private fun queueForGameWithFriendsRequest(): Boolean {
+        Log.d("friendQueue", "Friend ququeing")
+
+        val userInfo = repository.getUser()
+        Log.d("websocket", userInfo.userName)
+
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys =
+                        true // Useful if the JSON has more fields than the data class
+                })
+            }
+        }
+
+        try {
+            val responseText: HttpResponse =
+                client.post("http://$IPADDRESS:8080/queueFroGameWithFriend") {
+                    contentType(ContentType.Application.Json)
+                    setBody("{\"userid\":\"${userInfo.userid}\", \"websocketconnectionid\":\"${WebsocketId.value}\", \"username\":\"${userInfo.userName}\", \"FriendId\":\"${FriendId.value.replace(" ","")}\"}")
+                }
 
             if (responseText.status.value != 200) {
                 return false
@@ -197,4 +286,23 @@ class GameViewModel(val repository: Repository) : ViewModel(), BasicViewModel {
             hasRolled.value = true
         }
     }
+
+    fun getCardList(): List<Card> {
+        val cards = listOf("Destroy Column", "Double Mana", "Roll Again", "Flip Clockwise")
+        return cards.map { name -> Card(name, getCardImageById(name)) }
+    }
+
+    fun getCardImageById(cardName: String): Int {
+        return when (cardName) {
+            "Destroy Column" -> R.drawable.destroy_column_app
+            "Double Mana" -> R.drawable.double_mana_app
+            "Roll Again" -> R.drawable.roll_again_app
+            "Flip Clockwise" -> R.drawable.rotate_grid_app
+            else -> R.drawable.double_mana_app
+        }
+    }
+
+
 }
+
+data class Card(val cardName: String, val cardImageId: Int)
